@@ -2,21 +2,20 @@ import { Router } from "express";
 import MockController from "../controllers/mock.controller";
 
 class MockRoutes {
-	router = Router();
+    router = Router();
 
-	constructor() {
-		this.initializeRoutes();
-	}
+    constructor() {
+        this.initializeRoutes();
+    }
 
-	initializeRoutes() {
-		this.router.get("/helloworld", MockController.helloWorld);
-		this.router.get(
-			"/helloworld/:count",
-			MockController.multipleHelloWorld
-		);
-		this.router.get("/mockdata", MockController.retrieveMockData);
-		this.router.get("/theaters", MockController.getTheaters);
-	}
+    initializeRoutes() {
+        this.router.get("/helloworld", MockController.helloWorld);
+        this.router.get(
+            "/helloworld/:count",
+            MockController.multipleHelloWorld
+        );
+        this.router.get("/mockdata", MockController.retrieveMockData);
+    }
 }
 
 export default new MockRoutes().router;
