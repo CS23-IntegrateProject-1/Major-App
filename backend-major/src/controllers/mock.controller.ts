@@ -27,6 +27,11 @@ class MockController implements IMockController {
 		const data = await MockService.mockData();
 		res.status(200).send(data);
 	}
+
+	async getTheaters(req: Request, res: Response): Promise<void> {
+		const data = await MockService.getTheaters();
+		res.status(200).send(data);
+	}
 }
 
 export default new MockController();
