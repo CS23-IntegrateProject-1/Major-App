@@ -25,6 +25,7 @@ class MockService implements IMockService {
 	async getTheaters(): Promise<any[]> {
 		const prisma = new PrismaClient();
 		return await prisma.theaters.findMany();
+		
 	}
 }
 
