@@ -2,10 +2,11 @@ import {
   Box,
   Flex,
   // Heading,
+  Text,
   IconButton,
   useDisclosure,
 } from "@chakra-ui/react";
-import { HamburgerIcon} from "@chakra-ui/icons";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import { NavbarContent } from "./NavbarContent";
 import { useLocation } from "react-router-dom";
 import { getPageTitle } from "../../functions/getPageTitle";
@@ -43,7 +44,9 @@ export const Navbar = () => {
         />
       )}
 
-      <Box color="white">{pageTitle}</Box>
+      <Box color="white">
+        <Text fontWeight="bold">{pageTitle}</Text>
+      </Box>
       <IconButton
         aria-label="Notification Page"
         variant={"unstyled"}

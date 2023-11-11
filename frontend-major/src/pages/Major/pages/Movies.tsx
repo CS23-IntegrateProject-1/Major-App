@@ -1,38 +1,63 @@
+import React, { useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
-import { useState } from "react";
 
 const MoviePage = () => {
-  const [isHovered, setIsHovered] = useState(false);
+  const [isNowShowingHovered, setIsNowShowingHovered] = useState(false);
+  const [isComingSoonHovered, setIsComingSoonHovered] = useState(false);
 
   const linkStyles = {
-    ...TextStyle.h3,
-    color: isHovered ? "#d2aa5a" : "white", // Color changes on hover
+    ...TextStyle.h1,
     textDecoration: "none",
     transition: "color 0.3s ease",
-    padding: "2vh",
-  }
-  const handleMouseOver = () => {
-    setIsHovered(true);
+    paddingRight: "3rem",
   };
 
-  const handleMouseOut = () => {
-    setIsHovered(false);
+  const nowShowingStyles = {
+    ...linkStyles,
+    color: isNowShowingHovered ? "#d2aa5a" : "white",
   };
 
+  const comingSoonStyles = {
+    ...linkStyles,
+    color: isComingSoonHovered ? "#d2aa5a" : "white",
+  };
+
+  const handleNowShowingMouseOver = () => {
+    setIsNowShowingHovered(true);
+  };
+
+  const handleNowShowingMouseOut = () => {
+    setIsNowShowingHovered(false);
+  };
+
+  const handleComingSoonMouseOver = () => {
+    setIsComingSoonHovered(true);
+  };
+
+  const handleComingSoonMouseOut = () => {
+    setIsComingSoonHovered(false);
+  };
 
   return (
-    <Box>
+    <Box display="flex" justifyContent="center" textAlign="center">
       <a
         href="/Movie"
-        style={linkStyles}
-        onMouseOver={handleMouseOver}
-        onMouseOut={handleMouseOut}
+        style={nowShowingStyles}
+        onMouseOver={handleNowShowingMouseOver}
+        onMouseOut={handleNowShowingMouseOut}
       >
         Now Showing
       </a>
+      <a
+        href="/ComingSoon"
+        style={comingSoonStyles}
+        onMouseOver={handleComingSoonMouseOver}
+        onMouseOut={handleComingSoonMouseOut}
+      >
+        Coming Soon
+      </a>
     </Box>
-    
   );
 };
 
