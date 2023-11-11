@@ -17,6 +17,10 @@ const colors = {
     300: "#A0AEC0", // grey input
     400: "#242325", // dark grey
   },
+  major: {
+    100: "linear-gradient(24deg, rgba(112,0,37,1) 0%, rgba(19,19,60,1) 33%, rgba(0,0,0,1) 68%)", // dark accent -> ex. color={"brand.100"}
+    200: "linear-gradient(164deg, rgba(122,12,49,1) 0%, rgba(30,9,35,1) 37%, rgba(11,11,35,1) 53%, rgba(0,0,0,1) 76%)",
+  },
   red: "#C83333", // red -> ex. color={"red"}
 } as const;
 

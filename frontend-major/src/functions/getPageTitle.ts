@@ -4,10 +4,10 @@ export const getPageTitle = (pathname: string) => {
   switch (pathname) {
 
     //feature 9
-    case "/membership":
-      return "Membership";
-    case "/membership/my-privileges":
-        return "Privileges";
+    case "/Movie" :
+      return "MOVIES";
+    case "/Cinema":
+        return "CINEMAS";
     // more later...
     default:
       return "Harmoni";

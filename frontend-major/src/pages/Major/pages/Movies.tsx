@@ -29,7 +29,7 @@ const MoviePage = () => {
         onMouseOver={handleMouseOver}
         onMouseOut={handleMouseOut}
       >
-        NOW SHOWING
+        Now Showing
       </a>
     </Box>
     
