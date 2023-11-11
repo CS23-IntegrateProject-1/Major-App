@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
+import { MovieCard } from "../../../components/movieCard/moviecard";
 
 const MoviePage = () => {
   const [isNowShowingHovered, setIsNowShowingHovered] = useState(false);
@@ -47,17 +48,18 @@ const MoviePage = () => {
         onMouseOver={handleNowShowingMouseOver}
         onMouseOut={handleNowShowingMouseOut}
       >
-        Now Showing
-      </a>
-      <a
-        href="/ComingSoon"
-        style={comingSoonStyles}
-        onMouseOver={handleComingSoonMouseOver}
-        onMouseOut={handleComingSoonMouseOut}
-      >
-        Coming Soon
-      </a>
-    </Box>
+            Now Showing
+          </a>
+          <a
+            href="/ComingSoon"
+            style={comingSoonStyles}
+            onMouseOver={handleComingSoonMouseOver}
+            onMouseOut={handleComingSoonMouseOut}
+          >
+            Coming Soon
+          </a>
+          <MovieCard />
+        </Box>
   );
 };
 
