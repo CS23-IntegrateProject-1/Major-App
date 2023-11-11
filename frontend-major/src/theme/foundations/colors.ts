@@ -22,6 +22,7 @@ const colors = {
     200: "linear-gradient(164deg, rgba(122,12,49,1) 0%, rgba(30,9,35,1) 37%, rgba(11,11,35,1) 53%, rgba(0,0,0,1) 76%)",
   },
   red: "#C83333", // red -> ex. color={"red"}
+  gold: "#d2aa5a",
 } as const;
 
 export type Colors = typeof colors;

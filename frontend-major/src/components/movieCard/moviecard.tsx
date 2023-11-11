@@ -1,5 +1,8 @@
 import React, { useState } from "react";
 import { Card, Image, Button, CardFooter, CardBody } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import { Text, Box } from "@chakra-ui/react";
 
 export const MovieCard = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -16,6 +19,7 @@ export const MovieCard = () => {
   const posterHeight = "300px"; // Replace with your desired movie poster height
 
   return (
+    <Box>
     <Card
       maxW={posterWidth}
       maxH={posterHeight}
@@ -44,9 +48,11 @@ export const MovieCard = () => {
           bg="rgba(0, 0, 0, 0.67)"
           transition="color 0.3s ease"
         >
-          <CardBody>Helloajfaijfiajfapof</CardBody>
+          <CardBody color={"white"}>Helloajfaijfiajfapof</CardBody>
           <CardFooter>
-            <Button
+            {/* <Link to={`/movies/${movie.id}`}> */}
+            <NavLink to = "/MovieInfo">
+            <Button 
               variant="solid"
               color="WhiteAlpha.800"
               size="xs"
@@ -54,9 +60,12 @@ export const MovieCard = () => {
             >
               MORE INFO
             </Button>
+            </NavLink>
+            {/* </Link> */}
           </CardFooter>
         </Card>
       )}
     </Card>
+    </Box>
   );
 };

@@ -23,6 +23,7 @@ export const NavbarContent: FC<NavbarContentProps> = ({
       title: "CINEMAS",
       to: "/Cinema",
     },
+  
   ];
   return (
     <Slide direction="top" in={isOpen} unmountOnExit style={{ zIndex: 10 }}>

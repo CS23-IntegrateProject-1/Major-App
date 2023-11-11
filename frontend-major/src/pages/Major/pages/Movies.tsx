@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { MovieCard } from "../../../components/movieCard/moviecard";
+import { NavLink } from "react-router-dom";
 
 const MoviePage = () => {
   const [isNowShowingHovered, setIsNowShowingHovered] = useState(false);
@@ -11,7 +12,8 @@ const MoviePage = () => {
     ...TextStyle.h1,
     textDecoration: "none",
     transition: "color 0.3s ease",
-    paddingRight: "3rem",
+    padding: "2rem",
+    color: "white", // Default color
   };
 
   const nowShowingStyles = {
@@ -41,7 +43,7 @@ const MoviePage = () => {
   };
 
   return (
-    <Box display="flex" justifyContent="center" textAlign="center">
+    <Box  justifyContent="center" textAlign="center" alignItems="center">
       <a
         href="/Movie"
         style={nowShowingStyles}
