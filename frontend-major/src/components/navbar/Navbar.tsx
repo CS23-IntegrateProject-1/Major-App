@@ -2,10 +2,11 @@ import {
   Box,
   Flex,
   // Heading,
+  Text,
   IconButton,
   useDisclosure,
 } from "@chakra-ui/react";
-import { HamburgerIcon,ArrowBackIcon } from "@chakra-ui/icons";
+import { HamburgerIcon } from "@chakra-ui/icons";
 import { NavbarContent } from "./NavbarContent";
 import { useLocation } from "react-router-dom";
 import { getPageTitle } from "../../functions/getPageTitle";
@@ -24,7 +25,7 @@ export const Navbar = () => {
       alignItems={"center"}
       height="70px"
       padding={"1em"}
-      bg={"brand.400"}
+      bg={"major.100"}
       shadow={"md"}
     >
       {location.pathname === "/" ? (
@@ -33,17 +34,19 @@ export const Navbar = () => {
         <IconButton
           aria-label="Notification Page"
           variant={"unstyled"}
-          icon={
-            <ArrowBackIcon
-              width={"24px"}
-              height={"24px"}
-              // onClick={handleOpenNav}
-            />
-          }
+          // icon={
+          //   <ArrowBackIcon
+          //     width={"24px"}
+          //     height={"24px"}
+          //     // onClick={handleOpenNav}
+          //   />
+          // }
         />
       )}
 
-      <Box color="white">{pageTitle}</Box>
+      <Box color="white">
+        <Text fontWeight="bold">{pageTitle}</Text>
+      </Box>
       <IconButton
         aria-label="Notification Page"
         variant={"unstyled"}
