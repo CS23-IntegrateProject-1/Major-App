@@ -16,6 +16,7 @@ model Films {
   duration    Int
   posterImg   String      @db.VarChar(100)
   rate        Int
+  language    String?     @db.VarChar(2)
   Shows       Shows[]
 }
 
@@ -44,15 +45,16 @@ model Reservation_Logs {
 }
 
 model Screens {
-  screenId   Int                @id @default(autoincrement())
-  theaterId  Int
-  capacity   Int
-  screenType Screens_screenType
-  Theaters   Theaters           @relation(fields: [theaterId], references: [theaterId], onUpdate: Restrict, map: "Screens_ibfk_1")
-  Seats      Seats[]
-  Shows      Shows[]
+  screenId      Int                @id @default(autoincrement())
+  theaterId     Int
+  screen_number Int
+  capacity      Int
+  screenType    Screens_screenType
+  Theaters      Theaters           @relation(fields: [theaterId], references: [theaterId], onUpdate: Restrict, map: "Screens_ibfk_1")
+  Seats         Seats[]
+  Shows         Shows[]
 
-  @@index([theaterId], map: "theaterId")
+  @@index([theaterId], map: "Screens_ibfk_1")
 }
 
 model Seat_Types {

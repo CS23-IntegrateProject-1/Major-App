@@ -6,7 +6,8 @@ const prisma = new PrismaClient();
 type FilmShowtime = {
     name: string;
     date: Date;
-    startTime: Date;
+    startTime: string;
+    screenNo: number;
   };
   
 type ScreenWithFilms = {
@@ -46,13 +47,19 @@ export const getShowFromFilmId = async (req: Request, res: Response) => {
                 }
             });
             //check if screen, theater, film is not null
-            if (screen && theater && (film)) {
+            if (screen && theater && film) {
                 results.push({
-                    screen,
+                    screen: {
+                        screenId: screen.screenId,
+                        theaterId: screen.theaterId,
+                        capacity: screen.capacity,
+                        screenType: screen.screenType
+                    },
                     films: [{
                         name: film.name,
                         date: show.date,
-                        startTime: show.startTime
+                        startTime: show.startTime.toTimeString().split(' ')[0],
+                        screenNo: screen.screen_number
                     }]
                 });
             }
@@ -87,11 +94,12 @@ export const getShowFromFilmIdAndDate = async (req: Request, res: Response) => {
                     filmId: show.filmId
                 }
             });
-            if (film) {
+            if (film && screen) {
                 f.push({
                     name: film.name,
                     date: show.date,
-                    startTime: show.startTime
+                    startTime: show.startTime.toTimeString().split(' ')[0],
+                    screenNo: screen.screen_number
                 });
             }
             if (screen && f.length > 0) {
@@ -130,11 +138,12 @@ export const getShowByTheaterId = async (req: Request, res: Response) => {
                         filmId: showtime.filmId
                     }
                 });
-                if (film) {
+                if (film && showtime) {
                     filmsWithShowtimes.push({
                         name: film.name,
                         date: showtime.date,
-                        startTime: showtime.startTime
+                        startTime: showtime.startTime.toTimeString().split(' ')[0],
+                        screenNo: screen.screen_number
                     });
                 }
             }
@@ -177,11 +186,12 @@ export const getShowByTheaterIdAndDate = async (req: Request, res: Response) => 
                         filmId: showtime.filmId
                     }
                 });
-                if (film) {
+                if (film && showtime) {
                     filmsWithShowtimes.push({
                         name: film.name,
                         date: showtime.date,
-                        startTime: showtime.startTime
+                        startTime: showtime.startTime.toTimeString().split(' ')[0],
+                        screenNo: screen.screen_number
                     });
                 }
             }
@@ -216,11 +226,12 @@ export const getShowEveryTheater = async (req: Request, res: Response) => {
                         filmId: showtime.filmId
                     }
                 });
-                if (film) {
+                if (film && showtime) {
                     filmsWithShowtimes.push({
                         name: film.name,
                         date: showtime.date,
-                        startTime: showtime.startTime
+                        startTime: showtime.startTime.toTimeString().split(' ')[0],
+                        screenNo: screen.screen_number
                     });
                 }
             }
