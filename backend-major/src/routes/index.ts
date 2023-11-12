@@ -3,6 +3,7 @@ import MockRoutes from "./mock.routes";
 import router from "./film";
 import theater from "./theatre";
 import show from "./show";
+import screen from "./screen";
 
 class Routes {
 	constructor(app: Application) {
@@ -13,6 +14,8 @@ class Routes {
 		app.use("/theater", theater);
 		app.use("/api/show", show);
 		app.use("/show", show);
+		app.use("/api/screen", screen);
+		app.use("/screen", screen);
 	}
 }
 export default Routes;

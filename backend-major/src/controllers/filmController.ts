@@ -1,13 +1,12 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { parse } from "path";
 
 const prisma = new PrismaClient();
 
 export const getFilms = async (req: Request, res: Response) => {
   try {
     const films = await prisma.films.findMany();
-    res.status(200).json({films});
+    res.status(200).json(films);
   } catch (err) {
     const error = err as Error;
     res.status(500).json({ error: error.message });
@@ -23,7 +22,7 @@ export const getCurrentFilm = async (req: Request, res: Response) => {
         }
       }
     });
-    res.status(200).json({currentFilm});
+    res.status(200).json(currentFilm);
   } catch (err) {
       const error = err as Error;
       res.status(500).json({ error: error.message });
@@ -39,7 +38,7 @@ export const getUpcomingFilm = async (req: Request, res: Response) => {
         }
       }
     });
-    res.status(200).json({incommingFilm});
+    res.status(200).json(incommingFilm);
   } catch (err) {
       const error = err as Error;
       res.status(500).json({ error: error.message });

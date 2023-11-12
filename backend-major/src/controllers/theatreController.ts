@@ -8,7 +8,7 @@ export const getTheaters = async (req: Request, res: Response) => {
         if(!theatre){
             return res.status(404).json({error: "Theater not found"});
         }
-        res.status(200).json({theatre});
+        res.status(200).json(theatre);
     } catch (err) {
         const error = err as Error;
         res.status(500).json({error: error.message});
@@ -30,7 +30,7 @@ export const getTheaterById = async (req: Request, res: Response) => {
         if(!theater){
             return res.status(404).json({error: "Theater not found"});
         }
-        res.status(200).json({theater});
+        res.status(200).json(theater);
     } catch (err) {
         const error = err as Error;
         res.status(500).json({error: error.message});
