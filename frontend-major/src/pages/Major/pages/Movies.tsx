@@ -16,8 +16,15 @@ const MoviePage = () => {
   const [nowShowingMovies, setNowShowingMovies] = useState([]);
 
   useEffect(() => {
-    Axios.get
-  })
+    Axios.get("http://localhost:3000/film/getCurrentFilm")
+    .then((response) => {
+      setNowShowingMovies(response.data);
+    })
+    .catch((error) => {
+      console.error("Error fetching now showing movies:", error);
+    });
+}, []);
+
   return (
     <Box justifyContent="center" textAlign="center" alignItems="center">
       {/* Tab details and show */}
@@ -29,7 +36,9 @@ const MoviePage = () => {
         <TabIndicator mt="-1.5px" height="2px" bg="gold" borderRadius="1px" />
         <TabPanels>
           <TabPanel>
-            <MovieCard />
+          {nowShowingMovies.map((film) => (
+            <MovieCard key={film.filmId} film={film} />
+          ))}
           </TabPanel>
           <TabPanel>{/* upcoming has nothing */}</TabPanel>
         </TabPanels>

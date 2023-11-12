@@ -3,9 +3,15 @@ import { Card, Image, Button, CardFooter, CardBody } from "@chakra-ui/react";
 import { NavLink } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
 
-export const MovieCard = () => {
-  const [isHovered, setIsHovered] = useState(false);
+interface film {
+  filmId: number; // Replace 'number' with the actual type of filmId
+  title: string; // Replace 'string' with the actual type of title
+  posterImg: string; // Replace 'string' with the actual type of posterUrl
+  // Add other properties as needed
+}
 
+export const MovieCard: React.FC<{ film: film }> = ({ film }) => {
+  const [isHovered, setIsHovered] = useState(false);
   const handleMouseOver = () => {
     setIsHovered(true);
   };
@@ -16,7 +22,8 @@ export const MovieCard = () => {
 
   const posterWidth = "200px"; // Replace with your desired movie poster width
   const posterHeight = "300px"; // Replace with your desired movie poster height
-
+  
+  
   return (
     <Box>
       <Card
@@ -29,7 +36,7 @@ export const MovieCard = () => {
         m={4}
       >
         <Image
-          src="https://images.squarespace-cdn.com/content/v1/5acd17597c93273e08da4786/1547847934765-ZOU5KGSHYT6UVL6O5E5J/Shrek+Poster.png"
+          src={film.posterImg}
           alt="Movie Poster"
           borderRadius="lg"
           width={posterWidth}
@@ -50,7 +57,7 @@ export const MovieCard = () => {
             <CardBody color={"white"}>Helloajfaijfiajfapof</CardBody>
             <CardFooter>
               {/* <Link to={`/movies/${movie.id}`}> */}
-              <NavLink to="/MovieInfo">
+              <NavLink to={`/film/${film.filmId}`}>
                 <Button
                   variant="solid"
                   color="WhiteAlpha.800"

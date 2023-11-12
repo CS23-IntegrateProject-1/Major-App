@@ -54,6 +54,7 @@ export const getShowFromFilmId = async (req: Request, res: Response) => {
                         theaterId: screen.theaterId,
                         capacity: screen.capacity,
                         screenType: screen.screenType
+                        
                     },
                     films: [{
                         name: film.name,
