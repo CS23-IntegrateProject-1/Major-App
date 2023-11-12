@@ -72,8 +72,9 @@ const MovieInformationPage = () => {
 
           {/* Show (โรง+รอบหนัง) */}
           <TabPanel>
+            {/* วันที่ที่เลื่อนได้ */}
             <Text {...TextStyle.h2} mt={2} mb={2}>
-              Date swipe{" "}
+              Date swipe
             </Text>
             {/* Show (โรง+รอบหนัง) slide ลงมา */}
             <Accordion defaultIndex={[0]} allowMultiple>
@@ -86,10 +87,16 @@ const MovieInformationPage = () => {
                 </AccordionButton>
                 <AccordionPanel pb={4} {...TextStyle.body2}>
                   <Text mb={"2"}>Theatre 1 | EN </Text>
-                  <Box display={"flex"} flexDirection={"row" } >
-                    <Button  mr={"4"}> 13:00 </Button>
-                    <Button mr={"4"}> 16:00 </Button>
-                    <Button mr={"4"}> 19:00 </Button>
+                  <Box display={"flex"} flexDirection={"row"}>
+                    <Button size="xs" mr={"4"}>
+                      13:00
+                    </Button>
+                    <Button size="xs" mr={"4"}>
+                      16:00
+                    </Button>
+                    <Button size="xs" mr={"4"}>
+                      19:00
+                    </Button>
                   </Box>
                 </AccordionPanel>
               </AccordionItem>
