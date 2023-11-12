@@ -1,6 +1,7 @@
 import ExamplePage from "./pages/ExamplePage";
 import MoviePage from "./pages/Movies";
 import MovieInformationPage from "./pages/MovieInformationPage";
+import CinemasPage from "./pages/CinemasPage";
 
 const ExampleRoutes = () => {
 	return [
@@ -19,7 +20,11 @@ const ExampleRoutes = () => {
 		{
 			path: "/MovieInfo",
 			element: <MovieInformationPage/>
-		}
+		},
+		{
+			path: "/Cinema",
+			element: <CinemasPage/>
+		},
 	];
 };
 

@@ -1,67 +1,34 @@
 import { useState } from "react";
-import { Box } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { MovieCard } from "../../../components/movieCard/moviecard";
-import { NavLink } from "react-router-dom";
+import {
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  TabIndicator,
+} from "@chakra-ui/react";
 
 const MoviePage = () => {
-  const [isNowShowingHovered, setIsNowShowingHovered] = useState(false);
-  const [isComingSoonHovered, setIsComingSoonHovered] = useState(false);
-
-  const linkStyles = {
-    ...TextStyle.h1,
-    textDecoration: "none",
-    transition: "color 0.3s ease",
-    padding: "2rem",
-    color: "white", // Default color
-  };
-
-  const nowShowingStyles = {
-    ...linkStyles,
-    color: isNowShowingHovered ? "#d2aa5a" : "white",
-  };
-
-  const comingSoonStyles = {
-    ...linkStyles,
-    color: isComingSoonHovered ? "#d2aa5a" : "white",
-  };
-
-  const handleNowShowingMouseOver = () => {
-    setIsNowShowingHovered(true);
-  };
-
-  const handleNowShowingMouseOut = () => {
-    setIsNowShowingHovered(false);
-  };
-
-  const handleComingSoonMouseOver = () => {
-    setIsComingSoonHovered(true);
-  };
-
-  const handleComingSoonMouseOut = () => {
-    setIsComingSoonHovered(false);
-  };
-
   return (
-    <Box  justifyContent="center" textAlign="center" alignItems="center">
-      <a
-        href="/Movie"
-        style={nowShowingStyles}
-        onMouseOver={handleNowShowingMouseOver}
-        onMouseOut={handleNowShowingMouseOut}
-      >
-            Now Showing
-          </a>
-          <a
-            href="/ComingSoon"
-            style={comingSoonStyles}
-            onMouseOver={handleComingSoonMouseOver}
-            onMouseOut={handleComingSoonMouseOut}
-          >
-            Coming Soon
-          </a>
-          <MovieCard />
-        </Box>
+    <Box justifyContent="center" textAlign="center" alignItems="center">
+      {/* Tab details and show */}
+      <Tabs isFitted position="relative" variant="unstyled">
+        <TabList>
+          <Tab _selected={{ color: "gold" }}>Now Showing</Tab>
+          <Tab _selected={{ color: "gold" }}>Upcoming</Tab>
+        </TabList>
+        <TabIndicator mt="-1.5px" height="2px" bg="gold" borderRadius="1px" />
+        <TabPanels>
+          <TabPanel>
+            <MovieCard />
+          </TabPanel>
+          <TabPanel>{/* upcoming has nothing */}</TabPanel>
+        </TabPanels>
+      </Tabs>
+    </Box>
   );
 };
 
