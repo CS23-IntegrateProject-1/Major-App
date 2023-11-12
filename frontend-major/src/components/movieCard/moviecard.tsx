@@ -57,7 +57,8 @@ export const MovieCard: React.FC<{ film: film }> = ({ film }) => {
             <CardBody color={"white"}>Helloajfaijfiajfapof</CardBody>
             <CardFooter>
               {/* <Link to={`/movies/${movie.id}`}> */}
-              <NavLink to={`/film/${film.filmId}`}>
+              <NavLink to = "/MovieInfo">
+              // {`/film/${film.filmId}`}
                 <Button
                   variant="solid"
                   color="WhiteAlpha.800"
