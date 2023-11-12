@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { MovieCard } from "../../../components/movieCard/moviecard";
@@ -10,8 +10,14 @@ import {
   TabPanel,
   TabIndicator,
 } from "@chakra-ui/react";
+import { Axios } from "../../../AxiosInstance";
 
 const MoviePage = () => {
+  const [nowShowingMovies, setNowShowingMovies] = useState([]);
+
+  useEffect(() => {
+    Axios.get
+  })
   return (
     <Box justifyContent="center" textAlign="center" alignItems="center">
       {/* Tab details and show */}
