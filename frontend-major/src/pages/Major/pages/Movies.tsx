@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Text, Flex } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { MovieCard } from "../../../components/movieCard/moviecard";
 import {
@@ -22,21 +22,21 @@ const MoviePage = () => {
 
   useEffect(() => {
     Axios.get("http://localhost:3000/film/getCurrentFilm")
-    .then((response) => {
-      setNowShowingMovies(response.data);
-    })
-    .catch((error) => {
-      console.error("Error fetching now showing movies:", error);
-    });
-}, []);
+      .then((response) => {
+        setNowShowingMovies(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching now showing movies:", error);
+      });
+  }, []);
   useEffect(() => {
     Axios.get("http://localhost:3000/film/getUpcomingFilm")
-    .then((response) => {
-      setUpcommingMovies(response.data);
-    })
-    .catch((error) => {
-      console.error("Error fetching now showing movies:", error);
-    });
+      .then((response) => {
+        setUpcommingMovies(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching now showing movies:", error);
+      });
   }, []);
 
   return (
@@ -45,19 +45,23 @@ const MoviePage = () => {
       <Tabs isFitted position="relative" variant="unstyled">
         <TabList>
           <Tab _selected={{ color: "gold" }}>Now Showing</Tab>
-          <Tab _selected={{ color: "gold" }} >Upcoming</Tab>
+          <Tab _selected={{ color: "gold" }}>Upcoming</Tab>
         </TabList>
         <TabIndicator mt="-1.5px" height="2px" bg="gold" borderRadius="1px" />
         <TabPanels>
           <TabPanel>
-          {nowShowingMovies.map((film) => (
-            <MovieCard key={film} film={film} />
-          ))}
+            <Flex flexWrap="wrap" justifyContent="initial" >
+              {nowShowingMovies.map((film) => (
+                <MovieCard key={film} film={film} />
+              ))}
+            </Flex>
           </TabPanel>
           <TabPanel>
-          {upcommingMovies.map((film) => (
-            <MovieCard key={film} film={film} />
-          ))}
+            <Flex flexWrap="wrap" justifyContent="initial">
+              {upcommingMovies.map((film) => (
+                <MovieCard key={film} film={film} />
+              ))}
+            </Flex>
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -66,6 +70,3 @@ const MoviePage = () => {
 };
 
 export default MoviePage;
-
-
-
