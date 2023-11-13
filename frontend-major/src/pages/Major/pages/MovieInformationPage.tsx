@@ -77,16 +77,16 @@ const MovieInformationPage = () => {
           />
         </Box>
         <Box display={"flex"} flexDirection={"column"} padding={"4"}>
-          <Text color={"gold"} {...TextStyle.body2} mb={2}>
+          <Text color={"gold"} style={TextStyle.body2} mb={2}>
             {movieInfo.releaseDate? formatDate(movieInfo.releaseDate) : 'N/A'}
           </Text>
-          <Text {...TextStyle.h1} mb={2}>
+          <Text style={TextStyle.h1} mb={2}>
             {movieInfo.name}
           </Text>
-          <Text {...TextStyle.body2} mb={2}>
+          <Text style={TextStyle.body2} mb={2}>
             {movieInfo.genre}
           </Text>
-          <Text {...TextStyle.body2} mb={2}>
+          <Text style={TextStyle.body2} mb={2}>
             {movieInfo.duration} minutes
           </Text>
         </Box>
@@ -102,10 +102,10 @@ const MovieInformationPage = () => {
         <TabPanels>
           {/* Details */}
           <TabPanel>
-            <Text {...TextStyle.h2} mt={2} mb={2}>
+            <Text style={TextStyle.h2} mt={2} mb={2}>
               Synopsis
             </Text>
-            <Text {...TextStyle.body2} mt={2} mb={2} align={"justify"}>
+            <Text style={TextStyle.body2} mt={2} mb={2} align={"justify"}>
               {movieInfo.synopsis}
             </Text>
           </TabPanel>
@@ -113,7 +113,7 @@ const MovieInformationPage = () => {
           {/* Show (โรง+รอบหนัง) */}
           <TabPanel>
             {/* วันที่ที่เลื่อนได้ */}
-            <Text {...TextStyle.h2} mt={2} mb={2}>
+            <Text style={TextStyle.h2} mt={2} mb={2}>
               Date swipe
             </Text>
             {/* Show (โรง+รอบหนัง) slide ลงมา */}
@@ -121,11 +121,11 @@ const MovieInformationPage = () => {
               <AccordionItem>
                 <AccordionButton>
                   <Box as="span" flex="1" textAlign="left">
-                    <Text {...TextStyle.h2}>Theatre name 1 </Text>
+                    <Text style={TextStyle.h2}>Theatre name 1 </Text>
                   </Box>
                   <AccordionIcon />
                 </AccordionButton>
-                <AccordionPanel pb={4} {...TextStyle.body2}>
+                <AccordionPanel pb={4} style={TextStyle.body2}>
                   <Text mb={"2"}>Theatre 1 | EN </Text>
                   <Box display={"flex"} flexDirection={"row"}>
                     <Button size="xs" mr={"4"}>
