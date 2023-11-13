@@ -105,7 +105,7 @@ const MovieInformationPage = () => {
             <Text {...TextStyle.h2} mt={2} mb={2}>
               Synopsis
             </Text>
-            <Text {...TextStyle.body2} mt={2} mb={2} noOfLines={[1, 2, 3]}>
+            <Text {...TextStyle.body2} mt={2} mb={2} align={"justify"}>
               {movieInfo.synopsis}
             </Text>
           </TabPanel>
