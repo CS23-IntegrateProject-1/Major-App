@@ -12,8 +12,13 @@ import {
 } from "@chakra-ui/react";
 import { Axios } from "../../../AxiosInstance";
 
+const navigateToUpcoming = () => {
+  window.location.href = "/upcoming";
+};
+
 const MoviePage = () => {
   const [nowShowingMovies, setNowShowingMovies] = useState([]);
+  const [upcommingMovies, setUpcommingMovies] = useState([]);
 
   useEffect(() => {
     Axios.get("http://localhost:3000/film/getCurrentFilm")
@@ -24,6 +29,15 @@ const MoviePage = () => {
       console.error("Error fetching now showing movies:", error);
     });
 }, []);
+  useEffect(() => {
+    Axios.get("http://localhost:3000/film/getUpcomingFilm")
+    .then((response) => {
+      setUpcommingMovies(response.data);
+    })
+    .catch((error) => {
+      console.error("Error fetching now showing movies:", error);
+    });
+  }, []);
 
   return (
     <Box justifyContent="center" textAlign="center" alignItems="center">
@@ -31,16 +45,20 @@ const MoviePage = () => {
       <Tabs isFitted position="relative" variant="unstyled">
         <TabList>
           <Tab _selected={{ color: "gold" }}>Now Showing</Tab>
-          <Tab _selected={{ color: "gold" }}>Upcoming</Tab>
+          <Tab _selected={{ color: "gold" }} >Upcoming</Tab>
         </TabList>
         <TabIndicator mt="-1.5px" height="2px" bg="gold" borderRadius="1px" />
         <TabPanels>
           <TabPanel>
           {nowShowingMovies.map((film) => (
-            <MovieCard key={film.filmId} film={film} />
+            <MovieCard key={film} film={film} />
           ))}
           </TabPanel>
-          <TabPanel>{/* upcoming has nothing */}</TabPanel>
+          <TabPanel>
+          {upcommingMovies.map((film) => (
+            <MovieCard key={film} film={film} />
+          ))}
+          </TabPanel>
         </TabPanels>
       </Tabs>
     </Box>
@@ -48,3 +66,6 @@ const MoviePage = () => {
 };
 
 export default MoviePage;
+
+
+

@@ -1,5 +1,7 @@
 import { Box, Text, Image, Button } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
+import { useEffect, useState } from "react";
+import { Axios } from "../../../AxiosInstance";
 import {
   Tabs,
   TabList,
@@ -15,22 +17,48 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from "@chakra-ui/react";
+import { useParams } from "react-router-dom";
+
+
 
 const MovieInformationPage = () => {
+  interface film {
+  filmId: number; 
+  name: string;
+  posterImg: string; 
+  synopsis: string;
+  releaseDate: string;
+  duration: string;
+  genre: string;
+}
   const posterWidth = "150px"; // Replace with your desired movie poster width
   const posterHeight = "225px"; // Replace with your desired movie poster height
 
   const buttonWidth = "200px";
   const buttonHeight = "100px";
 
+  const [movieInfo, setMovieInfo] = useState<film>({} as film);
+  const { filmId } = useParams<{ filmId?: string }>();
+  const id = parseInt(filmId || "");
+  useEffect(() => {
+    try {
+      Axios.get(`http://localhost:3000/film/getFilmById/${id}`).then(
+        (response) => {
+          setMovieInfo(response.data);
+        }
+      );
+    } catch (error) {
+      console.error("Error fetching now showing movies:", error);
+    }
+  }, [id]);
   return (
     <Box>
       {/* Movie Info at top*/}
       <Box display={"flex"} flexDirection={"row"} paddingBottom={"7"}>
         <Box>
           <Image
-            src="https://images.squarespace-cdn.com/content/v1/5acd17597c93273e08da4786/1547847934765-ZOU5KGSHYT6UVL6O5E5J/Shrek+Poster.png"
-            alt="Movie Poster"
+            src={movieInfo.posterImg}
+            alt={movieInfo.name}
             borderRadius="lg"
             width={posterWidth}
             height={posterHeight}
@@ -38,16 +66,16 @@ const MovieInformationPage = () => {
         </Box>
         <Box display={"flex"} flexDirection={"column"} padding={"4"}>
           <Text color={"gold"} {...TextStyle.body2} mb={2}>
-            Movie date
+            {movieInfo.releaseDate}
           </Text>
           <Text {...TextStyle.h1} mb={2}>
-            Movie name
+            {movieInfo.name}
           </Text>
           <Text {...TextStyle.body2} mb={2}>
-            Movie Type
+            {movieInfo.genre}
           </Text>
           <Text {...TextStyle.body2} mb={2}>
-            Movie duration
+            {movieInfo.duration} minutes
           </Text>
         </Box>
       </Box>
@@ -66,7 +94,7 @@ const MovieInformationPage = () => {
               Synopsis
             </Text>
             <Text {...TextStyle.body2} mt={2} mb={2} noOfLines={[1, 2, 3]}>
-              Synopsis details
+              {movieInfo.synopsis}
             </Text>
           </TabPanel>
 

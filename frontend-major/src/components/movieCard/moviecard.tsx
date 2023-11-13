@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { Card, Image, Button, CardFooter, CardBody } from "@chakra-ui/react";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
 
 interface film {
   filmId: number; // Replace 'number' with the actual type of filmId
-  title: string; // Replace 'string' with the actual type of title
+  name: string; // Replace 'string' with the actual type of title
   posterImg: string; // Replace 'string' with the actual type of posterUrl
   // Add other properties as needed
 }
@@ -54,11 +54,11 @@ export const MovieCard: React.FC<{ film: film }> = ({ film }) => {
             bg="rgba(0, 0, 0, 0.67)"
             transition="color 0.3s ease"
           >
-            <CardBody color={"white"}>Helloajfaijfiajfapof</CardBody>
+            <CardBody color={"white"}>{film.name}</CardBody>
             <CardFooter>
-              {/* <Link to={`/movies/${movie.id}`}> */}
-              <NavLink to = "/MovieInfo">
-              // {`/film/${film.filmId}`}
+              <Link to={`/MovieInfo/${+film.filmId}`}>
+              {/* <NavLink to = "/MovieInfo/{film.filmId}`"> */}
+              {/* // {`/film/${film.filmId}`} */}
                 <Button
                   variant="solid"
                   color="WhiteAlpha.800"
@@ -67,8 +67,8 @@ export const MovieCard: React.FC<{ film: film }> = ({ film }) => {
                 >
                   MORE INFO
                 </Button>
-              </NavLink>
-              {/* </Link> */}
+              {/* </NavLink> */}
+              </Link>
             </CardFooter>
           </Card>
         )}

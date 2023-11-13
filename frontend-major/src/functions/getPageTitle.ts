@@ -9,10 +9,10 @@ export const getPageTitle = (pathname: string) => {
       return "MOVIES";
     case "/Cinema":
       return "CINEMAS";
-    case "/MovieInfo":
+    case "/MovieInfo/:id":
       return "MOVIES";
     // more later...
     default:
-      return "Harmoni";
+      return "MOVIES";
   }
 };
