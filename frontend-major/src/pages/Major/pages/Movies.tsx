@@ -50,11 +50,22 @@ const MoviePage = () => {
         <TabIndicator mt="-1.5px" height="2px" bg="gold" borderRadius="1px" />
         <TabPanels>
           <TabPanel>
-            <Flex flexWrap="wrap" justifyContent="initial" >
-              {nowShowingMovies.map((film) => (
-                <MovieCard key={film} film={film} />
-              ))}
-            </Flex>
+          <Flex flexWrap="wrap" justifyContent="center">
+            {nowShowingMovies.map((film, index) => {
+              const isSecondRow = index % 4 === 0;
+              return (
+                <Box 
+                  key={film} 
+                  flex="1 0 21%"
+                  display="flex" 
+                  justifyContent={isSecondRow ? "initial" : "center"} 
+                  m={2} 
+                >
+                  <MovieCard film={film} />
+                </Box>
+              )
+            })}
+          </Flex>
           </TabPanel>
           <TabPanel>
             <Flex flexWrap="wrap" justifyContent="initial">
