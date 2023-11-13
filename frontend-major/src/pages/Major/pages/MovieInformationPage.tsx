@@ -51,6 +51,18 @@ const MovieInformationPage = () => {
       console.error("Error fetching now showing movies:", error);
     }
   }, [id]);
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    };
+    const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(date);
+    return formattedDate.replace(/,/, '');
+  };
+
   return (
     <Box>
       {/* Movie Info at top*/}
@@ -66,7 +78,7 @@ const MovieInformationPage = () => {
         </Box>
         <Box display={"flex"} flexDirection={"column"} padding={"4"}>
           <Text color={"gold"} {...TextStyle.body2} mb={2}>
-            {movieInfo.releaseDate}
+            {movieInfo.releaseDate? formatDate(movieInfo.releaseDate) : 'N/A'}
           </Text>
           <Text {...TextStyle.h1} mb={2}>
             {movieInfo.name}
