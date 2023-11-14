@@ -99,7 +99,7 @@ export const getShowFromFilmIdAndDate = async (req: Request, res: Response) => {
                 f.push({
                     name: film.name,
                     date: show.date,
-                    startTime: show.startTime.toTimeString().split(' ')[0],
+                    startTime: `${show.startTime.getUTCHours().toString().padStart(2, '0')}:${show.startTime.getUTCMinutes().toString().padStart(2, '0')}`,
                     screenNo: screen.screen_number
                 });
             }

@@ -19,6 +19,28 @@ import {
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
 
+interface Film {
+  name: string;
+  date: string;
+  startTime: string;
+  screenNo: number;
+}
+
+interface Screen {
+  screenId: number;
+  theaterId: number;
+  capacity: number;
+  screenType: string;
+  screen_number: number;
+}
+
+interface ScreenWithFilms {
+  screenId: number;
+  theaterId: number;
+  capacity: number;
+  screenType: string;
+  films: Film[];
+}
 
 
 const MovieInformationPage = () => {
@@ -40,6 +62,7 @@ const MovieInformationPage = () => {
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const { filmId } = useParams<{ filmId?: string }>();
   const id = parseInt(filmId || "");
+
   useEffect(() => {
     try {
       Axios.get(`http://localhost:3000/film/getFilmById/${id}`).then(
@@ -52,6 +75,52 @@ const MovieInformationPage = () => {
     }
   }, [id]);
 
+  
+  const [showtimesByScreen, setShowtimesByScreen] = useState<ScreenWithFilms[]>([]);
+  const fetchShowtimes = async () => {
+    try {
+      const response = await Axios.get(`http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-08`);
+      console.log(response.data); 
+
+      if (!response.data || response.data.length === 0) {
+        throw new Error('No data received from API');
+      }
+
+      const groupedByScreen = response.data.reduce((acc: { [key: number]: ScreenWithFilms }, item: any) => {
+        //skip if no screen or no films
+        if (!item.screen || !item.films || item.films.length === 0) {
+          return acc; 
+        }
+        const screenNo = item.screen.screen_number;
+        if (!acc[screenNo]) {
+          acc[screenNo] = {
+            screenId: item.screen.screenId,
+            theaterId: item.screen.theaterId,
+            capacity: item.screen.capacity,
+            screenType: item.screen.screenType,
+            films: []
+          };
+        }
+        acc[screenNo].films.push(...item.films);
+        return acc;
+      }, {});
+
+      const screenWithFilmsArray: ScreenWithFilms[] = Object.values(groupedByScreen);
+      setShowtimesByScreen(screenWithFilmsArray);
+      console.log('Grouped by screen:', screenWithFilmsArray); // Check the grouped data
+    } catch (error) {
+      console.error("Error fetching showtimes:", error);
+    }
+  };
+
+  useEffect(() => {
+    // ... [existing Axios call to fetch movie info]
+    fetchShowtimes();
+  }, [id]);
+
+  
+  
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {
@@ -61,6 +130,11 @@ const MovieInformationPage = () => {
     };
     const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(date);
     return formattedDate.replace(/,/, '');
+  };
+
+  const formatTime = (timeString: string) => {
+    const [hours, minutes] = timeString.split(':');
+    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
   };
 
   return (
@@ -112,36 +186,31 @@ const MovieInformationPage = () => {
 
           {/* Show (โรง+รอบหนัง) */}
           <TabPanel>
-            {/* วันที่ที่เลื่อนได้ */}
-            <Text style={TextStyle.h2} mt={2} mb={2}>
-              Date swipe
-            </Text>
-            {/* Show (โรง+รอบหนัง) slide ลงมา */}
-            <Accordion defaultIndex={[0]} allowMultiple>
-              <AccordionItem>
-                <AccordionButton>
-                  <Box as="span" flex="1" textAlign="left">
-                    <Text style={TextStyle.h2}>Theatre name 1 </Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel pb={4} style={TextStyle.body2}>
-                  <Text mb={"2"}>Theatre 1 | EN </Text>
-                  <Box display={"flex"} flexDirection={"row"}>
-                    <Button size="xs" mr={"4"}>
-                      13:00
-                    </Button>
-                    <Button size="xs" mr={"4"}>
-                      16:00
-                    </Button>
-                    <Button size="xs" mr={"4"}>
-                      19:00
-                    </Button>
-                  </Box>
-                </AccordionPanel>
-              </AccordionItem>
-            </Accordion>
-          </TabPanel>
+    {/* ... [date swipe remains unchanged] */}
+    <Accordion defaultIndex={[0]} allowMultiple>
+     <h1 style={TextStyle.h1}>2023-11-08</h1>
+      {showtimesByScreen.map((screen, index) => (
+        <AccordionItem key={index}>
+          <AccordionButton>
+            <Box as="span" flex="1" textAlign="left">
+              <Text style={TextStyle.h2}>Screen {screen.screenType} {screen.screenId}</Text>
+            </Box>
+            <AccordionIcon />
+          </AccordionButton>
+          <AccordionPanel pb={4} style={TextStyle.body2}>
+            {screen.films.map((film, idx) => (
+              <Box key={idx}>
+                <Text mb={"2"}>{film.name} | {new Date(film.date).toLocaleDateString()}</Text>
+                <Button size="xs" mr={"4"}>
+                  {formatTime(film.startTime)}                                                                
+                </Button>
+              </Box>
+            ))}
+          </AccordionPanel>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  </TabPanel>
         </TabPanels>
       </Tabs>
     </Box>
