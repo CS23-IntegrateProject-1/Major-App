@@ -74,6 +74,19 @@ const MovieInformationPage = () => {
   const buttonWidth = "200px";
   const buttonHeight = "100px";
 
+  const nearestStyle = {
+    backgroundColor: '#d2ab5a', 
+    color: 'black', 
+    
+  };
+  
+  const futureStyle = {
+    backgroundColor: 'transparent', 
+    border: '1px solid #d2ab5a', 
+    color: '#d2ab5a', 
+  };
+  
+
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const { filmId } = useParams<{ filmId?: string }>();
   const id = parseInt(filmId || "");
@@ -94,93 +107,91 @@ const MovieInformationPage = () => {
 
   const [showtimesByTheater, setShowtimesByTheater] = useState<TheaterScreenFilms>({});
 
-const fetchShowtimes = async () => {
-  try {
-    const response = await Axios.get(`http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-08`);
-    if (!response.data || response.data.length === 0) {
-      throw new Error('No data received from API');
-    }
-    const screenType = response.data[0].screen.screenType;
-    const theaterNamesResponses = await Promise.all(
-      // response.data.map((screen: { screen: { theaterId: number } }) => 
-      //   Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`)
-      // )
-      response.data.map((screen: ScreenWithFilms) => Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`))
-    );
-
-    interface ScreenWithFilms {
-      screen: {
-        screenId: number;
-        theaterId: number;
-        screen_number: number;
-        screenType: string;
-      };
-      films: Film[];
-    }
-
-    const groupedData: TheaterScreenFilms = {};
-    response.data.forEach((screen: ScreenWithFilms, index: number) => {
-      const theaterName = theaterNamesResponses[index].data.name;
-      const screenNo = screen.screen.screen_number;
-
-      if (!groupedData[theaterName]) {
-        groupedData[theaterName] = {};
+  const fetchShowtimes = async () => {
+    try {
+      const response = await Axios.get(`http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-18`);
+      if (!response.data || response.data.length === 0) {
+        throw new Error('No data received from API');
       }
-      if (!groupedData[theaterName][screenNo]) {
-        groupedData[theaterName][screenNo] = {
-                                              screenType: screen.screen.screenType,
-                                              films: []
+      const screenType = response.data[0].screen.screenType;
+      const theaterNamesResponses = await Promise.all(
+        // response.data.map((screen: { screen: { theaterId: number } }) => 
+        //   Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`)
+        // )
+        response.data.map((screen: ScreenWithFilms) => Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`))
+      );
+
+      interface ScreenWithFilms {
+        screen: {
+          screenId: number;
+          theaterId: number;
+          screen_number: number;
+          screenType: string;
         };
+        films: Film[];
       }
-      groupedData[theaterName][screenNo].films.push(...screen.films);
-    });
 
-    setShowtimesByTheater(groupedData);
-  } catch (error) {
-    console.error("Error fetching showtimes:", error);
-  }
-};
+      const groupedData: TheaterScreenFilms = {};
+      response.data.forEach((screen: ScreenWithFilms, index: number) => {
+        const theaterName = theaterNamesResponses[index].data.name;
+        const screenNo = screen.screen.screen_number;
 
-  // const [showtimesByScreen, setShowtimesByScreen] = useState<ScreenWithFilms[]>([]);
-  // const fetchShowtimes = async () => {
-  //   try {
-  //     // Fetch showtimes
-  //     const response = await Axios.get(`http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-08`);
-  //     if (!response.data || response.data.length === 0) {
-  //       throw new Error('No data received from API');
-  //     }
-  //     console.log(response.data)
-      
-  //     // Fetch theater names for each screen
-  //     const theaterNamesResponses = await Promise.all(
-  //       response.data.map((screen: ScreenWithFilms) => 
-  //         Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`)
-  //       )
-  //     );
-  //     console.log(theaterNamesResponses)
-  
-  //     // Update each screen with the corresponding theater name
-  //     const updatedScreens: ScreenWithFilms[] = response.data.map((screen: ScreenWithFilms, index: number) => {
-  //       return {
-  //         ...screen,
-  //         theaterName: theaterNamesResponses[index].data.name
-  //       };
-  //     });
-  
-  //     setShowtimesByScreen(updatedScreens);
-  //   } catch (error) {
-  //     console.error("Error fetching showtimes:", error);
-  //   }
-  // };
-  
+        if (!groupedData[theaterName]) {
+          groupedData[theaterName] = {};
+        }
+        if (!groupedData[theaterName][screenNo]) {
+          groupedData[theaterName][screenNo] = {
+                                                screenType: screen.screen.screenType,
+                                                films: []
+          };
+        }
+        groupedData[theaterName][screenNo].films.push(...screen.films);
+      });
 
+      setShowtimesByTheater(groupedData);
+    } catch (error) {
+      console.error("Error fetching showtimes:", error);
+    }
+  };
   useEffect(() => {
     fetchShowtimes();
   }, [id]);
 
+  const isPastTime = (showDate: string, showTime: string) => {
+    const now = new Date();
+    const showDateTime = new Date(`${showDate}T${showTime}`);
+    return showDateTime < now;
+  };
 
+  const findNearestFutureTime = (theaterScreenFilms: TheaterScreenFilms): { date: string, startTime: string } | null => {
+    const now = new Date();
+    let nearestTime = null;
+    let minDiff = Number.MAX_SAFE_INTEGER;
   
-
+    Object.values(theaterScreenFilms).forEach(screens => {
+      Object.values(screens).forEach(screenDetails => {
+        screenDetails.films.forEach(film => {
+          // Extract the date part from film.date and combine it with film.startTime
+          const datePart = film.date.split('T')[0];
+          const showDateTimeStr = `${datePart}T${film.startTime}`;
+          const showDateTime = new Date(showDateTimeStr);
+  
+          console.log(`Show DateTime String: ${showDateTimeStr}, Show DateTime: ${showDateTime}`);
+  
+          const diff = showDateTime.getTime() - now.getTime();
+          if (!isNaN(diff) && diff > 0 && diff < minDiff) {
+            nearestTime = { date: film.date, startTime: film.startTime };
+            minDiff = diff;
+          }
+        });
+      });
+    });
+  
+    return nearestTime;
+  };
+  
+  
+  const nearestFutureTime = findNearestFutureTime(showtimesByTheater);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {
@@ -259,20 +270,33 @@ const fetchShowtimes = async () => {
                   <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel pb={4}>
-                {Object.entries(screens).map(([screenNo, screenDetails], screenIdx) => (
+                  {Object.entries(screens).map(([screenNo, screenDetails], screenIdx) => (
                       <Box key={screenIdx} p={2}>
                         <Text style={TextStyle.body1}>Screen {screenNo} | {screenDetails.screenType}</Text>
                         <Flex wrap="wrap" gap="10px">
-                          {screenDetails.films.map((film, filmIdx) => (
-                            <Box key={filmIdx}>
-                              <Button size="xs" mr={"4"}>
-                                {formatTime(film.startTime)}
-                              </Button>
-                            </Box>
-                          ))}
+
+                    {screenDetails.films.map((film, filmIdx) => {
+                      const isPast = isPastTime(film.date, film.startTime);
+                      const isNearest = nearestFutureTime && nearestFutureTime.date === film.date && nearestFutureTime.startTime === film.startTime;
+                      const future = new Date(film.date) > new Date();
+    
+                      return (
+                        <Box key={filmIdx}>
+                          <Button 
+                            size="xs" 
+                            mr={"4"}
+                            disabled={isPast}
+                            style={isNearest ? nearestStyle : (future? futureStyle : {})} // Change color scheme based on the status
+                          >
+                            {formatTime(film.startTime)}
+                          </Button>
+                        </Box>
+                      );
+                    })}
+
                         </Flex>
                       </Box>
-                    ))}
+                  ))}
                 </AccordionPanel>
               </AccordionItem>
             ))}
