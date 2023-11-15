@@ -2,7 +2,6 @@ import { Box, Text, Image, Button } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
-import React from "react";
 import { Flex } from "@chakra-ui/react";
 import {
   Tabs,
@@ -30,18 +29,15 @@ interface Film {
 
 interface TheaterScreenFilms {
   [theaterName: string]: {
-    [screenNo: number]: Film[];
+    [screenNo: number]: ScreenDetails;
   };
 }
 
 
-// interface Screen {
-//   screenId: number;
-//   theaterId: number;
-//   capacity: number;
-//   screenType: string;
-//   screen_number: number;
-// }
+interface ScreenDetails {
+  screenType: string;
+  films: Film[];
+}
 
 interface ScreenWithFilms {
   screenId: number;
@@ -104,16 +100,20 @@ const fetchShowtimes = async () => {
     if (!response.data || response.data.length === 0) {
       throw new Error('No data received from API');
     }
-
+    const screenType = response.data[0].screen.screenType;
     const theaterNamesResponses = await Promise.all(
-      response.data.map((screen: { screen: { theaterId: number } }) => 
-        Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`)
-      )
+      // response.data.map((screen: { screen: { theaterId: number } }) => 
+      //   Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`)
+      // )
+      response.data.map((screen: ScreenWithFilms) => Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`))
     );
 
     interface ScreenWithFilms {
       screen: {
+        screenId: number;
+        theaterId: number;
         screen_number: number;
+        screenType: string;
       };
       films: Film[];
     }
@@ -127,9 +127,12 @@ const fetchShowtimes = async () => {
         groupedData[theaterName] = {};
       }
       if (!groupedData[theaterName][screenNo]) {
-        groupedData[theaterName][screenNo] = [];
+        groupedData[theaterName][screenNo] = {
+                                              screenType: screen.screen.screenType,
+                                              films: []
+        };
       }
-      groupedData[theaterName][screenNo].push(...screen.films);
+      groupedData[theaterName][screenNo].films.push(...screen.films);
     });
 
     setShowtimesByTheater(groupedData);
@@ -247,37 +250,36 @@ const fetchShowtimes = async () => {
           <TabPanel>
           {/* ... [date swipe remains unchanged] */}
           <Accordion defaultIndex={[0]} allowMultiple>
-            <h1 style={TextStyle.h1}>2023-11-08</h1>
             {Object.entries(showtimesByTheater).map(([theaterName, screens], theaterIdx) => (
-              <React.Fragment key={theaterIdx}>
-                <Text style={TextStyle.h2}>Theater {theaterName}</Text>
-                {Object.entries(screens).map(([screenNo, films], screenIdx) => (
-                  <AccordionItem key={screenIdx}>
-                    <AccordionButton>
-                      <Box as="span" flex="1" textAlign="left">
-                        <Text style={TextStyle.body1}>Screen {screenNo}</Text>
+              <AccordionItem key={theaterIdx}>
+                <AccordionButton>
+                  <Box flex="1" textAlign="left">
+                    <Text style={TextStyle.h2}>Theater {theaterName}</Text>
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
+                <AccordionPanel pb={4}>
+                {Object.entries(screens).map(([screenNo, screenDetails], screenIdx) => (
+                      <Box key={screenIdx} p={2}>
+                        <Text style={TextStyle.body1}>Screen {screenNo} | {screenDetails.screenType}</Text>
+                        <Flex wrap="wrap" gap="10px">
+                          {screenDetails.films.map((film, filmIdx) => (
+                            <Box key={filmIdx}>
+                              <Button size="xs" mr={"4"}>
+                                {formatTime(film.startTime)}
+                              </Button>
+                            </Box>
+                          ))}
+                        </Flex>
                       </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                    <AccordionPanel pb={4} style={TextStyle.body2}>
-  <Flex wrap="wrap" gap="10px"> {/* Adjust gap as needed */}
-    {films.map((film, filmIdx) => (
-      <Box key={filmIdx}>
-        <Button size="xs" mr={"4"}>
-          {formatTime(film.startTime)}
-        </Button>
-      </Box>
-    ))}
-  </Flex>
-</AccordionPanel>
-                  </AccordionItem>
-                ))}
-              </React.Fragment>
+                    ))}
+                </AccordionPanel>
+              </AccordionItem>
             ))}
           </Accordion>
 
-  </TabPanel>
-        </TabPanels>
+        </TabPanel>
+      </TabPanels>
       </Tabs>
     </Box>
   );
