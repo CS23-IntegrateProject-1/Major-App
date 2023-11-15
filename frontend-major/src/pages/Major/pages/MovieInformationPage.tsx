@@ -2,6 +2,8 @@ import { Box, Text, Image, Button } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
+import React from "react";
+import { Flex } from "@chakra-ui/react";
 import {
   Tabs,
   TabList,
@@ -26,22 +28,38 @@ interface Film {
   screenNo: number;
 }
 
-interface Screen {
-  screenId: number;
-  theaterId: number;
-  capacity: number;
-  screenType: string;
-  screen_number: number;
+interface TheaterScreenFilms {
+  [theaterName: string]: {
+    [screenNo: number]: Film[];
+  };
 }
+
+
+// interface Screen {
+//   screenId: number;
+//   theaterId: number;
+//   capacity: number;
+//   screenType: string;
+//   screen_number: number;
+// }
 
 interface ScreenWithFilms {
   screenId: number;
   theaterId: number;
+  theaterName?: string;
   capacity: number;
   screenType: string;
   films: Film[];
 }
-
+// interface Theater {
+//   theaterId: number;
+//   name: string;
+//   address: string;
+//   phoneNum: string;
+//   promptPayNum: string;
+//   latitude: number;
+//   longitude: number;
+// }
 
 const MovieInformationPage = () => {
   interface film {
@@ -53,6 +71,7 @@ const MovieInformationPage = () => {
   duration: string;
   genre: string;
 }
+
   const posterWidth = "150px"; // Replace with your desired movie poster width
   const posterHeight = "225px"; // Replace with your desired movie poster height
 
@@ -62,6 +81,8 @@ const MovieInformationPage = () => {
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const { filmId } = useParams<{ filmId?: string }>();
   const id = parseInt(filmId || "");
+
+  
 
   useEffect(() => {
     try {
@@ -75,50 +96,86 @@ const MovieInformationPage = () => {
     }
   }, [id]);
 
-  
-  const [showtimesByScreen, setShowtimesByScreen] = useState<ScreenWithFilms[]>([]);
-  const fetchShowtimes = async () => {
-    try {
-      const response = await Axios.get(`http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-08`);
-      console.log(response.data); 
+  const [showtimesByTheater, setShowtimesByTheater] = useState<TheaterScreenFilms>({});
 
-      if (!response.data || response.data.length === 0) {
-        throw new Error('No data received from API');
-      }
-
-      const groupedByScreen = response.data.reduce((acc: { [key: number]: ScreenWithFilms }, item: any) => {
-        //skip if no screen or no films
-        if (!item.screen || !item.films || item.films.length === 0) {
-          return acc; 
-        }
-        const screenNo = item.screen.screen_number;
-        if (!acc[screenNo]) {
-          acc[screenNo] = {
-            screenId: item.screen.screenId,
-            theaterId: item.screen.theaterId,
-            capacity: item.screen.capacity,
-            screenType: item.screen.screenType,
-            films: []
-          };
-        }
-        acc[screenNo].films.push(...item.films);
-        return acc;
-      }, {});
-
-      const screenWithFilmsArray: ScreenWithFilms[] = Object.values(groupedByScreen);
-      setShowtimesByScreen(screenWithFilmsArray);
-      console.log('Grouped by screen:', screenWithFilmsArray); // Check the grouped data
-    } catch (error) {
-      console.error("Error fetching showtimes:", error);
+const fetchShowtimes = async () => {
+  try {
+    const response = await Axios.get(`http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-08`);
+    if (!response.data || response.data.length === 0) {
+      throw new Error('No data received from API');
     }
-  };
+
+    const theaterNamesResponses = await Promise.all(
+      response.data.map((screen: { screen: { theaterId: number } }) => 
+        Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`)
+      )
+    );
+
+    interface ScreenWithFilms {
+      screen: {
+        screen_number: number;
+      };
+      films: Film[];
+    }
+
+    const groupedData: TheaterScreenFilms = {};
+    response.data.forEach((screen: ScreenWithFilms, index: number) => {
+      const theaterName = theaterNamesResponses[index].data.name;
+      const screenNo = screen.screen.screen_number;
+
+      if (!groupedData[theaterName]) {
+        groupedData[theaterName] = {};
+      }
+      if (!groupedData[theaterName][screenNo]) {
+        groupedData[theaterName][screenNo] = [];
+      }
+      groupedData[theaterName][screenNo].push(...screen.films);
+    });
+
+    setShowtimesByTheater(groupedData);
+  } catch (error) {
+    console.error("Error fetching showtimes:", error);
+  }
+};
+
+  // const [showtimesByScreen, setShowtimesByScreen] = useState<ScreenWithFilms[]>([]);
+  // const fetchShowtimes = async () => {
+  //   try {
+  //     // Fetch showtimes
+  //     const response = await Axios.get(`http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-08`);
+  //     if (!response.data || response.data.length === 0) {
+  //       throw new Error('No data received from API');
+  //     }
+  //     console.log(response.data)
+      
+  //     // Fetch theater names for each screen
+  //     const theaterNamesResponses = await Promise.all(
+  //       response.data.map((screen: ScreenWithFilms) => 
+  //         Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`)
+  //       )
+  //     );
+  //     console.log(theaterNamesResponses)
+  
+  //     // Update each screen with the corresponding theater name
+  //     const updatedScreens: ScreenWithFilms[] = response.data.map((screen: ScreenWithFilms, index: number) => {
+  //       return {
+  //         ...screen,
+  //         theaterName: theaterNamesResponses[index].data.name
+  //       };
+  //     });
+  
+  //     setShowtimesByScreen(updatedScreens);
+  //   } catch (error) {
+  //     console.error("Error fetching showtimes:", error);
+  //   }
+  // };
+  
 
   useEffect(() => {
-    // ... [existing Axios call to fetch movie info]
     fetchShowtimes();
   }, [id]);
 
-  
+
   
 
   const formatDate = (dateString: string) => {
@@ -136,6 +193,8 @@ const MovieInformationPage = () => {
     const [hours, minutes] = timeString.split(':');
     return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
   };
+
+  
 
   return (
     <Box>
@@ -186,30 +245,37 @@ const MovieInformationPage = () => {
 
           {/* Show (โรง+รอบหนัง) */}
           <TabPanel>
-    {/* ... [date swipe remains unchanged] */}
-    <Accordion defaultIndex={[0]} allowMultiple>
-     <h1 style={TextStyle.h1}>2023-11-08</h1>
-      {showtimesByScreen.map((screen, index) => (
-        <AccordionItem key={index}>
-          <AccordionButton>
-            <Box as="span" flex="1" textAlign="left">
-              <Text style={TextStyle.h2}>Screen {screen.screenType} {screen.screenId}</Text>
-            </Box>
-            <AccordionIcon />
-          </AccordionButton>
-          <AccordionPanel pb={4} style={TextStyle.body2}>
-            {screen.films.map((film, idx) => (
-              <Box key={idx}>
-                <Text mb={"2"}>{film.name} | {new Date(film.date).toLocaleDateString()}</Text>
-                <Button size="xs" mr={"4"}>
-                  {formatTime(film.startTime)}                                                                
-                </Button>
-              </Box>
+          {/* ... [date swipe remains unchanged] */}
+          <Accordion defaultIndex={[0]} allowMultiple>
+            <h1 style={TextStyle.h1}>2023-11-08</h1>
+            {Object.entries(showtimesByTheater).map(([theaterName, screens], theaterIdx) => (
+              <React.Fragment key={theaterIdx}>
+                <Text style={TextStyle.h2}>Theater {theaterName}</Text>
+                {Object.entries(screens).map(([screenNo, films], screenIdx) => (
+                  <AccordionItem key={screenIdx}>
+                    <AccordionButton>
+                      <Box as="span" flex="1" textAlign="left">
+                        <Text style={TextStyle.body1}>Screen {screenNo}</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={4} style={TextStyle.body2}>
+  <Flex wrap="wrap" gap="10px"> {/* Adjust gap as needed */}
+    {films.map((film, filmIdx) => (
+      <Box key={filmIdx}>
+        <Button size="xs" mr={"4"}>
+          {formatTime(film.startTime)}
+        </Button>
+      </Box>
+    ))}
+  </Flex>
+</AccordionPanel>
+                  </AccordionItem>
+                ))}
+              </React.Fragment>
             ))}
-          </AccordionPanel>
-        </AccordionItem>
-      ))}
-    </Accordion>
+          </Accordion>
+
   </TabPanel>
         </TabPanels>
       </Tabs>

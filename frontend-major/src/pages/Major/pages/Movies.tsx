@@ -12,9 +12,6 @@ import {
 } from "@chakra-ui/react";
 import { Axios } from "../../../AxiosInstance";
 
-const navigateToUpcoming = () => {
-  window.location.href = "/upcoming";
-};
 
 const MoviePage = () => {
   const [nowShowingMovies, setNowShowingMovies] = useState([]);
