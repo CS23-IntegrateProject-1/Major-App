@@ -19,6 +19,7 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
+import { DateCarousel } from "../../../Datecarousel";
 
 interface Film {
   name: string;
@@ -262,6 +263,7 @@ const MovieInformationPage = () => {
           {/* Show (โรง+รอบหนัง) */}
           <TabPanel>
           {/* ... [date swipe remains unchanged] */}
+          <DateCarousel />
           <Accordion defaultIndex={[0]} allowMultiple>
             {Object.entries(showtimesByTheater).map(([theaterName, screens], theaterIdx) => (
               <AccordionItem key={theaterIdx}>
