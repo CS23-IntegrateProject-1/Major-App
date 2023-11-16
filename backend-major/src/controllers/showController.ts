@@ -80,6 +80,9 @@ export const getShowFromFilmIdAndDate = async (req: Request, res: Response) => {
             where: {
                 filmId: parseInt(id),
                 date: new Date(date)
+            },
+            orderBy: {
+                startTime: 'asc'
             }
         });
         let results: ScreenWithFilms[] = [];
@@ -218,6 +221,9 @@ export const getShowEveryTheater = async (req: Request, res: Response) => {
             const showtimes = await prisma.shows.findMany({
                 where: {
                     screenId: screen.screenId
+                },
+                orderBy: {  
+                    startTime: 'asc'
                 }
             });
             let filmsWithShowtimes: FilmShowtime[] = [];

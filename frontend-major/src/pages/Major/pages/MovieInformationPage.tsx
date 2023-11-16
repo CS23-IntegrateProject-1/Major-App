@@ -39,14 +39,14 @@ interface ScreenDetails {
   films: Film[];
 }
 
-interface ScreenWithFilms {
-  screenId: number;
-  theaterId: number;
-  theaterName?: string;
-  capacity: number;
-  screenType: string;
-  films: Film[];
-}
+// interface ScreenWithFilms {
+//   screenId: number;
+//   theaterId: number;
+//   theaterName?: string;
+//   capacity: number;
+//   screenType: string;
+//   films: Film[];
+// }
 // interface Theater {
 //   theaterId: number;
 //   name: string;
@@ -66,6 +66,7 @@ const MovieInformationPage = () => {
   releaseDate: string;
   duration: string;
   genre: string;
+  language: string;
 }
 
   const posterWidth = "150px"; // Replace with your desired movie poster width
@@ -84,6 +85,12 @@ const MovieInformationPage = () => {
     backgroundColor: 'transparent', 
     border: '1px solid #d2ab5a', 
     color: '#d2ab5a', 
+  };
+
+  const notAvailableStyle = {
+    backgroundColor: 'transparent', 
+    border: '1px solid grey', 
+    color: 'grey', 
   };
   
 
@@ -171,7 +178,6 @@ const MovieInformationPage = () => {
     Object.values(theaterScreenFilms).forEach(screens => {
       Object.values(screens).forEach(screenDetails => {
         screenDetails.films.forEach(film => {
-          // Extract the date part from film.date and combine it with film.startTime
           const datePart = film.date.split('T')[0];
           const showDateTimeStr = `${datePart}T${film.startTime}`;
           const showDateTime = new Date(showDateTimeStr);
@@ -231,7 +237,7 @@ const MovieInformationPage = () => {
             {movieInfo.name}
           </Text>
           <Text style={TextStyle.body2} mb={2}>
-            {movieInfo.genre}
+            {movieInfo.genre} | {movieInfo.language}
           </Text>
           <Text style={TextStyle.body2} mb={2}>
             {movieInfo.duration} minutes
@@ -274,25 +280,24 @@ const MovieInformationPage = () => {
                       <Box key={screenIdx} p={2}>
                         <Text style={TextStyle.body1}>Screen {screenNo} | {screenDetails.screenType}</Text>
                         <Flex wrap="wrap" gap="10px">
-
-                    {screenDetails.films.map((film, filmIdx) => {
-                      const isPast = isPastTime(film.date, film.startTime);
-                      const isNearest = nearestFutureTime && nearestFutureTime.date === film.date && nearestFutureTime.startTime === film.startTime;
-                      const future = new Date(film.date) > new Date();
+                          {screenDetails.films.map((film, filmIdx) => {
+                            const isPast = isPastTime(film.date, film.startTime);
+                            const isNearest = nearestFutureTime && nearestFutureTime.date === film.date && nearestFutureTime.startTime === film.startTime;
+                            const future = new Date(film.date) > new Date();
     
-                      return (
-                        <Box key={filmIdx}>
-                          <Button 
-                            size="xs" 
-                            mr={"4"}
-                            disabled={isPast}
-                            style={isNearest ? nearestStyle : (future? futureStyle : {})} // Change color scheme based on the status
-                          >
-                            {formatTime(film.startTime)}
-                          </Button>
-                        </Box>
-                      );
-                    })}
+                            return (
+                              <Box key={filmIdx}>
+                                <Button 
+                                  size="xs" 
+                                  mr={"4"}
+                                  disabled={isPast}
+                                  style={isNearest ? nearestStyle : (future? futureStyle : notAvailableStyle)} // Change color scheme based on the status
+                                >
+                                  {formatTime(film.startTime)}
+                                </Button>
+                              </Box>
+                            );
+                          })}
 
                         </Flex>
                       </Box>
