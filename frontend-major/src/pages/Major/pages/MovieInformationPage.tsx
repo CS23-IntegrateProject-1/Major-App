@@ -39,6 +39,12 @@ interface ScreenDetails {
   films: Film[];
 }
 
+interface NearestTime {
+  date: string;
+  startTime: string;
+}
+
+
 // interface ScreenWithFilms {
 //   screenId: number;
 //   theaterId: number;
@@ -122,9 +128,6 @@ const MovieInformationPage = () => {
       }
       const screenType = response.data[0].screen.screenType;
       const theaterNamesResponses = await Promise.all(
-        // response.data.map((screen: { screen: { theaterId: number } }) => 
-        //   Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`)
-        // )
         response.data.map((screen: ScreenWithFilms) => Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`))
       );
 
@@ -170,34 +173,27 @@ const MovieInformationPage = () => {
     return showDateTime < now;
   };
 
-  const findNearestFutureTime = (theaterScreenFilms: TheaterScreenFilms): { date: string, startTime: string } | null => {
+  const findNearestFutureTimeForScreen = (screenDetails: ScreenDetails): NearestTime | null => {
     const now = new Date();
     let nearestTime = null;
     let minDiff = Number.MAX_SAFE_INTEGER;
   
-    Object.values(theaterScreenFilms).forEach(screens => {
-      Object.values(screens).forEach(screenDetails => {
-        screenDetails.films.forEach(film => {
-          const datePart = film.date.split('T')[0];
-          const showDateTimeStr = `${datePart}T${film.startTime}`;
-          const showDateTime = new Date(showDateTimeStr);
+    screenDetails.films.forEach(film => {
+      const datePart = film.date.split('T')[0];
+      const showDateTimeStr = `${datePart}T${film.startTime}`;
+      const showDateTime = new Date(showDateTimeStr);
   
-          console.log(`Show DateTime String: ${showDateTimeStr}, Show DateTime: ${showDateTime}`);
-  
-          const diff = showDateTime.getTime() - now.getTime();
-          if (!isNaN(diff) && diff > 0 && diff < minDiff) {
-            nearestTime = { date: film.date, startTime: film.startTime };
-            minDiff = diff;
-          }
-        });
-      });
+      const diff = showDateTime.getTime() - now.getTime();
+      if (!isNaN(diff) && diff > 0 && diff < minDiff) {
+        nearestTime = { date: film.date, startTime: film.startTime };
+        minDiff = diff;
+      }
     });
   
     return nearestTime;
   };
   
   
-  const nearestFutureTime = findNearestFutureTime(showtimesByTheater);
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {
@@ -276,32 +272,34 @@ const MovieInformationPage = () => {
                   <AccordionIcon />
                 </AccordionButton>
                 <AccordionPanel pb={4}>
-                  {Object.entries(screens).map(([screenNo, screenDetails], screenIdx) => (
-                      <Box key={screenIdx} p={2}>
-                        <Text style={TextStyle.body1}>Screen {screenNo} | {screenDetails.screenType}</Text>
-                        <Flex wrap="wrap" gap="10px">
-                          {screenDetails.films.map((film, filmIdx) => {
-                            const isPast = isPastTime(film.date, film.startTime);
-                            const isNearest = nearestFutureTime && nearestFutureTime.date === film.date && nearestFutureTime.startTime === film.startTime;
-                            const future = new Date(film.date) > new Date();
-    
-                            return (
-                              <Box key={filmIdx}>
-                                <Button 
-                                  size="xs" 
-                                  mr={"4"}
-                                  disabled={isPast}
-                                  style={isNearest ? nearestStyle : (future? futureStyle : notAvailableStyle)} // Change color scheme based on the status
-                                >
-                                  {formatTime(film.startTime)}
-                                </Button>
-                              </Box>
-                            );
-                          })}
+                {Object.entries(screens).map(([screenNo, screenDetails], screenIdx) => {
+                  const nearestFutureTime = findNearestFutureTimeForScreen(screenDetails);
+                  return (
+                    <Box key={screenIdx} p={2}>
+                      <Text style={TextStyle.body1}>Screen {screenNo} | {screenDetails.screenType}</Text>
+                      <Flex wrap="wrap" gap="10px">
+                        {screenDetails.films.map((film, filmIdx) => {
+                          const isPast = isPastTime(film.date, film.startTime);
+                          const isNearest = nearestFutureTime !== null && nearestFutureTime.date === film.date && nearestFutureTime.startTime === film.startTime;
+                          const future = new Date(film.date) > new Date() || (new Date(film.date) === new Date() && new Date(film.startTime) > new Date());
 
-                        </Flex>
-                      </Box>
-                  ))}
+                          return (
+                            <Box key={filmIdx}>
+                              <Button 
+                                size="xs" 
+                                mr={"4"}
+                                disabled={isPast}
+                                style={isNearest ? nearestStyle : (future ? futureStyle : notAvailableStyle)}
+                              >
+                                {formatTime(film.startTime)}
+                              </Button>
+                            </Box>
+                          );
+                        })}
+                      </Flex>
+                    </Box>
+                  );
+                })}
                 </AccordionPanel>
               </AccordionItem>
             ))}

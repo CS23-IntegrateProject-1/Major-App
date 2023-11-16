@@ -82,15 +82,19 @@ export const getShowFromFilmIdAndDate = async (req: Request, res: Response) => {
                 date: new Date(date)
             },
             orderBy: {
-                startTime: 'asc'
+                startTime: 'asc',
             }
         });
+        console.log(shows)
         let results: ScreenWithFilms[] = [];
         for (let show of shows) {
             const screen = await prisma.screens.findUnique({
                 where: {
                     screenId: show.screenId
-                }
+                },
+                // orderBy: {
+                //     theaterId: 'asc'
+                // }
             });
             let f: FilmShowtime[] = [];
             const film = await prisma.films.findUnique({
