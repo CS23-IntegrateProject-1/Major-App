@@ -41,6 +41,8 @@ export const MovieCard: React.FC<{ film: film }> = ({ film }) => {
           borderRadius="lg"
           width={posterWidth}
           height={posterHeight}
+          style={{borderRadius:"6px"}}
+          
         />
         {isHovered && (
           <Card

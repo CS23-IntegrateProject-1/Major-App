@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Text, Flex } from "@chakra-ui/react";
+import { Box, Text, Flex, Grid, useBreakpointValue } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { MovieCard } from "../../../components/movieCard/moviecard";
 import {
@@ -11,7 +11,6 @@ import {
   TabIndicator,
 } from "@chakra-ui/react";
 import { Axios } from "../../../AxiosInstance";
-
 
 const MoviePage = () => {
   const [nowShowingMovies, setNowShowingMovies] = useState([]);
@@ -36,6 +35,8 @@ const MoviePage = () => {
       });
   }, []);
 
+  const columns = useBreakpointValue<number>({ base: 1, sm: 2, md: 3, lg: 4, xl: 5 }) || 1;
+
   return (
     <Box justifyContent="center" textAlign="center" alignItems="center">
       {/* Tab details and show */}
@@ -47,36 +48,30 @@ const MoviePage = () => {
         <TabIndicator mt="-1.5px" height="2px" bg="gold" borderRadius="1px" />
         <TabPanels>
           <TabPanel>
-            <Flex flexWrap="wrap" justifyContent="center" >
-              {nowShowingMovies.map((film, index) => {
-              const isNewRow = index % 4 === 0;
-              // Calculate whether the film is the last in its row (4th, 8th, 12th, etc.)
-              const isEndOfRow = (index + 1) % 4 === 0 || index === nowShowingMovies.length - 1;
-
-              // Apply left margin to all except the first in a row, right margin to all except the last in a row
-              const marginX = { marginLeft: isNewRow ? 0 : 2, marginRight: isEndOfRow ? 0 : 2 };
-
-              return (
-                <Box 
-                  key={film} // Assuming 'film' is an object with an 'id' field
-                  flex="1 0 21%" // Adjust this value to control the width of the card
-                  justifyContent="center"
-                  {...marginX}
-                  marginBottom={4} // Adjust this value to control the vertical spacing between rows
-                >
+            <Grid
+              templateColumns={`repeat(auto-fill, minmax(calc(${100 / columns}% - 20px), 1fr))`} // Adjust the column width here
+              gap={2} // Adjust the gap between grid items
+              justifyContent="center"
+            >
+              {nowShowingMovies.map((film, index) => (
+                <Box key={film} marginBottom={4}>
                   <MovieCard film={film} />
                 </Box>
-              )
-            })}
-          </Flex>
-
+              ))}
+            </Grid>
           </TabPanel>
           <TabPanel>
-            <Flex flexWrap="wrap" justifyContent="initial">
-              {upcommingMovies.map((film) => (
-                <MovieCard key={film} film={film} />
+          <Grid
+              templateColumns={`repeat(auto-fill, minmax(calc(${100 / columns}% - 20px), 1fr))`} // Adjust the column width here
+              gap={2} // Adjust the gap between grid items
+              justifyContent="center"
+            >
+              {upcommingMovies.map((film, index) => (
+                <Box key={film} marginBottom={4}>
+                  <MovieCard film={film} />
+                </Box>
               ))}
-            </Flex>
+            </Grid>
           </TabPanel>
         </TabPanels>
       </Tabs>
