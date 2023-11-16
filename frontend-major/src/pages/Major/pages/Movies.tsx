@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import { Axios } from "../../../AxiosInstance";
 
+
 const MoviePage = () => {
   const [nowShowingMovies, setNowShowingMovies] = useState([]);
   const [upcommingMovies, setUpcommingMovies] = useState([]);
