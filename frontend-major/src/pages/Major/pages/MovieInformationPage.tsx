@@ -19,7 +19,7 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { DateCarousel } from "../../../Datecarousel";
+import { DateCarousel } from "../../../components/DateCarousel";
 
 interface Film {
   name: string;
@@ -79,8 +79,8 @@ const MovieInformationPage = () => {
   const posterWidth = "150px"; // Replace with your desired movie poster width
   const posterHeight = "225px"; // Replace with your desired movie poster height
 
-  const buttonWidth = "200px";
-  const buttonHeight = "100px";
+  // const buttonWidth = "200px";
+  // const buttonHeight = "100px";
 
   const nearestStyle = {
     backgroundColor: '#d2ab5a', 
@@ -127,7 +127,7 @@ const MovieInformationPage = () => {
       if (!response.data || response.data.length === 0) {
         throw new Error('No data received from API');
       }
-      const screenType = response.data[0].screen.screenType;
+      // const screenType = response.data[0].screen.screenType;
       const theaterNamesResponses = await Promise.all(
         response.data.map((screen: ScreenWithFilms) => Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`))
       );

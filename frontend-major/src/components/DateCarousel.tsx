@@ -46,8 +46,8 @@ export const DateCarousel: FC = () => {
     ); // Calculate end date
 
     while (todayTime <= endDate) {
-      const options: Intl.DateTimeFormatOptions = { weekday: "short" };
-      const dayName: string = todayTime.toLocaleString("en-US", options);
+      // const options: Intl.DateTimeFormatOptions = { weekday: "short" };
+      // const dayName: string = todayTime.toLocaleString("en-US", options);
 
       const dayOfMonth: number = todayTime.getDate();
       const monthIndex: number = todayTime.getMonth();
