@@ -4,6 +4,7 @@ import router from "./film";
 import theater from "./theatre";
 import show from "./show";
 import screen from "./screen";
+import seat from "./seat";
 
 class Routes {
 	constructor(app: Application) {
@@ -16,6 +17,8 @@ class Routes {
 		app.use("/show", show);
 		app.use("/api/screen", screen);
 		app.use("/screen", screen);
+		app.use("/api/seat", seat);
+		app.use("/seat", seat);
 	}
 }
 export default Routes;
