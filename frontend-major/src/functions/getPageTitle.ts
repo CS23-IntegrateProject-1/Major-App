@@ -11,6 +11,8 @@ export const getPageTitle = (pathname: string) => {
       return "CINEMAS";
     case "/MovieInfo/:id":
       return "MOVIES";
+      case "/Screen":
+      return "SCREEN";
     // more later...
     default:
       return "MOVIES";
