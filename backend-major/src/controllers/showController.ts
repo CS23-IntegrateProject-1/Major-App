@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 const prisma = new PrismaClient();
 
 type FilmShowtime = {
+    filmId?: number;
     name: string;
     date: Date;
     startTime: string;
@@ -124,6 +125,7 @@ export const getShowFromFilmIdAndDate = async (req: Request, res: Response) => {
             });
             if (film && screen) {
                 f.push({
+                    filmId: show.filmId,
                     name: film.name,
                     date: show.date,
                     startTime: `${show.startTime.getUTCHours().toString().padStart(2, '0')}:${show.startTime.getUTCMinutes().toString().padStart(2, '0')}`,
