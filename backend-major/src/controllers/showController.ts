@@ -306,7 +306,7 @@ export const getShowByShowId = async (req: Request, res: Response) => {
         if (!show) {
             res.status(404).json({ error: "Show not found" });
         } else {
-            const startTime = show.startTime.toTimeString().split(' ')[0];
+            const startTime = `${show.startTime.getUTCHours().toString().padStart(2, '0')}:${show.startTime.getUTCMinutes().toString().padStart(2, '0')}`;
             res.status(200).json({ show, startTime });
         }
     } catch (err) { 
