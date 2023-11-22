@@ -4,12 +4,6 @@ import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
 
-interface Seat {
-  id: number;
-  row: number;
-  number: number;
-  status: "available" | "booked" | "selected";
-}
 interface ShowDetails{
   show: Show;
   startTime: string;
@@ -158,35 +152,6 @@ const ScreenPage: React.FC = () => {
   //   fetchData();
   // }, [dateday]);
 
-  //seatttttttttttttttttttttt
-  const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
-
-  // Mock seat data
-  const seatData: Seat[] = [];
-  const totalRows = 4;
-  const seatsPerRow = 6;
-
-  for (let row = 1; row <= totalRows; row++) {
-    for (let number = 1; number <= seatsPerRow; number++) {
-      const id = (row - 1) * seatsPerRow + number;
-      const status: Seat["status"] = 1 ? "available" : "booked"; // Randomly generate seat availability
-      seatData.push({ id, row, number, status });
-    }
-  }
-
-  const handleSeatClick = (seat: Seat): void => {
-    if (seat.status === "available") {
-      const isSelected = selectedSeats.some((s) => s.id === seat.id);
-      if (isSelected) {
-        const updatedSeats = selectedSeats.filter((s) => s.id !== seat.id);
-        setSelectedSeats(updatedSeats);
-      } else {
-        setSelectedSeats([...selectedSeats, seat]);
-      }
-    }
-  };
-  let counter = -1; // Initialize the counter
-
   return (
     <>
       {/* Movie Info at top*/}
@@ -237,53 +202,6 @@ const ScreenPage: React.FC = () => {
       </Box>
 
       {/* select seat */}
-      <Box textAlign="center" marginTop={8}>
-        <h1>Select Your Seats</h1>
-        <Grid
-          templateColumns={`repeat(${seatsPerRow}, 1fr)`}
-          rowGap={3}
-          columnGap={4}
-          marginTop={4}
-        >
-          {seatData.map((seat) => {
-            counter++;
-            return (
-              <React.Fragment key={seat.id}>
-                <Button
-                  disabled={seat.status !== "available"}
-                  variant={
-                    selectedSeats.some((s) => s.id === seat.id)
-                      ? "solid"
-                      : "outline"
-                  }
-                  colorScheme={seat.status === "booked" ? "gray" : "blue"}
-                  onClick={() => handleSeatClick(seat)}
-                ></Button>
-                {counter % seatsPerRow === seatsPerRow - 1 &&
-                  counter !== seatData.length - 1 && (
-                    <Box
-                      w="100%"
-                      h="0"
-                      gridColumn={`1 / span ${seatsPerRow}`}
-                    />
-                  )}
-              </React.Fragment>
-            );
-          })}
-        </Grid>
-        <Button
-          colorScheme="teal"
-          marginTop={6}
-          onClick={() =>
-            console.log(
-              "Selected seats:",
-              selectedSeats.map((seat) => seat.id)
-            )
-          }
-        >
-          Book Seats
-        </Button>
-      </Box>
     </>
   );
 };
