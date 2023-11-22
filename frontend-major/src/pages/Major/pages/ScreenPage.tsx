@@ -10,7 +10,42 @@ interface Seat {
   number: number;
   status: "available" | "booked" | "selected";
 }
+interface ShowDetails{
+  show: Show;
+  startTime: string;
+}
 
+interface Show{
+  date: string;
+  endTime: string;
+  filmId: number;
+  price: string;
+  screenId: number;
+  showId: number;
+  startTime: string;
+  Screens: Screen;
+  Films: Film;
+}
+
+interface Screen {
+  capacity: number;
+  screenId: number;
+  screenType: string;
+  screen_number: number; // This was corrected from screenNo to screen_number based on the log
+  theaterId: number;
+}
+
+interface Film {
+  duration: number;
+  filmId: number;
+  genre: string;
+  language: string;
+  name: string;
+  posterImg: string;
+  rate: number;
+  releaseDate: string;
+  synopsis: string;
+}
 const ScreenPage: React.FC = () => {
   const posterWidth = "25vh"; // Replace with your desired movie poster width
   const posterHeight = "40vh"; // Replace with your desired movie poster height
@@ -19,7 +54,9 @@ const ScreenPage: React.FC = () => {
   const filmid = parseInt(filmId || "0");
   const theaterId = useParams<{ theaterId: string }>().theaterId;
   const theaterid = parseInt(theaterId || "0");
-  console.log(date);
+  const showId = useParams<{ showId: string }>().showId;
+  const showid = parseInt(showId || "0");
+  console.log(showid);
 
   interface film {
     filmId: number;
@@ -31,6 +68,19 @@ const ScreenPage: React.FC = () => {
     genre: string;
     language: string;
   }
+  const [allShowDetails, setAllShowDetails] = useState<ShowDetails | null>(null);
+  useEffect(() => {
+    if (showid) {
+      Axios.get(`http://localhost:3000/show/getShowByShowId/${showid}`)
+        .then((response) => {
+          setAllShowDetails(response.data); 
+        })
+        .catch((error) => {
+          console.error("Error fetching show details:", error);
+        });
+    }
+  }, [showid]);
+  
 
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const formatDate = (dateString: string) => {
@@ -169,7 +219,10 @@ const ScreenPage: React.FC = () => {
         </Text>
         <Box display="flex" flexDirection="row">
           <Center style={TextStyle.body1} mb={2} mr={20}>
-            Theatre 1
+            Screen {allShowDetails?.show.Screens.screen_number}
+          </Center>
+          <Center style={TextStyle.body1} mb={2} mr={2}>
+            {allShowDetails?.show.date ? formatDate(allShowDetails?.show.date) : ""}
           </Center>
           <Center
             style={TextStyle.body1}
@@ -178,7 +231,7 @@ const ScreenPage: React.FC = () => {
             padding="0.5%"
             borderRadius="10%"
           >
-            {/* {showInfo.startTime} */}
+            {allShowDetails?.startTime.slice(0, 5)}
           </Center>
         </Box>
       </Box>
