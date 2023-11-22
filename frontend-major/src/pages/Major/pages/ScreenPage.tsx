@@ -1,11 +1,9 @@
-
 import { Box, Center, Image, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 
 const ScreenPage = () => {
   const posterWidth = "25vh"; // Replace with your desired movie poster width
   const posterHeight = "40vh"; // Replace with your desired movie poster height
-  
 
   return (
     <>
@@ -36,11 +34,17 @@ const ScreenPage = () => {
         <Text style={TextStyle.body1} mb={2}>
           Theatre name
         </Text>
-        <Box display="flex" flexDirection="row" >
+        <Box display="flex" flexDirection="row">
           <Center style={TextStyle.body1} mb={2} mr={20}>
             Theatre 1
           </Center>
-          <Center style={TextStyle.body1} ml={20} backgroundColor={"gold"} padding="0.5%" borderRadius="10%">
+          <Center
+            style={TextStyle.body1}
+            ml={20}
+            backgroundColor={"gold"}
+            padding="0.5%"
+            borderRadius="10%"
+          >
             13:00
           </Center>
         </Box>

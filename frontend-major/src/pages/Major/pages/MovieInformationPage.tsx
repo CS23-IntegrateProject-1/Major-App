@@ -135,6 +135,7 @@ const MovieInformationPage = () => {
 
       interface ScreenWithFilms {
         screen: {
+          showId: number;
           screenId: number;
           theaterId: number;
           screen_number: number;
@@ -159,8 +160,8 @@ const MovieInformationPage = () => {
         }
         groupedData[theaterName][screenNo].films.push(...screen.films);
       });
-
       setShowtimesByTheater(groupedData);
+      console.log(showtimesByTheater)
     } catch (error) {
       console.error("Error fetching showtimes:", error);
     }
