@@ -291,6 +291,30 @@ export const getShowEveryTheater = async (req: Request, res: Response) => {
     }
 };
 
+export const getShowByShowId = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const show = await prisma.shows.findUnique({
+            where: {
+                showId: parseInt(id)
+            },
+            include: {
+                Screens: true,
+                Films: true
+            }
+        });
+        if (!show) {
+            res.status(404).json({ error: "Show not found" });
+        } else {
+            const startTime = show.startTime.toTimeString().split(' ')[0];
+            res.status(200).json({ show, startTime });
+        }
+    } catch (err) { 
+        const error = err as Error;
+        res.status(500).json({error: error.message});
+    }
+}
+
 // export const getShowOfEveryTheaterByDate = async (req: Request, res: Response) => {
 //     try {
 //         const { date } = req.params;

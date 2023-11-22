@@ -2,7 +2,8 @@ import { getShowByTheaterId,
          getShowEveryTheater,
          getShowFromFilmId,
          getShowByTheaterIdAndDate,
-         getShowFromFilmIdAndDate} from "../controllers/showController";
+         getShowFromFilmIdAndDate,
+         getShowByShowId} from "../controllers/showController";
 import { Router } from "express";
 
 const show = Router();
@@ -11,5 +12,6 @@ show.get("/getShowEveryTheater", getShowEveryTheater);
 show.get("/getShowFromFilmId/:id", getShowFromFilmId);
 show.get("/getShowByTheaterIdAndDate/:id/:date", getShowByTheaterIdAndDate);
 show.get("/getShowFromFilmIdAndDate/:id/:date", getShowFromFilmIdAndDate);
+show.get("/getShowByShowId/:id", getShowByShowId);
 
 export default show;
