@@ -29,6 +29,7 @@ interface Film {
   startTime: string;
   screenNo: number;
   showId: number;
+  theaterId: number;
 }
 
 interface TheaterScreenFilms {
