@@ -60,7 +60,7 @@ export const DateCarousel: FC = () => {
       todayTime.setDate(todayTime.getDate() + 1); // Move to the next day for the next iteration
     }
 
-    console.log(dates);
+    // console.log(dates);
     return dates;
   };
 

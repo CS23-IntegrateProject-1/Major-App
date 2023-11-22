@@ -3,6 +3,7 @@ import { TextStyle } from "../../../theme/TextStyle";
 import { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { Flex } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 import {
   Tabs,
   TabList,
@@ -22,10 +23,12 @@ import { useParams } from "react-router-dom";
 import { DateCarousel } from "../../../components/DateCarousel";
 
 interface Film {
+  filmId: number;
   name: string;
   date: string;
   startTime: string;
   screenNo: number;
+  showId: number;
 }
 
 interface TheaterScreenFilms {
@@ -44,27 +47,10 @@ interface NearestTime {
   startTime: string;
 }
 
-// interface ScreenWithFilms {
-//   screenId: number;
-//   theaterId: number;
-//   theaterName?: string;
-//   capacity: number;
-//   screenType: string;
-//   films: Film[];
-// }
-// interface Theater {
-//   theaterId: number;
-//   name: string;
-//   address: string;
-//   phoneNum: string;
-//   promptPayNum: string;
-//   latitude: number;
-//   longitude: number;
-// }
-
 const MovieInformationPage = () => {
   interface film {
     filmId: number;
+    theaterId: number;
     name: string;
     posterImg: string;
     synopsis: string;
@@ -119,7 +105,7 @@ const MovieInformationPage = () => {
   const fetchShowtimes = async () => {
     try {
       const response = await Axios.get(
-        `http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-18`
+        `http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-25`
       );
       if (!response.data || response.data.length === 0) {
         throw new Error("No data received from API");
@@ -148,6 +134,9 @@ const MovieInformationPage = () => {
       response.data.forEach((screen: ScreenWithFilms, index: number) => {
         const theaterName = theaterNamesResponses[index].data.name;
         const screenNo = screen.screen.screen_number;
+        const showId = screen.screen.showId;
+        const filmId = screen.films[0].filmId;
+        const theaterId = screen.screen.theaterId;
 
         if (!groupedData[theaterName]) {
           groupedData[theaterName] = {};
@@ -158,10 +147,17 @@ const MovieInformationPage = () => {
             films: [],
           };
         }
-        groupedData[theaterName][screenNo].films.push(...screen.films);
+        const filmsWithShowId: Film[] = screen.films.map((film) => ({
+          ...film,
+          filmId: filmId,
+          theaterId: theaterId, 
+          showId: showId,
+        }));
+  
+        groupedData[theaterName][screenNo].films.push(...filmsWithShowId);
       });
       setShowtimesByTheater(groupedData);
-      console.log(showtimesByTheater)
+      console.log(groupedData);
     } catch (error) {
       console.error("Error fetching showtimes:", error);
     }
@@ -305,9 +301,14 @@ const MovieInformationPage = () => {
 
                                   return (
                                     <Box key={filmIdx}>
+                                    <Link
+                                      to={`/Screen/${film.filmId}/${film.date}/${film.showId}/${film.theaterId}`}
+                                      style={{ textDecoration: 'none' }}
+                                    >
                                       <Button
+                                        as="div" // Use "as" prop to render as a div
                                         size="xs"
-                                        mr={"4"}
+                                        mr="4"
                                         disabled={isPast}
                                         style={
                                           isNearest
@@ -319,7 +320,8 @@ const MovieInformationPage = () => {
                                       >
                                         {formatTime(film.startTime)}
                                       </Button>
-                                    </Box>
+                                    </Link>
+                                  </Box>
                                   );
                                 })}
                               </Flex>

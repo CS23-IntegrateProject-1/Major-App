@@ -28,7 +28,7 @@ const ExampleRoutes = () => {
 			element: <MovieInformationPage/>
 		},
 		{
-			path: "/Screen",
+			path: "/Screen/:filmId/:date/:showId/:theaterId",
 			element: <ScreenPage/>
 
 		},
