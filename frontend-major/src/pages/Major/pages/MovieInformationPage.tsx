@@ -119,22 +119,21 @@ const MovieInformationPage = () => {
           )
         )
       );
-
+      console.log(response.data)
       interface ScreenWithFilms {
         screen: {
           showId: number;
           screenId: number;
           theaterId: number;
-          screen_number: number;
           screenType: string;
         };
         films: Film[];
       }
-
+      console.log(response.data)
       const groupedData: TheaterScreenFilms = {};
       response.data.forEach((screen: ScreenWithFilms, index: number) => {
         const theaterName = theaterNamesResponses[index].data.name;
-        const screenNo = screen.screen.screen_number;
+        const screenNo = screen.films[0].screenNo
         const showId = screen.screen.showId;
         const filmId = screen.films[0].filmId;
         const theaterId = screen.screen.theaterId;
@@ -277,6 +276,7 @@ const MovieInformationPage = () => {
                     <AccordionPanel pb={4}>
                       {Object.entries(screens).map(
                         ([screenNo, screenDetails], screenIdx) => {
+                          console.log(screenNo, screenDetails)
                           const nearestFutureTime =
                             findNearestFutureTimeForScreen(screenDetails);
                           return (
