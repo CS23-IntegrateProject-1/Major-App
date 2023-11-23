@@ -1,6 +1,5 @@
 import React, { useEffect, useState, FC } from "react";
 import { Box, Center, Image, Text } from "@chakra-ui/react";
-import { TextStyle } from "../../theme/TextStyle";
 
 export const MovieSeat: FC = () => {
   const [selected, setSelected] = useState(false);
@@ -19,7 +18,7 @@ export const MovieSeat: FC = () => {
   return (
     <>
       <Box>
-        <Center
+        {/* <Center
           style={TextStyle.h2}
           mt={10}
           mb={10}
@@ -28,7 +27,7 @@ export const MovieSeat: FC = () => {
           p={1} // Padding to make the border visible
         >
           screen
-        </Center>
+        </Center> */}
         <Box>
           <Image
             onClick={handleImageClick}

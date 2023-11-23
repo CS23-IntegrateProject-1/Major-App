@@ -220,9 +220,22 @@ const ScreenPage: React.FC = () => {
           </Center>
         </Box>
       </Box>
+     {/* Screen */}
+      <Center
+        style={TextStyle.h2}
+        mt={10}
+        mb={10}
+        borderWidth="0.2vw"
+        borderColor="gold"
+        p={1} // Padding to make the border visible
+      >
+        screen
+      </Center>
 
-      {/* select seat */}
+      {/* seat */}
       <MovieSeat />
+
+      {/* TypeCard */}
       <Center>
         <Grid
           templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
@@ -237,7 +250,6 @@ const ScreenPage: React.FC = () => {
           ))}
         </Grid>
       </Center>
-
       <Box display="flex" flexDirection="row" justifyContent="center">
         <Text>Seat no: </Text>
         <Text>Price: </Text>
