@@ -1,4 +1,4 @@
-import { Box, Center, Image, Text, Grid, Button } from "@chakra-ui/react";
+import { Box, Center, Image, Text, Grid, Flex} from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
@@ -27,7 +27,7 @@ interface Screen {
   capacity: number;
   screenId: number;
   screenType: string;
-  screen_number: number; // This was corrected from screenNo to screen_number based on the log
+  screen_number: number; 
   theaterId: number;
 }
 
@@ -43,16 +43,26 @@ interface Film {
   synopsis: string;
 }
 
-interface type {
+interface Seat {
+  seatId: number;
+  Seat_Types: SeatType;
+  screenId: number;
+  showId: number;
+  seatRow: string;
+  seatNo: number;
+}
+
+interface SeatType {
+  seatTypeId: number;
   typeName: string;
-  finalPrice: number;
+  price: number;
 }
 
 const ScreenPage: React.FC = () => {
   const posterWidth = "25vh"; // Replace with your desired movie poster width
   const posterHeight = "40vh"; // Replace with your desired movie poster height
   const filmId = useParams<{ filmId: string }>().filmId;
-  const date = useParams<{ date: string }>().date;
+  // const date = useParams<{ date: string }>().date;
   const filmid = parseInt(filmId || "0");
   const theaterId = useParams<{ theaterId: string }>().theaterId;
   const theaterid = parseInt(theaterId || "0");
@@ -170,6 +180,51 @@ const ScreenPage: React.FC = () => {
       });
   }, []);
 
+
+
+  //seat
+  const [seats, setSeats] = useState<Seat[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<Array<number>>([]);
+  const [availableSeats, setAvailableSeats] = useState<Array<number>>([]);
+  
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    Axios.get(`http://localhost:3000/seat/getSeatInfoByScreenId/${allShowDetails?.show.screenId}/${showId}`)
+      .then(response => {
+        setSeats(response.data);
+        fetchAvailableSeats();
+      })
+      .catch(error => setError(error.message));
+  }, [allShowDetails?.show.screenId, showId]);
+
+  
+  const fetchAvailableSeats = () => {
+    Axios.get(`http://localhost:3000/seat/getAvailableSeats/${allShowDetails?.show.screenId}/${showId}`)
+        .then(response => setAvailableSeats(response.data))
+        .catch(error => setError(error.message));
+  };
+
+  const handleSeatClick = (seatId: number) => {
+    if (availableSeats.includes(seatId)) {
+      setSelectedSeats((prevSelectedSeats: Array<number>) => {
+        if (prevSelectedSeats.includes(seatId)) {
+          return prevSelectedSeats.filter((id) => id !== seatId);
+        } else {
+          return [...prevSelectedSeats, seatId];
+        }
+      });
+    }
+  };
+
+  const seatsByRow: { [key: string]: Seat[] } = seats.reduce((acc, seat) => {
+    acc[seat.seatRow] = acc[seat.seatRow] || [];
+    acc[seat.seatRow].push(seat);
+    return acc;
+  }, {} as { [key: string]: Seat[] });
+  console.log(seats)
+  console.log(seatsByRow)
+  
   return (
     <>
       {/* Movie Info at top*/}
@@ -233,7 +288,24 @@ const ScreenPage: React.FC = () => {
       </Center>
 
       {/* seat */}
-      <MovieSeat />
+      <Center flexDir="column">
+        {Object.entries(seatsByRow)
+          .sort((a, b) => parseInt(b[0], 10) - parseInt(a[0], 10)) 
+          .map(([row, seatsInRow]) => (
+            <Flex key={row} justifyContent="center" mb={4}>
+            {seatsInRow.map(seat => (
+              <MovieSeat
+                key={seat.seatId}
+                seatId={seat.seatId}
+                isSelected={selectedSeats.includes(seat.seatId)}
+                onSeatClick={handleSeatClick}
+                type={seat.Seat_Types.typeName}
+              />
+            ))}
+            </Flex>
+          ))}
+      </Center>
+
 
       {/* TypeCard */}
       <Center>

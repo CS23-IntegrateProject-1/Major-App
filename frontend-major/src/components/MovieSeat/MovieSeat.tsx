@@ -1,43 +1,56 @@
 import React, { useEffect, useState, FC } from "react";
 import { Box, Center, Image, Text } from "@chakra-ui/react";
 
-export const MovieSeat: FC = () => {
-  const [selected, setSelected] = useState(false);
-  const [imageSrc, setImageSrc] = useState("../../../../redSeat.svg");
-  const handleImageClick = () => {
-    setSelected(!selected); // Toggle the selection status
+interface MovieSeatProps {
+  seatId: number;
+  isSelected: boolean;
+  onSeatClick: (seatId: number) => void; 
+  type: string;
+}
 
-    // Change image source based on selection status
-    if (selected) {
-      setImageSrc("../../../../checked.png"); // Replace with the path to your selected image
-    } else {
-      setImageSrc("../../../../redSeat.svg"); // Replace with the path to your default image
+export const MovieSeat: React.FC<MovieSeatProps> = ({
+  seatId,
+  isSelected,
+  onSeatClick,
+  type
+}) => {
+  const [selected, setSelected] = useState(isSelected);
+  const getSeatImage = () => {
+    switch (type) {
+      case "Regular":
+        return "../../../../redSeat.svg";
+      case "Premium":
+        return "../../../../purpleSeat.svg";
+      case "Honeymoon":
+        return "../../../../yellowSeat.svg";
+      default:
+        return "../../../../chair.png";
     }
   };
 
-  return (
-    <>
+  useEffect(() => {
+
+    setSelected(isSelected);
+  }, [isSelected]);
+  const imageSrc = selected ? "../../../../checked.png" : getSeatImage();
+
+    const handleImageClick = () => {
+      onSeatClick(seatId);
+      setSelected(!selected); 
+    };
+
+    return (
       <Box>
-        {/* <Center
-          style={TextStyle.h2}
-          mt={10}
-          mb={10}
-          borderWidth="0.2vw"
-          borderColor="gold"
-          p={1} // Padding to make the border visible
-        >
-          screen
-        </Center> */}
         <Box>
           <Image
             onClick={handleImageClick}
             style={{ cursor: "pointer" }}
-            src={imageSrc}
+            src={imageSrc} 
             alt="chair"
             w="7vh"
-          ></Image>
+          />
         </Box>
       </Box>
-    </>
-  );
-};
+    );
+  };
+          
