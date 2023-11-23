@@ -8,9 +8,32 @@ import {
   Flex,
   Button,
 } from "@chakra-ui/react";
-import { FC, useState } from "react";
+import { useState } from "react";
 
-export const DateCarousel: FC = () => {
+interface DateCarouselProps {
+  onDateSelect: (date: string) => void;
+};
+
+export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
+
+  const handleDateClick = (date: string) => {
+    const formattedDate = formatDate(date);
+    onDateSelect(formattedDate);
+  };
+  const formatDate = (dateStr: string): string => {
+    const months: { [key: string]: string } = {
+      Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
+      Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
+    };
+    const parts = dateStr.split(' ');
+    const day = parts[2]; 
+    const month = months[parts[3]];
+    const year = new Date().getFullYear();
+  
+    return `${year}-${month}-${day}`;
+  };
+  
+
   const [tab, setTab] = useState<number>(0);
 
   const generateDay = (numberOfDays: number): string[] => {
@@ -119,6 +142,7 @@ export const DateCarousel: FC = () => {
                 minW={"100px"}
                 cursor={"pointer"}
                 zIndex={99}
+                onClick={() => handleDateClick(date)}
               >
                 <Text
                   _hover={{

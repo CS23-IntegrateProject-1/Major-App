@@ -84,6 +84,18 @@ const MovieInformationPage = () => {
     color: "grey",
   };
 
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  console.log(selectedDate)
+  const handleDateSelect = (date: string) => {
+    setSelectedDate(date);
+  }
+  console.log(typeof selectedDate)
+  useEffect(() => {
+    if (selectedDate) {
+      fetchShowtimes();
+    }
+  }, [selectedDate]);
+
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const { filmId } = useParams<{ filmId?: string }>();
   const id = parseInt(filmId || "");
@@ -105,8 +117,10 @@ const MovieInformationPage = () => {
 
   const fetchShowtimes = async () => {
     try {
+      console.log('first')
+      console.log('Selected Date:', selectedDate);
       const response = await Axios.get(
-        `http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-25`
+        `http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/${selectedDate}`
       );
       if (!response.data || response.data.length === 0) {
         throw new Error("No data received from API");
@@ -262,7 +276,7 @@ const MovieInformationPage = () => {
           {/* Show (โรง+รอบหนัง) */}
           <TabPanel>
             {/* ... [date swipe remains unchanged] */}
-            <DateCarousel />
+            <DateCarousel onDateSelect={handleDateSelect} />
             <Accordion defaultIndex={[0]} allowMultiple>
               {Object.entries(showtimesByTheater).map(
                 ([theaterName, screens], theaterIdx) => (
