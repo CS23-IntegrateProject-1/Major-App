@@ -3,6 +3,7 @@ import { TextStyle } from "../../../theme/TextStyle";
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
+import { MovieSeat } from "../../../components/MovieSeat/MovieSeat";
 
 interface ShowDetails{
   show: Show;
@@ -202,6 +203,7 @@ const ScreenPage: React.FC = () => {
       </Box>
 
       {/* select seat */}
+      <MovieSeat/>
     </>
   );
 };

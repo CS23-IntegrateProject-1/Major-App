@@ -2,8 +2,10 @@ import React, { useEffect, useState,FC } from "react";
 import { Box, Center, Image, Text} from "@chakra-ui/react";
 import { TextStyle } from "../../theme/TextStyle";
 
-const [selected, setSelected] = useState(false);
-const [imageSrc, setImageSrc] = useState("../");
+
+export const MovieSeat: FC = () => {
+  const [selected, setSelected] = useState(false);
+const [imageSrc, setImageSrc] = useState("../../../../chair.png");
 const handleImageClick = () => {
   setSelected(!selected); // Toggle the selection status
 
@@ -15,7 +17,6 @@ const handleImageClick = () => {
   }
 };
 
-export const MovieSeat: FC = () => {
   return (
     <>
     <Box>
@@ -39,6 +40,7 @@ export const MovieSeat: FC = () => {
         ></Image>
       </Box>
 
+      <Box>
       <Center
         style={TextStyle.body1}
         mt={10}
@@ -52,9 +54,15 @@ export const MovieSeat: FC = () => {
         w="20vh"
       >
         <Image src="../../../../chair.png" alt="chair" w="7vh"></Image>
-        <Text>Type of chair</Text>
+        <Text mt="2" mb="2">Type of chair</Text>
         <Text>price</Text>
       </Center>
+      </Box>
+
+      <Box display="flex" flexDirection="row" justifyContent="center">
+        <Text>Seat no: </Text>
+        <Text>Price: </Text>
+      </Box>
     </Box>
     </>
   );
