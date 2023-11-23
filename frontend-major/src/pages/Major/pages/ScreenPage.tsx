@@ -4,13 +4,14 @@ import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { MovieSeat } from "../../../components/MovieSeat/MovieSeat";
+import { TypeOfSeatCard } from "../../../components/MovieSeat/TypeOfSeatCard";
 
-interface ShowDetails{
+interface ShowDetails {
   show: Show;
   startTime: string;
 }
 
-interface Show{
+interface Show {
   date: string;
   endTime: string;
   filmId: number;
@@ -41,6 +42,12 @@ interface Film {
   releaseDate: string;
   synopsis: string;
 }
+
+interface type {
+  typeName: string;
+  finalPrice: number;
+}
+
 const ScreenPage: React.FC = () => {
   const posterWidth = "25vh"; // Replace with your desired movie poster width
   const posterHeight = "40vh"; // Replace with your desired movie poster height
@@ -51,6 +58,7 @@ const ScreenPage: React.FC = () => {
   const theaterid = parseInt(theaterId || "0");
   const showId = useParams<{ showId: string }>().showId;
   const showid = parseInt(showId || "0");
+
   console.log(showid);
 
   interface film {
@@ -63,19 +71,39 @@ const ScreenPage: React.FC = () => {
     genre: string;
     language: string;
   }
-  const [allShowDetails, setAllShowDetails] = useState<ShowDetails | null>(null);
+  const [allShowDetails, setAllShowDetails] = useState<ShowDetails>();
   useEffect(() => {
     if (showid) {
       Axios.get(`http://localhost:3000/show/getShowByShowId/${showid}`)
         .then((response) => {
-          setAllShowDetails(response.data); 
+          setAllShowDetails(response.data);
         })
         .catch((error) => {
           console.error("Error fetching show details:", error);
         });
     }
   }, [showid]);
-  
+  useEffect(() => {
+    if (
+      allShowDetails &&
+      allShowDetails.show &&
+      allShowDetails.show.Screens &&
+      allShowDetails.show.Screens.screenId &&
+      showid
+    ) {
+      const screenId = allShowDetails.show.Screens.screenId;
+      console.log("Screen ID:", screenId); // Log screenId
+      Axios.get(
+        `http://localhost:3000/seat/getUniqueSeatTypeByScreenId/${screenId}/${showid}`
+      )
+        .then((response) => {
+          setSeatType(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching seat types:", error);
+        });
+    }
+  }, [allShowDetails, showid]);
 
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const formatDate = (dateString: string) => {
@@ -128,30 +156,19 @@ const ScreenPage: React.FC = () => {
     }
   }, [theaterid]);
 
-  // interface Show {
-  //   filmId: number;
-  //   name: string;
-  //   date: string;
-  //   startTime: string;
-  //   screenNo: number;
-  // }
+  const [seatType, setSeatType] = useState([]);
 
-  // const [showInfo, setShowInfo] = useState<Show>({} as Show);
-
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await Axios.get(
-  //         `http://localhost:3000/show/getShowFromFilmIdAndDate/${filmid}/${dateday}`
-  //       );
-  //       setShowInfo(response.data);
-  //     } catch (error) {
-  //       console.error("Error fetching show information:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [dateday]);
+  useEffect(() => {
+    Axios.get(
+      `http://localhost:3000/http://localhost:3000/seat/getUniqueSeatTypeByScreenId/${allShowDetails?.show.Screens.screenId}/${showid}`
+    )
+      .then((response) => {
+        setSeatType(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching now showing movies:", error);
+      });
+  }, []);
 
   return (
     <>
@@ -188,7 +205,9 @@ const ScreenPage: React.FC = () => {
             Screen {allShowDetails?.show.Screens.screen_number}
           </Center>
           <Center style={TextStyle.body1} mb={2} mr={2}>
-            {allShowDetails?.show.date ? formatDate(allShowDetails?.show.date) : ""}
+            {allShowDetails?.show.date
+              ? formatDate(allShowDetails?.show.date)
+              : ""}
           </Center>
           <Center
             style={TextStyle.body1}
@@ -203,7 +222,26 @@ const ScreenPage: React.FC = () => {
       </Box>
 
       {/* select seat */}
-      <MovieSeat/>
+      <MovieSeat />
+      <Center>
+        <Grid
+          templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+          gap={4}
+          maxWidth="800px" // Adjust the maximum width as needed
+          width="100%"
+        >
+          {seatType.map((type) => (
+            <Box key={type}>
+              <TypeOfSeatCard type={type} />
+            </Box>
+          ))}
+        </Grid>
+      </Center>
+
+      <Box display="flex" flexDirection="row" justifyContent="center">
+        <Text>Seat no: </Text>
+        <Text>Price: </Text>
+      </Box>
     </>
   );
 };
