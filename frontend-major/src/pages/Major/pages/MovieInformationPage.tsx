@@ -117,12 +117,20 @@ const MovieInformationPage = () => {
 
   const fetchShowtimes = async () => {
     try {
-      console.log('first')
-      console.log('Selected Date:', selectedDate);
+      let dateToUse = selectedDate;
+      if (selectedDate === '') {
+        const today = new Date();
+        const offset = today.getTimezoneOffset() * 60000;
+        const localISODate = new Date(today.getTime() - offset).toISOString().split('T')[0];
+        dateToUse = localISODate;
+      }
+      console.log(dateToUse)
       const response = await Axios.get(
-        `http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/${selectedDate}`
+        `http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/${dateToUse}`
       );
+      console.log(response.data)
       if (!response.data || response.data.length === 0) {
+        setShowtimesByTheater({});
         throw new Error("No data received from API");
       }
       // const screenType = response.data[0].screen.screenType;

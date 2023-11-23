@@ -16,11 +16,20 @@ interface DateCarouselProps {
 
 export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
 
-  const handleDateClick = (date: string) => {
+  const handleDateClick = (date?: string) => {
     const formattedDate = formatDate(date);
     onDateSelect(formattedDate);
+    console.log(formattedDate)
   };
-  const formatDate = (dateStr: string): string => {
+  
+  const formatDate = (dateStr?: string): string => {
+    if (!dateStr) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because getMonth() returns 0-11
+      const day = today.getDate().toString().padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
     const months: { [key: string]: string } = {
       Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
       Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
@@ -124,6 +133,7 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
             transition: "color 0.3s ease-in-out",
           }}
           borderColor="white"
+          onClick={() => handleDateClick(dates[0])}
         >
           {dates[0]}
         </Button>
