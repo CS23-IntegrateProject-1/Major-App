@@ -4,6 +4,7 @@ import { Request, Response } from "express";
 const prisma = new PrismaClient();
 
 type FilmShowtime = {
+    filmId?: number;
     name: string;
     date: Date;
     startTime: string;
@@ -12,6 +13,7 @@ type FilmShowtime = {
   
 type ScreenWithFilms = {
     screen: {
+      showId: number;
       screenId: number;
       theaterId: number;
       capacity: number;
@@ -19,6 +21,24 @@ type ScreenWithFilms = {
     };
     films: FilmShowtime[];
 };
+
+type ScreenWithFilm = {
+    screen: {
+      screenId: number;
+      theaterId: number;
+      capacity: number;
+      screenType: string;
+    };
+    films: FilmShowtime[];
+};
+
+type FilmShowtimes = {
+    showId: number;
+    name: string;
+    date: Date;
+    startTime: string;
+    screenNo: number;
+  };
 
 export const getShowFromFilmId = async (req: Request, res: Response) => {
     try {
@@ -50,6 +70,7 @@ export const getShowFromFilmId = async (req: Request, res: Response) => {
             if (screen && theater && film) {
                 results.push({
                     screen: {
+                        showId: show.showId,
                         screenId: screen.screenId,
                         theaterId: screen.theaterId,
                         capacity: screen.capacity,
@@ -104,6 +125,7 @@ export const getShowFromFilmIdAndDate = async (req: Request, res: Response) => {
             });
             if (film && screen) {
                 f.push({
+                    filmId: show.filmId,
                     name: film.name,
                     date: show.date,
                     startTime: `${show.startTime.getUTCHours().toString().padStart(2, '0')}:${show.startTime.getUTCMinutes().toString().padStart(2, '0')}`,
@@ -112,7 +134,13 @@ export const getShowFromFilmIdAndDate = async (req: Request, res: Response) => {
             }
             if (screen && f.length > 0) {
                 results.push({
-                    screen,
+                    screen: {
+                        showId: show.showId,
+                        screenId: screen.screenId,
+                        theaterId: screen.theaterId,
+                        capacity: screen.capacity,
+                        screenType: screen.screenType
+                    },
                     films: f
                 });
             }
@@ -132,7 +160,7 @@ export const getShowByTheaterId = async (req: Request, res: Response) => {
                 theaterId: parseInt(id)
             }
         });
-        let results: ScreenWithFilms[] = [];
+        let results: ScreenWithFilm[] = [];
         for (let screen of screens) {
             const showtimes = await prisma.shows.findMany({
                 where: {
@@ -179,7 +207,7 @@ export const getShowByTheaterIdAndDate = async (req: Request, res: Response) => 
         if (!screens) {
             res.status(404).json({error: "Screen not found"});
         }
-        let results: ScreenWithFilms[] = [];
+        let results: ScreenWithFilm[] = [];
         for (let screen of screens) {
             const showtimes = await prisma.shows.findMany({
                 where: {
@@ -187,7 +215,10 @@ export const getShowByTheaterIdAndDate = async (req: Request, res: Response) => 
                     date: new Date(date)
                 }
             });
-            let filmsWithShowtimes: FilmShowtime[] = [];
+            // Collect showIds for this screen
+            let showIds = showtimes.map(showtime => showtime.showId);
+
+            let filmsWithShowtimes: FilmShowtimes[] = [];
             for (let showtime of showtimes) {
                 const film = await prisma.films.findUnique({
                     where: {
@@ -196,6 +227,7 @@ export const getShowByTheaterIdAndDate = async (req: Request, res: Response) => 
                 });
                 if (film && showtime) {
                     filmsWithShowtimes.push({
+                        showId: showtime.showId,
                         name: film.name,
                         date: showtime.date,
                         startTime: showtime.startTime.toTimeString().split(' ')[0],
@@ -217,10 +249,11 @@ export const getShowByTheaterIdAndDate = async (req: Request, res: Response) => 
     }
 }
 
+
 export const getShowEveryTheater = async (req: Request, res: Response) => {
     try {
         const screens = await prisma.screens.findMany();
-        let results: ScreenWithFilms[] = [];
+        let results: ScreenWithFilm[] = [];
         for (let screen of screens) {
             const showtimes = await prisma.shows.findMany({
                 where: {
@@ -257,6 +290,30 @@ export const getShowEveryTheater = async (req: Request, res: Response) => {
         res.status(500).json({error: error.message});
     }
 };
+
+export const getShowByShowId = async (req: Request, res: Response) => {
+    try {
+        const { id } = req.params;
+        const show = await prisma.shows.findUnique({
+            where: {
+                showId: parseInt(id)
+            },
+            include: {
+                Screens: true,
+                Films: true
+            }
+        });
+        if (!show) {
+            res.status(404).json({ error: "Show not found" });
+        } else {
+            const startTime = `${show.startTime.getUTCHours().toString().padStart(2, '0')}:${show.startTime.getUTCMinutes().toString().padStart(2, '0')}`;
+            res.status(200).json({ show, startTime });
+        }
+    } catch (err) { 
+        const error = err as Error;
+        res.status(500).json({error: error.message});
+    }
+}
 
 // export const getShowOfEveryTheaterByDate = async (req: Request, res: Response) => {
 //     try {

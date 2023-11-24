@@ -7,19 +7,74 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
+import { Axios } from "../../../AxiosInstance";
+
+interface theater{
+  theaterId: number;
+  name: string;
+  address: string;
+  phoneNum: string;
+  promptPayNum: string;
+  latitude: string;
+  longitude: string;
+}
+
 
 const CinemasPage = () => {
+  const [theaterInfo, setTheaterInfo] = useState<theater[]>([]);
+  useEffect(() => {
+    try {
+      Axios.get(
+        `http://localhost:3000/theater/getTheaters`
+      ).then((response) => {
+        setTheaterInfo(response.data);
+      });
+    } catch (error) {
+      console.error("Error fetching now showing theatre:", error);
+    }
+  }, []);
   return (
     <>
       <Box>
         <Text color={"gold"} {...TextStyle.h1} mb={4}>
-          BANGKOK
+          BRANCHES
         </Text>
-        <Accordion>
-          <AccordionItem>
+        <Accordion allowMultiple>
+          {theaterInfo.map((theater: theater) => (
+            <AccordionItem>
+              <AccordionButton>
+                <Box as="span" flex="1" textAlign="left" {...TextStyle.body1}>
+                  {theater.name}
+                </Box>
+                <AccordionIcon />
+              </AccordionButton>
+              <AccordionPanel pb={4}>
+                  <Text {...TextStyle.body2} pr={"6"}> 
+                    Address: {theater.address}
+                  </Text> 
+                  <Text {...TextStyle.body2} pr={"6"} > 
+                    Phone: {theater.phoneNum}
+                  </Text>
+              </AccordionPanel>
+            </AccordionItem>
+          ))
+          }
+          
+        </Accordion>
+      </Box>
+    </>
+  );
+};
+
+export default CinemasPage;
+
+
+
+{/* <AccordionItem>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left" {...TextStyle.body1}>
-                Bangkok: Urban
+                {theaterInfo.name}
               </Box>
               <AccordionIcon />
             </AccordionButton>
@@ -51,11 +106,4 @@ const CinemasPage = () => {
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
               nisi ut aliquip ex ea commodo consequat.
             </AccordionPanel>
-          </AccordionItem>
-        </Accordion>
-      </Box>
-    </>
-  );
-};
-
-export default CinemasPage;
+          </AccordionItem> */}

@@ -3,6 +3,7 @@ import { TextStyle } from "../../../theme/TextStyle";
 import { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { Flex } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 import {
   Tabs,
   TabList,
@@ -19,13 +20,16 @@ import {
   AccordionIcon,
 } from "@chakra-ui/react";
 import { useParams } from "react-router-dom";
-import { DateCarousel } from "../../../Datecarousel";
+import { DateCarousel } from "../../../components/DateCarousel";
 
 interface Film {
+  filmId: number;
   name: string;
   date: string;
   startTime: string;
   screenNo: number;
+  showId: number;
+  theaterId: number;
 }
 
 interface TheaterScreenFilms {
@@ -33,7 +37,6 @@ interface TheaterScreenFilms {
     [screenNo: number]: ScreenDetails;
   };
 }
-
 
 interface ScreenDetails {
   screenType: string;
@@ -45,67 +48,57 @@ interface NearestTime {
   startTime: string;
 }
 
-
-// interface ScreenWithFilms {
-//   screenId: number;
-//   theaterId: number;
-//   theaterName?: string;
-//   capacity: number;
-//   screenType: string;
-//   films: Film[];
-// }
-// interface Theater {
-//   theaterId: number;
-//   name: string;
-//   address: string;
-//   phoneNum: string;
-//   promptPayNum: string;
-//   latitude: number;
-//   longitude: number;
-// }
-
 const MovieInformationPage = () => {
   interface film {
-  filmId: number; 
-  name: string;
-  posterImg: string; 
-  synopsis: string;
-  releaseDate: string;
-  duration: string;
-  genre: string;
-  language: string;
-}
+    filmId: number;
+    theaterId: number;
+    name: string;
+    posterImg: string;
+    synopsis: string;
+    releaseDate: string;
+    duration: string;
+    genre: string;
+    language: string;
+  }
 
-  const posterWidth = "150px"; // Replace with your desired movie poster width
-  const posterHeight = "225px"; // Replace with your desired movie poster height
+  const posterWidth = "25vh"; // Replace with your desired movie poster width
+  const posterHeight = "40vh"; // Replace with your desired movie poster height
 
-  const buttonWidth = "200px";
-  const buttonHeight = "100px";
+  // const buttonWidth = "200px";
+  // const buttonHeight = "100px";
 
   const nearestStyle = {
-    backgroundColor: '#d2ab5a', 
-    color: 'black', 
-    
+    backgroundColor: "#d2ab5a",
+    color: "black",
   };
-  
+
   const futureStyle = {
-    backgroundColor: 'transparent', 
-    border: '1px solid #d2ab5a', 
-    color: '#d2ab5a', 
+    backgroundColor: "transparent",
+    border: "1px solid #d2ab5a",
+    color: "#d2ab5a",
   };
 
   const notAvailableStyle = {
-    backgroundColor: 'transparent', 
-    border: '1px solid grey', 
-    color: 'grey', 
+    backgroundColor: "transparent",
+    border: "1px solid grey",
+    color: "grey",
   };
-  
+
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  console.log(selectedDate)
+  const handleDateSelect = (date: string) => {
+    setSelectedDate(date);
+  }
+  console.log(typeof selectedDate)
+  useEffect(() => {
+    if (selectedDate) {
+      fetchShowtimes();
+    }
+  }, [selectedDate]);
 
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const { filmId } = useParams<{ filmId?: string }>();
   const id = parseInt(filmId || "");
-
-  
 
   useEffect(() => {
     try {
@@ -119,47 +112,74 @@ const MovieInformationPage = () => {
     }
   }, [id]);
 
-  const [showtimesByTheater, setShowtimesByTheater] = useState<TheaterScreenFilms>({});
+  const [showtimesByTheater, setShowtimesByTheater] =
+    useState<TheaterScreenFilms>({});
 
   const fetchShowtimes = async () => {
     try {
-      const response = await Axios.get(`http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/2023-11-18`);
-      if (!response.data || response.data.length === 0) {
-        throw new Error('No data received from API');
+      let dateToUse = selectedDate;
+      if (selectedDate === '') {
+        const today = new Date();
+        const offset = today.getTimezoneOffset() * 60000;
+        const localISODate = new Date(today.getTime() - offset).toISOString().split('T')[0];
+        dateToUse = localISODate;
       }
-      const screenType = response.data[0].screen.screenType;
-      const theaterNamesResponses = await Promise.all(
-        response.data.map((screen: ScreenWithFilms) => Axios.get(`http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`))
+      console.log(dateToUse)
+      const response = await Axios.get(
+        `http://localhost:3000/show/getShowFromFilmIdAndDate/${id}/${dateToUse}`
       );
-
+      console.log(response.data)
+      if (!response.data || response.data.length === 0) {
+        setShowtimesByTheater({});
+        throw new Error("No data received from API");
+      }
+      // const screenType = response.data[0].screen.screenType;
+      const theaterNamesResponses = await Promise.all(
+        response.data.map((screen: ScreenWithFilms) =>
+          Axios.get(
+            `http://localhost:3000/theater/getTheaterById/${screen.screen.theaterId}`
+          )
+        )
+      );
+      console.log(response.data)
       interface ScreenWithFilms {
         screen: {
+          showId: number;
           screenId: number;
           theaterId: number;
-          screen_number: number;
           screenType: string;
         };
         films: Film[];
       }
-
+      console.log(response.data)
       const groupedData: TheaterScreenFilms = {};
       response.data.forEach((screen: ScreenWithFilms, index: number) => {
         const theaterName = theaterNamesResponses[index].data.name;
-        const screenNo = screen.screen.screen_number;
+        const screenNo = screen.films[0].screenNo
+        const showId = screen.screen.showId;
+        const filmId = screen.films[0].filmId;
+        const theaterId = screen.screen.theaterId;
 
         if (!groupedData[theaterName]) {
           groupedData[theaterName] = {};
         }
         if (!groupedData[theaterName][screenNo]) {
           groupedData[theaterName][screenNo] = {
-                                                screenType: screen.screen.screenType,
-                                                films: []
+            screenType: screen.screen.screenType,
+            films: [],
           };
         }
-        groupedData[theaterName][screenNo].films.push(...screen.films);
+        const filmsWithShowId: Film[] = screen.films.map((film) => ({
+          ...film,
+          filmId: filmId,
+          theaterId: theaterId, 
+          showId: showId,
+        }));
+  
+        groupedData[theaterName][screenNo].films.push(...filmsWithShowId);
       });
-
       setShowtimesByTheater(groupedData);
+      console.log(groupedData);
     } catch (error) {
       console.error("Error fetching showtimes:", error);
     }
@@ -168,50 +188,93 @@ const MovieInformationPage = () => {
     fetchShowtimes();
   }, [id]);
 
-  const isPastTime = (showDate: string, showTime: string) => {
-    const now = new Date();
-    const showDateTime = new Date(`${showDate}T${showTime}`);
-    return showDateTime < now;
-  };
+  const isPastTime = (showDate: string, showTime: string): boolean => {
+    console.log('Input Show Date:', showDate, 'Input Show Time:', showTime);
 
-  const findNearestFutureTimeForScreen = (screenDetails: ScreenDetails): NearestTime | null => {
+    // Ensure that showTime includes seconds, if they are missing
+    const timeParts = showTime.split(':');
+    if (timeParts.length === 2) {
+        showTime += ':00'; // Append seconds if they're missing
+    } else if (timeParts.length < 2 || timeParts.length > 3) {
+        console.error('Invalid time format:', showTime);
+        return false;
+    }
+
+    // Construct the show date and time string with timezone
+    const showDateTimeStr = `${showDate.slice(0, 10)}T${showTime}+07:00`;
+    console.log(showDateTimeStr)
+    const showDateTime = new Date(showDateTimeStr);
+    console.log(showDateTime)
+
+    // Log the constructed date for debugging
+    console.log('Constructed Show DateTime:', showDateTime);
+
+    // Validate the constructed Date object
+    if (isNaN(showDateTime.getTime())) {
+        console.error('Invalid date or time value:', showDateTimeStr);
+        return false;
+    }
+
+    // Get the current date and time
+    const now = new Date();
+    console.log('Current DateTime:', now); // Log the ISO string for clarity
+
+    // Compare the current date and time to the show date and time
+    const result = now > showDateTime;
+    console.log('Comparison result:', result);
+
+    // Return the result of the comparison
+    return result;
+};
+
+
+
+
+
+
+
+
+  
+
+  const findNearestFutureTimeForScreen = (
+    screenDetails: ScreenDetails
+  ): NearestTime | null => {
     const now = new Date();
     let nearestTime = null;
     let minDiff = Number.MAX_SAFE_INTEGER;
-  
-    screenDetails.films.forEach(film => {
-      const datePart = film.date.split('T')[0];
+
+    screenDetails.films.forEach((film) => {
+      const datePart = film.date.split("T")[0];
       const showDateTimeStr = `${datePart}T${film.startTime}`;
       const showDateTime = new Date(showDateTimeStr);
-  
+      console.log(showDateTime)
       const diff = showDateTime.getTime() - now.getTime();
       if (!isNaN(diff) && diff > 0 && diff < minDiff) {
         nearestTime = { date: film.date, startTime: film.startTime };
         minDiff = diff;
       }
     });
-  
+
     return nearestTime;
   };
-  
-  
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const options: Intl.DateTimeFormatOptions = {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
+      day: "numeric",
+      month: "long",
+      year: "numeric",
     };
-    const formattedDate = new Intl.DateTimeFormat('en-GB', options).format(date);
-    return formattedDate.replace(/,/, '');
+    const formattedDate = new Intl.DateTimeFormat("en-GB", options).format(
+      date
+    );
+    return formattedDate.replace(/,/, "");
   };
 
   const formatTime = (timeString: string) => {
-    const [hours, minutes] = timeString.split(':');
-    return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+    const [hours, minutes] = timeString.split(":");
+    return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
   };
-
-  
 
   return (
     <Box>
@@ -228,7 +291,7 @@ const MovieInformationPage = () => {
         </Box>
         <Box display={"flex"} flexDirection={"column"} padding={"4"}>
           <Text color={"gold"} style={TextStyle.body2} mb={2}>
-            {movieInfo.releaseDate? formatDate(movieInfo.releaseDate) : 'N/A'}
+            {movieInfo.releaseDate ? formatDate(movieInfo.releaseDate) : "N/A"}
           </Text>
           <Text style={TextStyle.h1} mb={2}>
             {movieInfo.name}
@@ -262,53 +325,80 @@ const MovieInformationPage = () => {
 
           {/* Show (โรง+รอบหนัง) */}
           <TabPanel>
-          {/* ... [date swipe remains unchanged] */}
-          <DateCarousel />
-          <Accordion defaultIndex={[0]} allowMultiple>
-            {Object.entries(showtimesByTheater).map(([theaterName, screens], theaterIdx) => (
-              <AccordionItem key={theaterIdx}>
-                <AccordionButton>
-                  <Box flex="1" textAlign="left">
-                    <Text style={TextStyle.h2}>Theater {theaterName}</Text>
-                  </Box>
-                  <AccordionIcon />
-                </AccordionButton>
-                <AccordionPanel pb={4}>
-                {Object.entries(screens).map(([screenNo, screenDetails], screenIdx) => {
-                  const nearestFutureTime = findNearestFutureTimeForScreen(screenDetails);
-                  return (
-                    <Box key={screenIdx} p={2}>
-                      <Text style={TextStyle.body1}>Screen {screenNo} | {screenDetails.screenType}</Text>
-                      <Flex wrap="wrap" gap="10px">
-                        {screenDetails.films.map((film, filmIdx) => {
-                          const isPast = isPastTime(film.date, film.startTime);
-                          const isNearest = nearestFutureTime !== null && nearestFutureTime.date === film.date && nearestFutureTime.startTime === film.startTime;
-                          const future = new Date(film.date) > new Date() || (new Date(film.date) === new Date() && new Date(film.startTime) > new Date());
-
+            {/* ... [date swipe remains unchanged] */}
+            <DateCarousel onDateSelect={handleDateSelect} />
+            <Accordion defaultIndex={[0]} allowMultiple>
+              {Object.entries(showtimesByTheater).map(
+                ([theaterName, screens], theaterIdx) => (
+                  <AccordionItem key={theaterIdx}>
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left">
+                        <Text style={TextStyle.h2}>Theater {theaterName}</Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel pb={4}>
+                      {Object.entries(screens).map(
+                        ([screenNo, screenDetails], screenIdx) => {
+                          console.log(screenNo, screenDetails)
+                          const nearestFutureTime =
+                            findNearestFutureTimeForScreen(screenDetails);
                           return (
-                            <Box key={filmIdx}>
-                              <Button 
-                                size="xs" 
-                                mr={"4"}
-                                disabled={isPast}
-                                style={isNearest ? nearestStyle : (future ? futureStyle : notAvailableStyle)}
-                              >
-                                {formatTime(film.startTime)}
-                              </Button>
+                            <Box key={screenIdx} p={2}>
+                              <Text style={TextStyle.body1}>
+                                Screen {screenNo} | {screenDetails.screenType}
+                              </Text>
+                              <Flex wrap="wrap" gap="10px">
+                                {screenDetails.films.map((film, filmIdx) => {
+                                  const isPast = isPastTime(
+                                    film.date,
+                                    film.startTime
+                                  );
+                                  const isNearest =
+                                    nearestFutureTime !== null &&
+                                    nearestFutureTime.date === film.date &&
+                                    nearestFutureTime.startTime ===
+                                      film.startTime;
+                                      const showDateTime = new Date(`${film.date.slice(0,10)}T${film.startTime}`);
+                                      const now = new Date();
+                                      const future = showDateTime > now;
+                                  return (
+                                    <Box key={filmIdx}>
+                                    <Link
+                                      to={`/Screen/${film.filmId}/${film.date}/${film.showId}/${film.theaterId}`}
+                                      style={{ textDecoration: 'none' }}
+                                    >
+                                      <Button
+                                        as="div" // Use "as" prop to render as a div
+                                        size="xs"
+                                        mr="4"
+                                        disabled={isPast}
+                                        style={
+                                          isNearest
+                                            ? nearestStyle
+                                            : future
+                                            ? futureStyle
+                                            : notAvailableStyle
+                                        }
+                                      >
+                                        {formatTime(film.startTime)}
+                                      </Button>
+                                    </Link>
+                                  </Box>
+                                  );
+                                })}
+                              </Flex>
                             </Box>
                           );
-                        })}
-                      </Flex>
-                    </Box>
-                  );
-                })}
-                </AccordionPanel>
-              </AccordionItem>
-            ))}
-          </Accordion>
-
-        </TabPanel>
-      </TabPanels>
+                        }
+                      )}
+                    </AccordionPanel>
+                  </AccordionItem>
+                )
+              )}
+            </Accordion>
+          </TabPanel>
+        </TabPanels>
       </Tabs>
     </Box>
   );

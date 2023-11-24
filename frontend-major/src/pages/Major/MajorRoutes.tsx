@@ -2,6 +2,7 @@ import ExamplePage from "./pages/ExamplePage";
 import MoviePage from "./pages/Movies";
 import MovieInformationPage from "./pages/MovieInformationPage";
 import CinemasPage from "./pages/CinemasPage";
+import ScreenPage from "./pages/ScreenPage";
 // import UpcomingMovie from "./pages/UpcomingMovie";
 
 const ExampleRoutes = () => {
@@ -25,6 +26,11 @@ const ExampleRoutes = () => {
 		{
 			path: "/MovieInfo/:filmId",
 			element: <MovieInformationPage/>
+		},
+		{
+			path: "/Screen/:filmId/:date/:showId/:theaterId",
+			element: <ScreenPage/>
+
 		},
 		{
 			path: "/Cinema",

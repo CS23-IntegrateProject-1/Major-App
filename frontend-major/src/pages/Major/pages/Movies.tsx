@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Text, Flex, Grid, useBreakpointValue } from "@chakra-ui/react";
-import { TextStyle } from "../../../theme/TextStyle";
+import { Box, Grid, useBreakpointValue } from "@chakra-ui/react";
 import { MovieCard } from "../../../components/movieCard/moviecard";
 import {
   Tabs,
@@ -54,7 +53,7 @@ const MoviePage = () => {
               gap={2} // Adjust the gap between grid items
               justifyContent="center"
             >
-              {nowShowingMovies.map((film, index) => (
+              {nowShowingMovies.map((film) => (
                 <Box key={film} marginBottom={4}>
                   <MovieCard film={film} />
                 </Box>
@@ -67,7 +66,7 @@ const MoviePage = () => {
               gap={2} // Adjust the gap between grid items
               justifyContent="center"
             >
-              {upcommingMovies.map((film, index) => (
+              {upcommingMovies.map((film) => (
                 <Box key={film} marginBottom={4}>
                   <MovieCard film={film} />
                 </Box>

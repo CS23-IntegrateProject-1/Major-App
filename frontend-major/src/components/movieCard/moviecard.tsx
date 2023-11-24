@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Card, Image, Button, CardFooter, CardBody } from "@chakra-ui/react";
-import { NavLink, Link } from "react-router-dom";
+import {  Link } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
 
 interface film {
