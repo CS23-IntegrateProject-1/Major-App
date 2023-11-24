@@ -188,11 +188,53 @@ const MovieInformationPage = () => {
     fetchShowtimes();
   }, [id]);
 
-  const isPastTime = (showDate: string, showTime: string) => {
+  const isPastTime = (showDate: string, showTime: string): boolean => {
+    console.log('Input Show Date:', showDate, 'Input Show Time:', showTime);
+
+    // Ensure that showTime includes seconds, if they are missing
+    const timeParts = showTime.split(':');
+    if (timeParts.length === 2) {
+        showTime += ':00'; // Append seconds if they're missing
+    } else if (timeParts.length < 2 || timeParts.length > 3) {
+        console.error('Invalid time format:', showTime);
+        return false;
+    }
+
+    // Construct the show date and time string with timezone
+    const showDateTimeStr = `${showDate.slice(0, 10)}T${showTime}+07:00`;
+    console.log(showDateTimeStr)
+    const showDateTime = new Date(showDateTimeStr);
+    console.log(showDateTime)
+
+    // Log the constructed date for debugging
+    console.log('Constructed Show DateTime:', showDateTime);
+
+    // Validate the constructed Date object
+    if (isNaN(showDateTime.getTime())) {
+        console.error('Invalid date or time value:', showDateTimeStr);
+        return false;
+    }
+
+    // Get the current date and time
     const now = new Date();
-    const showDateTime = new Date(`${showDate}T${showTime}`);
-    return showDateTime < now;
-  };
+    console.log('Current DateTime:', now); // Log the ISO string for clarity
+
+    // Compare the current date and time to the show date and time
+    const result = now > showDateTime;
+    console.log('Comparison result:', result);
+
+    // Return the result of the comparison
+    return result;
+};
+
+
+
+
+
+
+
+
+  
 
   const findNearestFutureTimeForScreen = (
     screenDetails: ScreenDetails
@@ -205,7 +247,7 @@ const MovieInformationPage = () => {
       const datePart = film.date.split("T")[0];
       const showDateTimeStr = `${datePart}T${film.startTime}`;
       const showDateTime = new Date(showDateTimeStr);
-
+      console.log(showDateTime)
       const diff = showDateTime.getTime() - now.getTime();
       if (!isNaN(diff) && diff > 0 && diff < minDiff) {
         nearestTime = { date: film.date, startTime: film.startTime };
@@ -317,11 +359,9 @@ const MovieInformationPage = () => {
                                     nearestFutureTime.date === film.date &&
                                     nearestFutureTime.startTime ===
                                       film.startTime;
-                                  const future =
-                                    new Date(film.date) > new Date() ||
-                                    (new Date(film.date) === new Date() &&
-                                      new Date(film.startTime) > new Date());
-
+                                      const showDateTime = new Date(`${film.date.slice(0,10)}T${film.startTime}`);
+                                      const now = new Date();
+                                      const future = showDateTime > now;
                                   return (
                                     <Box key={filmIdx}>
                                     <Link

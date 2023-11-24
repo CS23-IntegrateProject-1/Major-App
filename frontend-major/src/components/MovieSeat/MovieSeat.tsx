@@ -1,5 +1,5 @@
-import React, { useEffect, useState, FC } from "react";
-import { Box, Center, Image, Text } from "@chakra-ui/react";
+import React, { useEffect, useState } from "react";
+import { Box, Image } from "@chakra-ui/react";
 
 interface MovieSeatProps {
   seatId: number;
