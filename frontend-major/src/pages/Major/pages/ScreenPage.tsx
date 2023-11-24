@@ -188,6 +188,7 @@ const ScreenPage: React.FC = () => {
   const [availableSeats, setAvailableSeats] = useState<Array<number>>([]);
   
   const [error, setError] = useState(null);
+  console.log(error);
 
   useEffect(() => {
     Axios.get(`http://localhost:3000/seat/getSeatInfoByScreenId/${allShowDetails?.show.screenId}/${showId}`)
@@ -291,20 +292,29 @@ const ScreenPage: React.FC = () => {
       <Center flexDir="column">
         {Object.entries(seatsByRow)
           .sort((a, b) => parseInt(b[0], 10) - parseInt(a[0], 10)) 
-          .map(([row, seatsInRow]) => (
-            <Flex key={row} justifyContent="center" mb={4}>
-            {seatsInRow.map(seat => (
-              <MovieSeat
-                key={seat.seatId}
-                seatId={seat.seatId}
-                isSelected={selectedSeats.includes(seat.seatId)}
-                onSeatClick={handleSeatClick}
-                type={seat.Seat_Types.typeName}
-              />
-            ))}
-            </Flex>
-          ))}
+          .map(([row, seatsInRow]) => {
+            const rowLetter = String.fromCharCode(64 + parseInt(row, 10));
+
+            return (
+              <Flex key={row} align="center" mb={4}>
+                <Text minWidth="50px" textAlign="right" fontWeight="bold" mr={4}>{rowLetter}</Text>
+                <Flex justifyContent="center" flexWrap="wrap">
+                  {seatsInRow.map(seat => (
+                    <MovieSeat
+                      key={seat.seatId}
+                      seatId={seat.seatId}
+                      isSelected={selectedSeats.includes(seat.seatId)}
+                      onSeatClick={handleSeatClick}
+                      type={seat.Seat_Types.typeName}
+                    />
+                  ))}
+                </Flex>
+              </Flex>
+            );
+          })}
       </Center>
+
+
 
 
       {/* TypeCard */}
