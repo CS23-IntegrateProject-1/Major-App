@@ -56,6 +56,7 @@ interface SeatType {
   seatTypeId: number;
   typeName: string;
   price: number;
+  finalPrice: number;
 }
 
 const ScreenPage: React.FC = () => {
@@ -166,19 +167,8 @@ const ScreenPage: React.FC = () => {
     }
   }, [theaterid]);
 
-  const [seatType, setSeatType] = useState([]);
+  const [seatType, setSeatType] = useState<SeatType[]>([]);
 
-  useEffect(() => {
-    Axios.get(
-      `http://localhost:3000/http://localhost:3000/seat/getUniqueSeatTypeByScreenId/${allShowDetails?.show.Screens.screenId}/${showid}`
-    )
-      .then((response) => {
-        setSeatType(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching now showing movies:", error);
-      });
-  }, []);
 
 
 
@@ -186,29 +176,40 @@ const ScreenPage: React.FC = () => {
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<Array<number>>([]);
   const [availableSeats, setAvailableSeats] = useState<Array<number>>([]);
+   const [totalPrice, setTotalPrice] = useState<number>(0);
   
   const [error, setError] = useState(null);
   console.log(error);
 
   useEffect(() => {
-    Axios.get(`http://localhost:3000/seat/getSeatInfoByScreenId/${allShowDetails?.show.screenId}/${showId}`)
-      .then(response => {
-        setSeats(response.data);
-        fetchAvailableSeats();
-      })
-      .catch(error => setError(error.message));
-  }, [allShowDetails?.show.screenId, showId]);
+    if (allShowDetails && allShowDetails.show && allShowDetails.show.screenId && showId) {
+      Axios.get(
+        `http://localhost:3000/seat/getSeatInfoByScreenId/${allShowDetails.show.screenId}/${showId}`
+      )
+        .then((response) => {
+          setSeats(response.data);
+          fetchAvailableSeats();
+        })
+        .catch((error) => setError(error.message));
+    }
+  }, [allShowDetails, showId]);
 
   
   const fetchAvailableSeats = () => {
-    Axios.get(`http://localhost:3000/seat/getAvailableSeats/${allShowDetails?.show.screenId}/${showId}`)
-        .then(response => setAvailableSeats(response.data))
-        .catch(error => setError(error.message));
+    if (allShowDetails && allShowDetails.show && allShowDetails.show.screenId && showId) {
+      Axios.get(
+        `http://localhost:3000/seat/getAvailableSeatIdByShowIdAndScreenId/${showId}/${allShowDetails.show.screenId}`
+      )
+        .then((response) => {
+          setAvailableSeats(response.data);
+        })
+        .catch((error) => setError(error.message));
+    }
   };
 
   const handleSeatClick = (seatId: number) => {
     if (availableSeats.includes(seatId)) {
-      setSelectedSeats((prevSelectedSeats: Array<number>) => {
+      setSelectedSeats((prevSelectedSeats: number[]) => {
         if (prevSelectedSeats.includes(seatId)) {
           return prevSelectedSeats.filter((id) => id !== seatId);
         } else {
@@ -217,6 +218,22 @@ const ScreenPage: React.FC = () => {
       });
     }
   };
+  
+  useEffect(() => {
+    // Calculate total price when selectedSeats or seatType changes
+    if (selectedSeats.length > 0 && seatType.length > 0) {
+      const totalPrice = selectedSeats.reduce((total, seatTypeId) => {
+        const seatPrice = seatType.find((type) => type.seatTypeId === seatTypeId)?.finalPrice || 0;
+        return total + seatPrice;
+      }, 0);
+      setTotalPrice(totalPrice);
+    } else {
+      setTotalPrice(0);
+    }
+  }, [selectedSeats, seatType]);
+  
+  
+  
 
   const seatsByRow: { [key: string]: Seat[] } = seats.reduce((acc, seat) => {
     acc[seat.seatRow] = acc[seat.seatRow] || [];
@@ -304,38 +321,41 @@ const ScreenPage: React.FC = () => {
                       key={seat.seatId}
                       seatId={seat.seatId}
                       isSelected={selectedSeats.includes(seat.seatId)}
-                      onSeatClick={handleSeatClick}
+                      onSeatClick={(seatId: number ) => handleSeatClick(seatId)}
                       type={seat.Seat_Types.typeName}
                     />
                   ))}
                 </Flex>
               </Flex>
             );
-          })}
+          }
+        )}
       </Center>
-
-
-
-
       {/* TypeCard */}
       <Center>
         <Grid
-          templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
-          gap={4}
-          maxWidth="800px" // Adjust the maximum width as needed
-          width="100%"
-        >
-          {seatType.map((type) => (
-            <Box key={type}>
-              <TypeOfSeatCard type={type} />
-            </Box>
-          ))}
-        </Grid>
-      </Center>
-      <Box display="flex" flexDirection="row" justifyContent="center">
-        <Text>Seat no: </Text>
-        <Text>Price: </Text>
-      </Box>
+              templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+              gap={4}
+              maxWidth="800px" // Adjust the maximum width as needed
+              width="100%"
+            >
+              {seatType.map((type) => (
+                <Box key={String(type)}>
+                  <TypeOfSeatCard type={type} key={String(type.seatTypeId)} />
+                </Box>
+              ))}
+            </Grid>
+          </Center>
+          <Flex justifyContent="center" marginTop="20px">
+            <Text>
+              Selected Seat No:{" "}
+          {selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}
+        </Text>
+        <Text marginLeft="20px">
+          Total Price: {totalPrice} THB
+        </Text>
+      </Flex>
+
     </>
   );
 };
