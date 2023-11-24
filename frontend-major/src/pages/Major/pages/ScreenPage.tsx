@@ -174,7 +174,7 @@ const ScreenPage: React.FC = () => {
 
   //seat
   const [seats, setSeats] = useState<Seat[]>([]);
-  const [selectedSeats, setSelectedSeats] = useState<Array<number>>([]);
+  const [selectedSeats, setSelectedSeats] = useState<Array<string>>([]);
   const [availableSeats, setAvailableSeats] = useState<Array<number>>([]);
    const [totalPrice, setTotalPrice] = useState<number>(0);
   
@@ -208,29 +208,40 @@ const ScreenPage: React.FC = () => {
   };
 
   const handleSeatClick = (seatId: number) => {
+    const seatRow = seats.find((seat) => seat.seatId === seatId)?.seatRow;
+    const seatNo = seats.find((seat) => seat.seatId === seatId)?.seatNo;
+    const row = String.fromCharCode(64 + parseInt(seatRow || "0", 10));
+    const seatIdentifier = `${row}${seatNo}`;
     if (availableSeats.includes(seatId)) {
-      setSelectedSeats((prevSelectedSeats: number[]) => {
-        if (prevSelectedSeats.includes(seatId)) {
-          return prevSelectedSeats.filter((id) => id !== seatId);
+      setSelectedSeats((prevSelectedSeats) => {
+        if (prevSelectedSeats.includes(seatIdentifier)) {
+          return prevSelectedSeats.filter(id => id !== seatIdentifier);
         } else {
-          return [...prevSelectedSeats, seatId];
+          return [...prevSelectedSeats, seatIdentifier];
         }
       });
     }
   };
   
+  function getSeatIdFromIdentifier(seatIdentifier: string) {
+    return seats.find((s) => `${String.fromCharCode(64 + parseInt(s.seatRow, 10))}${s.seatNo}` === seatIdentifier)?.seatId;
+  }
   useEffect(() => {
-    // Calculate total price when selectedSeats or seatType changes
-    if (selectedSeats.length > 0 && seatType.length > 0) {
-      const totalPrice = selectedSeats.reduce((total, seatTypeId) => {
-        const seatPrice = seatType.find((type) => type.seatTypeId === seatTypeId)?.finalPrice || 0;
-        return total + seatPrice;
-      }, 0);
-      setTotalPrice(totalPrice);
-    } else {
-      setTotalPrice(0);
-    }
-  }, [selectedSeats, seatType]);
+    const calculateTotalPrice = () => {
+      let total = 0;
+      for (const seatIdentifier of selectedSeats) {
+        const seatId = getSeatIdFromIdentifier(seatIdentifier); // Convert back to seatId
+        const seat = seats.find((s) => s.seatId === seatId);
+        const seatTypeObj = seatType.find((type) => type.seatTypeId === seat?.Seat_Types.seatTypeId);
+        total += seatTypeObj ? seatTypeObj.finalPrice : 0;
+      }
+      return total;
+    };
+  
+    setTotalPrice(calculateTotalPrice());
+  }, [selectedSeats, seatType, seats]);
+  
+  
   
   
   
@@ -242,6 +253,11 @@ const ScreenPage: React.FC = () => {
   }, {} as { [key: string]: Seat[] });
   console.log(seats)
   console.log(seatsByRow)
+
+  console.log('Selected Seats:', selectedSeats);
+console.log('Seat Types:', seatType);
+console.log('Seats:', seats);
+
   
   return (
     <>
@@ -315,21 +331,22 @@ const ScreenPage: React.FC = () => {
             return (
               <Flex key={row} align="center" mb={4}>
                 <Text minWidth="50px" textAlign="right" fontWeight="bold" mr={4}>{rowLetter}</Text>
-                <Flex justifyContent="center" flexWrap="wrap">
-                  {seatsInRow.map(seat => (
-                    <MovieSeat
-                      key={seat.seatId}
-                      seatId={seat.seatId}
-                      isSelected={selectedSeats.includes(seat.seatId)}
-                      onSeatClick={(seatId: number ) => handleSeatClick(seatId)}
-                      type={seat.Seat_Types.typeName}
-                    />
-                  ))}
-                </Flex>
-              </Flex>
+                {seatsInRow.map(seat => {
+          const seatIdentifier = `${rowLetter}${seat.seatNo}`;
+          return (
+            <MovieSeat
+              key={seat.seatId}
+              seatId={seat.seatId}
+              isSelected={selectedSeats.includes(seatIdentifier)}
+              onSeatClick={(seatId: number ) => handleSeatClick(seatId)}
+              type={seat.Seat_Types.typeName}
+            />
+          );
+        })}
+      </Flex>
             );
           }
-        )}
+          )}
       </Center>
       {/* TypeCard */}
       <Center>
