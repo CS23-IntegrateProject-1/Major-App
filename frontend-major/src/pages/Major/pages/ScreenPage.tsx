@@ -1,10 +1,10 @@
-import { Box, Center, Image, Text, Grid, Flex} from "@chakra-ui/react";
+import { Box, Center, Image, Text, Grid, Flex, Button } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
-import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { MovieSeat } from "../../../components/MovieSeat/MovieSeat";
 import { TypeOfSeatCard } from "../../../components/MovieSeat/TypeOfSeatCard";
+import { useParams, Link } from "react-router-dom";
 
 interface ShowDetails {
   show: Show;
@@ -27,7 +27,7 @@ interface Screen {
   capacity: number;
   screenId: number;
   screenType: string;
-  screen_number: number; 
+  screen_number: number;
   theaterId: number;
 }
 
@@ -169,20 +169,22 @@ const ScreenPage: React.FC = () => {
 
   const [seatType, setSeatType] = useState<SeatType[]>([]);
 
-
-
-
   //seat
   const [seats, setSeats] = useState<Seat[]>([]);
   const [selectedSeats, setSelectedSeats] = useState<Array<string>>([]);
   const [availableSeats, setAvailableSeats] = useState<Array<number>>([]);
-   const [totalPrice, setTotalPrice] = useState<number>(0);
-  
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+
   const [error, setError] = useState(null);
   console.log(error);
 
   useEffect(() => {
-    if (allShowDetails && allShowDetails.show && allShowDetails.show.screenId && showId) {
+    if (
+      allShowDetails &&
+      allShowDetails.show &&
+      allShowDetails.show.screenId &&
+      showId
+    ) {
       Axios.get(
         `http://localhost:3000/seat/getSeatInfoByScreenId/${allShowDetails.show.screenId}/${showId}`
       )
@@ -194,9 +196,13 @@ const ScreenPage: React.FC = () => {
     }
   }, [allShowDetails, showId]);
 
-  
   const fetchAvailableSeats = () => {
-    if (allShowDetails && allShowDetails.show && allShowDetails.show.screenId && showId) {
+    if (
+      allShowDetails &&
+      allShowDetails.show &&
+      allShowDetails.show.screenId &&
+      showId
+    ) {
       Axios.get(
         `http://localhost:3000/seat/getAvailableSeatIdByShowIdAndScreenId/${showId}/${allShowDetails.show.screenId}`
       )
@@ -215,16 +221,20 @@ const ScreenPage: React.FC = () => {
     if (availableSeats.includes(seatId)) {
       setSelectedSeats((prevSelectedSeats) => {
         if (prevSelectedSeats.includes(seatIdentifier)) {
-          return prevSelectedSeats.filter(id => id !== seatIdentifier);
+          return prevSelectedSeats.filter((id) => id !== seatIdentifier);
         } else {
           return [...prevSelectedSeats, seatIdentifier];
         }
       });
     }
   };
-  
+
   function getSeatIdFromIdentifier(seatIdentifier: string) {
-    return seats.find((s) => `${String.fromCharCode(64 + parseInt(s.seatRow, 10))}${s.seatNo}` === seatIdentifier)?.seatId;
+    return seats.find(
+      (s) =>
+        `${String.fromCharCode(64 + parseInt(s.seatRow, 10))}${s.seatNo}` ===
+        seatIdentifier
+    )?.seatId;
   }
   useEffect(() => {
     const calculateTotalPrice = () => {
@@ -232,33 +242,29 @@ const ScreenPage: React.FC = () => {
       for (const seatIdentifier of selectedSeats) {
         const seatId = getSeatIdFromIdentifier(seatIdentifier); // Convert back to seatId
         const seat = seats.find((s) => s.seatId === seatId);
-        const seatTypeObj = seatType.find((type) => type.seatTypeId === seat?.Seat_Types.seatTypeId);
+        const seatTypeObj = seatType.find(
+          (type) => type.seatTypeId === seat?.Seat_Types.seatTypeId
+        );
         total += seatTypeObj ? seatTypeObj.finalPrice : 0;
       }
       return total;
     };
-  
+
     setTotalPrice(calculateTotalPrice());
   }, [selectedSeats, seatType, seats]);
-  
-  
-  
-  
-  
 
   const seatsByRow: { [key: string]: Seat[] } = seats.reduce((acc, seat) => {
     acc[seat.seatRow] = acc[seat.seatRow] || [];
     acc[seat.seatRow].push(seat);
     return acc;
   }, {} as { [key: string]: Seat[] });
-  console.log(seats)
-  console.log(seatsByRow)
+  console.log(seats);
+  console.log(seatsByRow);
 
-  console.log('Selected Seats:', selectedSeats);
-console.log('Seat Types:', seatType);
-console.log('Seats:', seats);
+  console.log("Selected Seats:", selectedSeats);
+  console.log("Seat Types:", seatType);
+  console.log("Seats:", seats);
 
-  
   return (
     <>
       {/* Movie Info at top*/}
@@ -309,7 +315,7 @@ console.log('Seats:', seats);
           </Center>
         </Box>
       </Box>
-     {/* Screen */}
+      {/* Screen */}
       <Center
         style={TextStyle.h2}
         mt={10}
@@ -324,55 +330,65 @@ console.log('Seats:', seats);
       {/* seat */}
       <Center flexDir="column">
         {Object.entries(seatsByRow)
-          .sort((a, b) => parseInt(b[0], 10) - parseInt(a[0], 10)) 
+          .sort((a, b) => parseInt(b[0], 10) - parseInt(a[0], 10))
           .map(([row, seatsInRow]) => {
             const rowLetter = String.fromCharCode(64 + parseInt(row, 10));
 
             return (
               <Flex key={row} align="center" mb={4}>
-                <Text minWidth="50px" textAlign="right" fontWeight="bold" mr={4}>{rowLetter}</Text>
-                {seatsInRow.map(seat => {
-          const seatIdentifier = `${rowLetter}${seat.seatNo}`;
-          return (
-            <MovieSeat
-              key={seat.seatId}
-              seatId={seat.seatId}
-              isSelected={selectedSeats.includes(seatIdentifier)}
-              onSeatClick={(seatId: number ) => handleSeatClick(seatId)}
-              type={seat.Seat_Types.typeName}
-            />
-          );
-        })}
-      </Flex>
+                <Text
+                  minWidth="50px"
+                  textAlign="right"
+                  fontWeight="bold"
+                  mr={4}
+                >
+                  {rowLetter}
+                </Text>
+                {seatsInRow.map((seat) => {
+                  const seatIdentifier = `${rowLetter}${seat.seatNo}`;
+                  return (
+                    <MovieSeat
+                      key={seat.seatId}
+                      seatId={seat.seatId}
+                      isSelected={selectedSeats.includes(seatIdentifier)}
+                      onSeatClick={(seatId: number) => handleSeatClick(seatId)}
+                      type={seat.Seat_Types.typeName}
+                    />
+                  );
+                })}
+              </Flex>
             );
-          }
-          )}
+          })}
       </Center>
       {/* TypeCard */}
       <Center>
         <Grid
-              templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
-              gap={4}
-              maxWidth="800px" // Adjust the maximum width as needed
-              width="100%"
-            >
-              {seatType.map((type) => (
-                <Box key={String(type)}>
-                  <TypeOfSeatCard type={type} key={String(type.seatTypeId)} />
-                </Box>
-              ))}
-            </Grid>
-          </Center>
-          <Flex justifyContent="center" marginTop="20px">
-            <Text>
-              Selected Seat No:{" "}
+          templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+          gap={4}
+          maxWidth="800px" // Adjust the maximum width as needed
+          width="100%"
+        >
+          {seatType.map((type) => (
+            <Box key={String(type)}>
+              <TypeOfSeatCard type={type} key={String(type.seatTypeId)} />
+            </Box>
+          ))}
+        </Grid>
+      </Center>
+      <Flex justifyContent="center" marginTop="20px">
+        <Text>
+          Selected Seat No:{" "}
           {selectedSeats.length > 0 ? selectedSeats.join(", ") : "None"}
         </Text>
-        <Text marginLeft="20px">
-          Total Price: {totalPrice} THB
-        </Text>
+        <Text marginLeft="20px">Total Price: {totalPrice} THB</Text>
       </Flex>
-
+      <Center marginTop={6}>
+        <Link to={`/PendingOrder`}>
+          <Button bg="gold" _hover={{ bg: "gold" }} size="md" width="15rem">
+            BUY NOW
+          </Button>
+        </Link>
+      </Center>
     </>
   );
 };

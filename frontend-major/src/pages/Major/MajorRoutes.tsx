@@ -3,6 +3,7 @@ import MoviePage from "./pages/Movies";
 import MovieInformationPage from "./pages/MovieInformationPage";
 import CinemasPage from "./pages/CinemasPage";
 import ScreenPage from "./pages/ScreenPage";
+import PendingOrderPage from "./pages/PendingOrderPage";
 // import UpcomingMovie from "./pages/UpcomingMovie";
 
 const ExampleRoutes = () => {
@@ -35,6 +36,10 @@ const ExampleRoutes = () => {
 		{
 			path: "/Cinema",
 			element: <CinemasPage/>
+		},
+		{
+			path: "/PendingOrder",
+			element: <PendingOrderPage/>
 		},
 	];
 };
