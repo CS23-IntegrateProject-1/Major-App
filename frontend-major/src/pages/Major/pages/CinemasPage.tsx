@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { useNavigate } from "react-router-dom";
-interface theater{
+interface theater {
   theaterId: number;
   name: string;
   address: string;
@@ -20,17 +20,16 @@ interface theater{
   longitude: string;
 }
 
-
 const CinemasPage = () => {
   const [theaterInfo, setTheaterInfo] = useState<theater[]>([]);
   const navigate = useNavigate();
   useEffect(() => {
     try {
-      Axios.get(
-        `http://localhost:3000/theater/getTheaters`
-      ).then((response) => {
-        setTheaterInfo(response.data);
-      });
+      Axios.get(`http://localhost:3000/theater/getTheaters`).then(
+        (response) => {
+          setTheaterInfo(response.data);
+        }
+      );
     } catch (error) {
       console.error("Error fetching now showing theatre:", error);
     }
@@ -38,7 +37,7 @@ const CinemasPage = () => {
 
   const handleClick = (theaterId: number) => {
     navigate(`/ShowtimeInTheater/${theaterId}`);
-  }
+  };
   return (
     <>
       <Box>
@@ -49,12 +48,25 @@ const CinemasPage = () => {
           {theaterInfo.map((theater: theater) => (
             <AccordionItem key={theater.theaterId}>
               <AccordionButton>
-                <Box as="span" flex="1" textAlign="left" {...TextStyle.body1}>
-                  {theater.name}
+                <Box
+                  as="span"
+                  flex="1"
+                  textAlign="left"
+                  {...TextStyle.h2}
+                  onClick={() => handleClick(theater.theaterId)}
+                >
+                  <Text
+                    _hover={{
+                      color: "gold", // Change text color on hover
+                      transition: "color 0.3s ease-in-out",
+                    }}
+                  >
+                    {theater.name}
+                  </Text>
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
-              <AccordionPanel pb={4} onClick={() => handleClick(theater.theaterId)}>
+              <AccordionPanel pb={4}>
                 <Text {...TextStyle.body2} pr={"6"}>
                   Address: {theater.address}
                 </Text>
@@ -72,9 +84,8 @@ const CinemasPage = () => {
 
 export default CinemasPage;
 
-
-
-{/* <AccordionItem>
+{
+  /* <AccordionItem>
             <AccordionButton>
               <Box as="span" flex="1" textAlign="left" {...TextStyle.body1}>
                 {theaterInfo.name}
@@ -109,4 +120,5 @@ export default CinemasPage;
               enim ad minim veniam, quis nostrud exercitation ullamco laboris
               nisi ut aliquip ex ea commodo consequat.
             </AccordionPanel>
-          </AccordionItem> */}
+          </AccordionItem> */
+}
