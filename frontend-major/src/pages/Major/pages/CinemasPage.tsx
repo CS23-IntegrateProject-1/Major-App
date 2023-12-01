@@ -9,7 +9,7 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
-
+import { useNavigate } from "react-router-dom";
 interface theater{
   theaterId: number;
   name: string;
@@ -23,6 +23,7 @@ interface theater{
 
 const CinemasPage = () => {
   const [theaterInfo, setTheaterInfo] = useState<theater[]>([]);
+  const navigate = useNavigate();
   useEffect(() => {
     try {
       Axios.get(
@@ -34,6 +35,10 @@ const CinemasPage = () => {
       console.error("Error fetching now showing theatre:", error);
     }
   }, []);
+
+  const handleClick = (theaterId: number) => {
+    navigate(`/ShowtimeInTheater/${theaterId}`);
+  }
   return (
     <>
       <Box>
@@ -42,25 +47,23 @@ const CinemasPage = () => {
         </Text>
         <Accordion allowMultiple>
           {theaterInfo.map((theater: theater) => (
-            <AccordionItem>
+            <AccordionItem key={theater.theaterId}>
               <AccordionButton>
                 <Box as="span" flex="1" textAlign="left" {...TextStyle.body1}>
                   {theater.name}
                 </Box>
                 <AccordionIcon />
               </AccordionButton>
-              <AccordionPanel pb={4}>
-                  <Text {...TextStyle.body2} pr={"6"}> 
-                    Address: {theater.address}
-                  </Text> 
-                  <Text {...TextStyle.body2} pr={"6"} > 
-                    Phone: {theater.phoneNum}
-                  </Text>
+              <AccordionPanel pb={4} onClick={() => handleClick(theater.theaterId)}>
+                <Text {...TextStyle.body2} pr={"6"}>
+                  Address: {theater.address}
+                </Text>
+                <Text {...TextStyle.body2} pr={"6"}>
+                  Phone: {theater.phoneNum}
+                </Text>
               </AccordionPanel>
             </AccordionItem>
-          ))
-          }
-          
+          ))}
         </Accordion>
       </Box>
     </>
