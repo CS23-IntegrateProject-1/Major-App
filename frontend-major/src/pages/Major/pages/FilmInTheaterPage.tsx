@@ -191,13 +191,19 @@ const FilmInTheaterPage = () => {
 
     const findNearestFutureTimeForScreen = (films: Film[]): NearestTime | null => {
         const now = new Date();
+        console.log(now)
         let nearestTime = null;
         let minDiff = Number.MAX_SAFE_INTEGER;
+        films.sort((a, b) => {
+            const timeA = new Date(`${a.date.split("T")[0]}T${a.startTime}`);
+            const timeB = new Date(`${b.date.split("T")[0]}T${b.startTime}`);
+            return timeA.getTime() - timeB.getTime();
+        });
+    
         films.forEach((film) => {
             const datePart = film.date.split("T")[0];
             const showDateTimeStr = `${datePart}T${film.startTime}`;
             const showDateTime = new Date(showDateTimeStr);
-            console.log(showDateTime)
             const diff = showDateTime.getTime() - now.getTime();
             if (!isNaN(diff) && diff > 0 && diff < minDiff) {
                 nearestTime = { date: film.date, startTime: film.startTime };
