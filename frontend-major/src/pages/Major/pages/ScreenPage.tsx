@@ -299,16 +299,18 @@ const ScreenPage: React.FC = () => {
       });
       const seatIds = numericalSeatIds.join(","); // Join numerical seat IDs into a comma-separated string
 
-      const selectedSeatTypes = selectedSeats
+      const selectedSeatTypesWithPrices = selectedSeats
         .map((seatIdentifier) => {
           const seatId = getSeatIdFromIdentifier(seatIdentifier);
           const seat = seats.find((s) => s.seatId === seatId);
-          return seat ? seat.Seat_Types.typeName : "";
+          return seat
+            ? `${seat.Seat_Types.typeName}:${seat.Seat_Types.finalPrice}`
+            : "";
         })
         .join(",");
 
       navigate(
-        `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}`
+        `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypesWithPrices}&totalPrice=${totalPrice}&showid=${showid}`
       );
     }
   };
