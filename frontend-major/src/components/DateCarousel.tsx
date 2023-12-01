@@ -24,10 +24,15 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
   
   const formatDate = (dateStr?: string): string => {
     if (!dateStr) {
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = (today.getMonth() + 1).toString().padStart(2, '0'); // Adding 1 because getMonth() returns 0-11
-      const day = today.getDate().toString().padStart(2, '0');
+      const today = new Date(Date.UTC(
+        new Date().getUTCFullYear(),
+        new Date().getUTCMonth(),
+        new Date().getUTCDate()
+      ));
+      const year = today.getUTCFullYear();
+      const month = (today.getUTCMonth() + 1).toString().padStart(2, '0');
+      const day = today.getUTCDate().toString().padStart(2, '0');
+      console.log(day)
       return `${year}-${month}-${day}`;
     }
     const months: { [key: string]: string } = {
@@ -35,7 +40,7 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
       Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
     };
     const parts = dateStr.split(' ');
-    const day = parts[2]; 
+    const day = parts[2].padStart(2, '0'); 
     const month = months[parts[3]];
     const year = new Date().getFullYear();
   

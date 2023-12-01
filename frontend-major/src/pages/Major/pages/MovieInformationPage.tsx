@@ -190,17 +190,13 @@ const MovieInformationPage = () => {
 
   const isPastTime = (showDate: string, showTime: string): boolean => {
     console.log('Input Show Date:', showDate, 'Input Show Time:', showTime);
-
-    // Ensure that showTime includes seconds, if they are missing
     const timeParts = showTime.split(':');
     if (timeParts.length === 2) {
-        showTime += ':00'; // Append seconds if they're missing
+        showTime += ':00'; 
     } else if (timeParts.length < 2 || timeParts.length > 3) {
         console.error('Invalid time format:', showTime);
         return false;
     }
-
-    // Construct the show date and time string with timezone
     const showDateTimeStr = `${showDate.slice(0, 10)}T${showTime}+07:00`;
     console.log(showDateTimeStr)
     const showDateTime = new Date(showDateTimeStr);
@@ -350,43 +346,40 @@ const MovieInformationPage = () => {
                               </Text>
                               <Flex wrap="wrap" gap="10px">
                                 {screenDetails.films.map((film, filmIdx) => {
-                                  const isPast = isPastTime(
-                                    film.date,
-                                    film.startTime
-                                  );
-                                  const isNearest =
-                                    nearestFutureTime !== null &&
-                                    nearestFutureTime.date === film.date &&
-                                    nearestFutureTime.startTime ===
-                                      film.startTime;
-                                      const showDateTime = new Date(`${film.date.slice(0,10)}T${film.startTime}`);
-                                      const now = new Date();
-                                      const future = showDateTime > now;
-                                  return (
-                                    <Box key={filmIdx}>
-                                    <Link
-                                      to={`/Screen/${film.filmId}/${film.date}/${film.showId}/${film.theaterId}`}
-                                      style={{ textDecoration: 'none' }}
-                                    >
-                                      <Button
-                                        as="div" // Use "as" prop to render as a div
-                                        size="xs"
-                                        mr="4"
-                                        disabled={isPast}
-                                        style={
-                                          isNearest
-                                            ? nearestStyle
-                                            : future
-                                            ? futureStyle
-                                            : notAvailableStyle
-                                        }
-                                      >
-                                        {formatTime(film.startTime)}
-                                      </Button>
-                                    </Link>
-                                  </Box>
-                                  );
-                                })}
+                                  const isPast = isPastTime(film.date, film.startTime);
+                                  const isNearest = nearestFutureTime !== null &&
+                                                    nearestFutureTime.date === film.date &&
+                                                    nearestFutureTime.startTime === film.startTime;
+                                  const showDateTime = new Date(`${film.date.slice(0,10)}T${film.startTime}`);
+                                  const now = new Date();
+                                  const future = showDateTime > now;
+
+                                  const buttonStyle = isNearest ? nearestStyle : future ? futureStyle : notAvailableStyle;
+                                  const buttonContent = <Button
+                                                          as="div"
+                                                          size="xs"
+                                                          mr="4"
+                                                          disabled={isPast}
+                                                          style={buttonStyle}
+                                                        >
+                                                          {formatTime(film.startTime)}
+                                                        </Button>;
+
+                                        return (
+                                          <Box key={filmIdx}>
+                                            {isPast ? (
+                                              buttonContent
+                                            ) : (
+                                              <Link
+                                                to={`/Screen/${film.filmId}/${film.date}/${film.showId}/${film.theaterId}`}
+                                                style={{ textDecoration: 'none' }}
+                                              >
+                                                {buttonContent}
+                                              </Link>
+                                            )}
+                                          </Box>
+                                        );
+                                      })}
                               </Flex>
                             </Box>
                           );
