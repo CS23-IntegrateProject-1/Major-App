@@ -4,6 +4,7 @@ import MovieInformationPage from "./pages/MovieInformationPage";
 import CinemasPage from "./pages/CinemasPage";
 import ScreenPage from "./pages/ScreenPage";
 import PendingOrderPage from "./pages/PendingOrderPage";
+import FilmInTheaterPage from "./pages/FilmInTheaterPage";
 // import UpcomingMovie from "./pages/UpcomingMovie";
 
 const ExampleRoutes = () => {
@@ -41,6 +42,10 @@ const ExampleRoutes = () => {
 			path: "/PendingOrder",
 			element: <PendingOrderPage/>
 		},
+		{
+			path: "/ShowtimeInTheater/:theaterId",
+			element: <FilmInTheaterPage/>
+		}
 	];
 };
 
