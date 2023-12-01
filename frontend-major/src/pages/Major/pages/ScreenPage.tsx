@@ -1,10 +1,25 @@
-import { Box, Center, Image, Text, Grid, Flex, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Image,
+  Text,
+  Grid,
+  Flex,
+  Button,
+  useDisclosure,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+} from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import React, { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { MovieSeat } from "../../../components/MovieSeat/MovieSeat";
 import { TypeOfSeatCard } from "../../../components/MovieSeat/TypeOfSeatCard";
-import { useParams, Link } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 
 interface ShowDetails {
   show: Show;
@@ -69,6 +84,7 @@ const ScreenPage: React.FC = () => {
   const theaterid = parseInt(theaterId || "0");
   const showId = useParams<{ showId: string }>().showId;
   const showid = parseInt(showId || "0");
+  const [selectedSeatId, setSelectedSeatId] = useState<number | null>(null);
 
   console.log(showid);
 
@@ -219,6 +235,7 @@ const ScreenPage: React.FC = () => {
     const row = String.fromCharCode(64 + parseInt(seatRow || "0", 10));
     const seatIdentifier = `${row}${seatNo}`;
     if (availableSeats.includes(seatId)) {
+      setSelectedSeatId(selectedSeatId !== seatId ? seatId : null);
       setSelectedSeats((prevSelectedSeats) => {
         if (prevSelectedSeats.includes(seatIdentifier)) {
           return prevSelectedSeats.filter((id) => id !== seatIdentifier);
@@ -264,6 +281,37 @@ const ScreenPage: React.FC = () => {
   console.log("Selected Seats:", selectedSeats);
   console.log("Seat Types:", seatType);
   console.log("Seats:", seats);
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const navigate = useNavigate();
+  const seatsPerRow = 10; // Assuming 10 seats per row, you can adjust this value accordingly
+
+  const handleBuyClick = () => {
+    if (selectedSeats.length === 0) {
+      onOpen(); // Open modal if no seat is selected
+    } else {
+      const numericalSeatIds = selectedSeats.map((seatIdentifier) => {
+        const row = seatIdentifier.charAt(0); // Get the row letter (e.g., 'A')
+        const seatNo = seatIdentifier.slice(1); // Get the seat number (e.g., '1')
+        const numericSeatId =
+          (row.charCodeAt(0) - 65) * seatsPerRow + parseInt(seatNo, 10);
+        return numericSeatId.toString(); // Convert back to string
+      });
+      const seatIds = numericalSeatIds.join(","); // Join numerical seat IDs into a comma-separated string
+
+      const selectedSeatTypes = selectedSeats
+        .map((seatIdentifier) => {
+          const seatId = getSeatIdFromIdentifier(seatIdentifier);
+          const seat = seats.find((s) => s.seatId === seatId);
+          return seat ? seat.Seat_Types.typeName : "";
+        })
+        .join(",");
+
+      navigate(
+        `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}`
+      );
+    }
+  };
 
   return (
     <>
@@ -382,13 +430,36 @@ const ScreenPage: React.FC = () => {
         </Text>
         <Text marginLeft="20px">Total Price: {totalPrice} THB</Text>
       </Flex>
+
+      {/* Buy buton */}
       <Center marginTop={6}>
-        <Link to={`/PendingOrder`}>
-          <Button bg="gold" _hover={{ bg: "gold" }} size="md" width="15rem">
-            BUY NOW
-          </Button>
-        </Link>
+        <Button
+          bg="gold"
+          _hover={{ bg: "gold" }}
+          size="md"
+          width="15rem"
+          onClick={handleBuyClick} // Trigger function on button click
+        >
+          BUY
+        </Button>
       </Center>
+
+      {/* Modal for displaying the message */}
+      <Modal isOpen={isOpen} onClose={onClose}>
+        <ModalOverlay />
+        <ModalContent>
+          <ModalHeader color="black">Please select a seat</ModalHeader>
+          <ModalBody color="black">
+            You haven't selected a seat yet. Please select a seat before
+            proceeding.
+          </ModalBody>
+          <ModalFooter>
+            <Button bg="gold" _hover={{ bg: "gold" }} mr={3} onClick={onClose}>
+              Close
+            </Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </>
   );
 };
