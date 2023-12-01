@@ -34,10 +34,14 @@ type ScreenWithFilm = {
 
 type FilmShowtimes = {
     showId: number;
+    filmId: number;
     name: string;
     date: Date;
     startTime: string;
     screenNo: number;
+    screenType: string;
+    posterImg: string;
+    duration: number;
   };
 
 export const getShowFromFilmId = async (req: Request, res: Response) => {
@@ -228,10 +232,14 @@ export const getShowByTheaterIdAndDate = async (req: Request, res: Response) => 
                 if (film && showtime) {
                     filmsWithShowtimes.push({
                         showId: showtime.showId,
+                        filmId: showtime.filmId,
                         name: film.name,
+                        posterImg: film.posterImg,
+                        duration: film.duration,   
                         date: showtime.date,
-                        startTime: showtime.startTime.toTimeString().split(' ')[0],
-                        screenNo: screen.screen_number
+                        startTime: `${showtime.startTime.getUTCHours().toString().padStart(2, '0')}:${showtime.startTime.getUTCMinutes().toString().padStart(2, '0')}`,
+                        screenNo: screen.screen_number,
+                        screenType: screen.screenType
                     });
                 }
             }
