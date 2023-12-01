@@ -1,7 +1,7 @@
-import { Box, Text, Center } from "@chakra-ui/react";
+import { Box, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
-import { TypeOfSeatCard } from "../../../components/MovieSeat/TypeOfSeatCard";
+import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
 
 function PendingOrderPage() {
   const location = useLocation();
@@ -9,16 +9,15 @@ function PendingOrderPage() {
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
   const totalPrice = queryParams.get("totalPrice")?.split(",") || [];
 
-  const uniqueSeatTypesMap = new Map(); // Using Map to store unique seat types
+  const uniqueSeatTypesMap = new Map<string, boolean>(); // Using Map to store unique seat types
 
   // Loop through seatTypes to extract unique seat types
-  seatTypes.forEach((type) => {
-    const [typeName, price] = type.split(":");
-    const finalPrice = price ? parseFloat(price) : 0; // Parse the price to a number
+  seatTypes.forEach((type, index) => {
+    const [typeName] = type.split(":");
 
     // Check if the seat type name already exists in the Map
     if (!uniqueSeatTypesMap.has(typeName)) {
-      uniqueSeatTypesMap.set(typeName, finalPrice); // Store the unique seat type with its price
+      uniqueSeatTypesMap.set(typeName, true); // Store the unique seat type with its price
     }
   });
 
@@ -26,14 +25,14 @@ function PendingOrderPage() {
 
   return (
     <Box>
-      <Text color={"gold"} {...TextStyle.h1} mb={4}>
+      <Text color="gold" {...TextStyle.h1} mb={4}>
         Purchase Order
       </Text>
 
-      {uniqueSeatTypes.map(([typeName, finalPrice], index) => (
-        <TypeOfSeatCard key={index} type={{ typeName, finalPrice }} />
+      {uniqueSeatTypes.map(([typeName], index) => (
+        <TypeOfSeat2 key={index} type={{ typeName }} />
       ))}
-      <Box>: {totalPrice}</Box>
+      <Box>Total Price: {totalPrice.join(", ")}</Box>
     </Box>
   );
 }
