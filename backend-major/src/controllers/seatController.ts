@@ -56,6 +56,7 @@ export const getUniqueSeatTypeByScreenId = async (req: Request, res: Response) =
             include: {
                 Seat_Types: {
                     select: {
+                        seatTypeId: true,
                         typeName: true,
                         price_modifier: true,
                     },
@@ -76,21 +77,23 @@ export const getUniqueSeatTypeByScreenId = async (req: Request, res: Response) =
         const seatTypeToPrice = new Map();
 
         for (const seat of seats) {
-            const typeName = seat.Seat_Types.typeName;
+            const { seatTypeId, typeName, price_modifier } = seat.Seat_Types;
             if (show) {
-                const finalPrice = parseFloat(show.price.toString()) * parseFloat(seat.Seat_Types.price_modifier.toString());
-                if (!seatTypeToPrice.has(typeName) || seatTypeToPrice.get(typeName) !== finalPrice) {
-                    seatTypeToPrice.set(typeName, finalPrice);
+                const finalPrice = parseFloat(show.price.toString()) * parseFloat(price_modifier.toString());
+                const key = `${seatTypeId}-${typeName}`; // Use a combined key
+                if (!seatTypeToPrice.has(key) || seatTypeToPrice.get(key).finalPrice !== finalPrice) {
+                    seatTypeToPrice.set(key, { seatTypeId, typeName, finalPrice });
                 }
             }
         }
-        const seatTypesWithPrices = Array.from(seatTypeToPrice, ([typeName, finalPrice]) => ({ typeName, finalPrice }));
+        const seatTypesWithPrices = Array.from(seatTypeToPrice.values());
         res.status(200).json(seatTypesWithPrices);
     } catch (err) {
         const error = err as Error;
         res.status(500).json({ error: error.message });
     }
- };
+};
+
 
  export const getInfoBySeatId = async (req: Request, res: Response) => {
     try {
