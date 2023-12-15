@@ -12,7 +12,7 @@ function PendingOrderPage() {
   const uniqueSeatTypesMap = new Map<string, boolean>(); // Using Map to store unique seat types
 
   // Loop through seatTypes to extract unique seat types
-  seatTypes.forEach((type, index) => {
+  seatTypes.forEach((type) => {
     const [typeName] = type.split(":");
 
     // Check if the seat type name already exists in the Map
