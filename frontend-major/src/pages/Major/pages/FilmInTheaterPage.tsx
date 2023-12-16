@@ -296,7 +296,7 @@ const FilmInTheaterPage = () => {
 																	film.date &&
 																nearestFutureTime.startTime ===
 																	film.startTime;
-															let buttonStyle =
+															const buttonStyle =
 																isPast
 																	? notAvailableStyle
 																	: isNearest

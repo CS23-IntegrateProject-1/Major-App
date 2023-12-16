@@ -317,9 +317,9 @@ const ScreenPage: React.FC = () => {
         })
         .join(",");
 
-      const selectedSeatRows = selectedSeats
-        .map((seatIdentifier) => seatIdentifier.charAt(0)) // Extracting the row letter from seat identifier
-        .join(","); // Joining rows with a comma
+    //   const selectedSeatRows = selectedSeats
+    //     .map((seatIdentifier) => seatIdentifier.charAt(0)) // Extracting the row letter from seat identifier
+    //     .join(","); // Joining rows with a comma
 
       navigate(
         `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(

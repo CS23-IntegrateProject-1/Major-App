@@ -16,7 +16,7 @@ function PendingOrderPage() {
   const [qrCode, setqrCode] = useState("sample");
   const navigate = useNavigate();
   const seatWithRow = queryParams.get("selectedSeats")?.split(",") || []; // Assuming seatIds are passed as a parameter
-  const seatIds = queryParams.get("seatIds")?.split(",") || []; // Assuming seatIds are passed as a parameter
+  //const seatIds = queryParams.get("seatIds")?.split(",") || []; // Assuming seatIds are passed as a parameter
 
   const uniqueSeatTypesMap = new Map(); // Using Map to store unique seat types
 

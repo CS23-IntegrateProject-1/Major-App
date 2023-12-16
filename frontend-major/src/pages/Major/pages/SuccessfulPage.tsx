@@ -1,4 +1,4 @@
-import { Box, Button, Center, Text } from "@chakra-ui/react";
+import { Box, Center, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
@@ -36,10 +36,8 @@ const SuccessfulPage = () => {
       <Center {...TextStyle.h1} h={"20vh"}>
         Reservation ID:
       </Center>
-      <Center>
-        Scan this QR code to get a ticket <br />
-        (Please take this screenshot of this QR code)
-      </Center>
+      <Center>Scan this QR code to get a ticket</Center>
+      <Center>(Please take this screenshot of this QR code)</Center>
     </Box>
   );
 };
