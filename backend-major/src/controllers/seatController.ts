@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import { isError } from "util";
 
 const prisma = new PrismaClient();
 
@@ -122,26 +123,37 @@ export const getUniqueSeatTypeByScreenId = async (req: Request, res: Response) =
 
 export const reserveSeatForShow = async (req: Request, res: Response) => {
     try {
-        const { showId, seatId } = req.params; 
+        const { showId } = req.params; 
+        const { seatId } = req.body;
         const showIdNum = parseInt(showId);
-        const seatIdNum = parseInt(seatId);
-
-        const existingReservation = await prisma.reservation_Logs.findFirst({
-            where: {
-                showId: showIdNum,
-                seatId: seatIdNum
+        const seatIdArray =seatId.split(",");
+        let isError = false;
+        const reservations = await Promise.all(seatIdArray.map(async (seatId) => {
+            const seatIdNum = parseInt(seatId);
+            console.log(seatIdNum)
+            const existingReservation = await prisma.reservation_Logs.findFirst({
+                where: {
+                    showId: showIdNum,
+                    seatId: seatIdNum
+                }
+            });
+            if (existingReservation) {
+                isError = true
+                return res.status(400).json({error: "Seat is already reserved for this show"});
             }
-        });
-        if (existingReservation) {
-            return res.status(400).json({error: "Seat is already reserved for this show"});
+            const newReservation = await prisma.reservation_Logs.create({
+                data: {
+                    showId: showIdNum,
+                    seatId: seatIdNum
+                }
+            });
+            return newReservation;
         }
-        const newReservation = await prisma.reservation_Logs.create({
-            data: {
-                showId: showIdNum,
-                seatId: seatIdNum
-            }
-        });
-        res.status(201).json(newReservation);
+        ));
+        if (isError){
+            return;
+        }
+        res.status(200).json(reservations);
     } catch (err) {
         const error = err as Error;
         res.status(500).json({error: error.message});
