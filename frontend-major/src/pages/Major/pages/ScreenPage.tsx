@@ -181,12 +181,13 @@ const ScreenPage: React.FC = () => {
 		}
 	}, [theaterid]);
 
-	const [seatType, setSeatType] = useState<SeatType[]>([]);
-
+  
 	//seat
+	const [seatType, setSeatType] = useState<SeatType[]>([]);
 	const [seats, setSeats] = useState<Seat[]>([]);
 	const [selectedSeats, setSelectedSeats] = useState<Array<string>>([]);
 	const [availableSeats, setAvailableSeats] = useState<Array<number>>([]);
+  // const [notAvailableSeat, setNotAvailableSeat] = useState<Array<number>>([]);
 	const [totalPrice, setTotalPrice] = useState<number>(0);
 
 	const [error, setError] = useState(null);
@@ -226,6 +227,24 @@ const ScreenPage: React.FC = () => {
 				.catch((error) => setError(error.message));
 		}
 	};
+
+  // const notAvailable = () =>{
+  //   const notAvailableSeat = seats
+  //   .filter((seat) => !availableSeats.includes(seat.seatId))
+  //   .map((seat) => seat.seatId);
+  //   setNotAvailableSeat(notAvailableSeat);
+  //   console.log(notAvailableSeat);
+  //   return notAvailableSeat;
+  // }
+
+  const isNotAvailable = (seatId: number) => {
+    const notAvailableSeat = seats.filter((seat) => !availableSeats.includes(seat.seatId)).map((seat) => seat.seatId);
+    if (notAvailableSeat.includes(seatId)) {
+      return true;
+    }
+    return false;
+  }
+
 
 	const handleSeatClick = (seatId: number) => {
 		const seatRow = seats.find((seat) => seat.seatId === seatId)?.seatRow;
@@ -410,17 +429,19 @@ const ScreenPage: React.FC = () => {
 								{seatsInRow.map((seat) => {
 									const seatIdentifier = `${rowLetter}${seat.seatNo}`;
 									return (
-										<MovieSeat
-											key={seat.seatId}
-											seatId={seat.seatId}
-											isSelected={selectedSeats.includes(
-												seatIdentifier
-											)}
-											onSeatClick={(seatId: number) =>
-												handleSeatClick(seatId)
-											}
-											type={seat.Seat_Types.typeName}
-										/>
+                    <MovieSeat
+                      key={seat.seatId}
+                      seatId={seat.seatId}
+                      isSelected={selectedSeats.includes(seatIdentifier)}
+                      isNotAvailable={isNotAvailable(seat.seatId)} 
+                      onSeatClick={(seatId: number) => {
+                        if (isNotAvailable(seatId)) { 
+                          return;
+                        }
+                        handleSeatClick(seatId);
+                      }}
+                      type={seat.Seat_Types.typeName}
+                    />
 									);
 								})}
 							</Flex>

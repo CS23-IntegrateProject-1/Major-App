@@ -6,6 +6,7 @@ interface MovieSeatProps {
   isSelected: boolean;
   onSeatClick: (seatId: number) => void; 
   type: string;
+  isNotAvailable: boolean;
   //isBooked: boolean; // New prop to indicate whether the seat is booked
 }
 
@@ -13,24 +14,29 @@ export const MovieSeat: React.FC<MovieSeatProps> = ({
   seatId,
   isSelected,
   onSeatClick,
-  type
+  type,
+  isNotAvailable,
 }) => {
   const [selected, setSelected] = useState(isSelected);
   const getSeatImage = () => {
-    switch (type) {
-      case "Regular":
-        return "../../../../redSeat.svg";
-      case "Premium":
-        return "../../../../purpleSeat.svg";
-      case "Honeymoon":
-        return "../../../../yellowSeat.svg";
-      case "Reserved":
-          return "../../../../reserveSeat.svg";
-      default:
-        return "../../../../chair.png";
+    if (isNotAvailable) {
+      return "../../../../reserveSeat.svg";
     }
-  };
-
+    else {
+      switch (type) {
+        case "Regular":
+          return "../../../../redSeat.svg";
+        case "Premium":
+          return "../../../../purpleSeat.svg";
+        case "Honeymoon":
+          return "../../../../yellowSeat.svg";
+        case "Reserved":
+          return "../../../../reserveSeat.svg";
+        default:
+          return "../../../../chair.png";
+      }
+    }
+  }
   useEffect(() => {
 
     setSelected(isSelected);
@@ -38,8 +44,10 @@ export const MovieSeat: React.FC<MovieSeatProps> = ({
   const imageSrc = selected ? "../../../../checked.png" : getSeatImage();
 
     const handleImageClick = () => {
-      onSeatClick(seatId);
-      setSelected(!selected); 
+      if(!isNotAvailable) {
+        setSelected(!selected);
+        onSeatClick(seatId);
+      }
     };
 
     return (
