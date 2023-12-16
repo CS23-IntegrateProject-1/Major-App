@@ -324,7 +324,7 @@ const ScreenPage: React.FC = () => {
       navigate(
         `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
           ","
-        )}` // Include selectedSeats in the URL
+        )}&theaterId=${theaterId}` // Include selectedSeats in the URL
       );
     }
   };

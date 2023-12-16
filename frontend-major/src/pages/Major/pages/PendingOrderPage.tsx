@@ -6,18 +6,48 @@ import QRCode from "qrcode.react";
 import { useEffect, useState } from "react";
 import generatePayload from "promptpay-qr";
 import logo from "../../../assets/promptpay logo/PromptPay-logo.png";
+import { Axios } from "../../../AxiosInstance";
+
+interface theater {
+  theaterId: number;
+  name: string;
+  address: string;
+  phoneNum: string;
+  promptPayNum: string;
+  latitude: string;
+  longitude: string;
+}
 
 function PendingOrderPage() {
-  const phone = "0970437853";
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
   const totalPrice = queryParams.get("totalPrice")?.split(",") || [];
+  const theaterId = queryParams.get("theaterId")?.split(",") || [];
   const [qrCode, setqrCode] = useState("sample");
   const navigate = useNavigate();
   const seatWithRow = queryParams.get("selectedSeats")?.split(",") || []; // Assuming seatIds are passed as a parameter
   //const seatIds = queryParams.get("seatIds")?.split(",") || []; // Assuming seatIds are passed as a parameter
-
+  const [theaterInfo, setTheaterInfo] = useState<theater>({} as theater);
+  const [promptPayNum, setPromptPayNum] = useState<string>("");
+  useEffect(() => {
+    const fetchTheaterInfo = async () => {
+      try {
+        const response = await Axios.get(`/theater/getTheaterById/${theaterId}`);
+        setTheaterInfo(response.data);
+        setPromptPayNum(response.data.promptPayNum);
+        console.log(response.data)
+        console.log(promptPayNum)
+        console.log(typeof promptPayNum)
+      } catch (error) {
+        console.error('Error fetching theater information:', error);
+      }
+    };
+    
+    if (theaterId) {
+      fetchTheaterInfo();
+    }
+  }, [theaterId]);
   const uniqueSeatTypesMap = new Map(); // Using Map to store unique seat types
 
   // Loop through seatTypes to extract unique seat types
@@ -33,8 +63,13 @@ function PendingOrderPage() {
   const uniqueSeatTypes = Array.from(uniqueSeatTypesMap.keys()); // Get unique seat types as an array
 
   useEffect(() => {
-    setqrCode(generatePayload(phone, { amount: parseFloat(totalPrice[0]) }));
-  }, []);
+    if (theaterInfo && totalPrice.length > 0) {
+      const phone = theaterInfo.promptPayNum || "";
+      const amount = parseFloat(totalPrice[0]);
+      const qrCodeData = generatePayload(phone, { amount });
+      setqrCode(qrCodeData);
+    }
+  }, [theaterInfo, totalPrice]);
 
   const handleConfirm = () => {
     navigate("/success");
@@ -77,10 +112,10 @@ function PendingOrderPage() {
               <QRCode value={qrCode} />
               <Box p="20px">
                 <Text fontSize={"25px"} fontFamily={"inherit"} color={"black"}>
-                  Miss Pavika Malipan
+                  {theaterInfo.name}
                 </Text>
-                <Text fontSize={"25px"} fontFamily={"inherit"} color={"black"}>
-                  097-043-7853
+                <Text fontSize={"25px"} fontFamily={"inherit"} color={"black"} textAlign={'center'}>
+                  {promptPayNum}
                 </Text>
               </Box>
             </Center>
