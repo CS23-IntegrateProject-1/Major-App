@@ -388,7 +388,6 @@ const ScreenPage: React.FC = () => {
 						return (
 							<Flex key={row} align="center" mb={4}>
 								<Text
-									minWidth="50px"
 									textAlign="right"
 									fontWeight="bold"
 									mr={4}>
@@ -416,8 +415,7 @@ const ScreenPage: React.FC = () => {
 			</Center>
 			{/* TypeCard */}
 			<Center>
-				<Grid
-					templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+				<Grid templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
 					gap={4}
 					maxWidth="800px" // Adjust the maximum width as needed
 					width="100%">
@@ -431,7 +429,7 @@ const ScreenPage: React.FC = () => {
 					))}
 				</Grid>
 			</Center>
-			<Flex justifyContent="center" marginTop="20px">
+			<Center marginTop="20px">
 				<Text>
 					Selected Seat No:{" "}
 					{selectedSeats.length > 0
@@ -439,7 +437,7 @@ const ScreenPage: React.FC = () => {
 						: "None"}
 				</Text>
 				<Text marginLeft="20px">Total Price: {totalPrice} THB</Text>
-			</Flex>
+			</Center>
 
 			{/* Buy buton */}
 			<Center marginTop={6}>

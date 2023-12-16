@@ -1,4 +1,4 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Box, Button, Center, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
@@ -33,6 +33,18 @@ function PendingOrderPage() {
         <TypeOfSeat2 key={index} type={{ typeName }} />
       ))}
       <Box>Total Price: {totalPrice.join(", ")}</Box>
+      <Text>Selected Seat No:</Text>
+      <Center {...TextStyle.h1} h={"20vh"}>
+        Scan to pay
+      </Center>
+      <Center>
+        <Button bg="gold"
+					_hover={{ bg: "gold" }}
+					size="md"
+					width="15rem">
+          CONFIRM
+        </Button>
+      </Center>
     </Box>
   );
 }
