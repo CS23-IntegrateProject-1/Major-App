@@ -300,7 +300,10 @@ const ScreenPage: React.FC = () => {
 				return numericSeatId.toString(); // Convert back to string
 			});
 			const seatIds = numericalSeatIds.join(","); // Join numerical seat IDs into a comma-separated string
-
+      const seat = selectedSeats.map((seatIdentifier) => {
+        const seatId = getSeatIdFromIdentifier(seatIdentifier);
+        return seatId ? `${seatId}` : "";
+      }).join(",");
 			const selectedSeatTypes = selectedSeats
 				.map((seatIdentifier) => {
 					const seatId = getSeatIdFromIdentifier(seatIdentifier);
@@ -308,11 +311,21 @@ const ScreenPage: React.FC = () => {
 					return seat ? `${seat.Seat_Types.typeName}` : "";
 				})
 				.join(",");
-
-			navigate(
-				`/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}`
-			);
-		}
+        console.log(selectedSeatId)
+        console.log(getSeatIdFromIdentifier(selectedSeats[0]));
+        console.log(getSeatIdFromIdentifier(selectedSeats[1]));
+        Axios.post(`/seat/reserveSeatForShow/${showid}`, {
+          seatId: seat
+        }).then((response) => {
+          navigate(
+            `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}`
+          );
+          console.log(response.data);
+          }).catch((error) => {
+            console.error("Error fetching show details:", error);
+          }
+        );  
+      }
 	};
 
 	return (
@@ -388,6 +401,7 @@ const ScreenPage: React.FC = () => {
 						return (
 							<Flex key={row} align="center" mb={4}>
 								<Text
+									minWidth="50px"
 									textAlign="right"
 									fontWeight="bold"
 									mr={4}>
@@ -415,7 +429,8 @@ const ScreenPage: React.FC = () => {
 			</Center>
 			{/* TypeCard */}
 			<Center>
-				<Grid templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
+				<Grid
+					templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
 					gap={4}
 					maxWidth="800px" // Adjust the maximum width as needed
 					width="100%">
@@ -429,7 +444,7 @@ const ScreenPage: React.FC = () => {
 					))}
 				</Grid>
 			</Center>
-			<Center marginTop="20px">
+			<Flex justifyContent="center" marginTop="20px">
 				<Text>
 					Selected Seat No:{" "}
 					{selectedSeats.length > 0
@@ -437,7 +452,7 @@ const ScreenPage: React.FC = () => {
 						: "None"}
 				</Text>
 				<Text marginLeft="20px">Total Price: {totalPrice} THB</Text>
-			</Center>
+			</Flex>
 
 			{/* Buy buton */}
 			<Center marginTop={6}>
