@@ -6,6 +6,7 @@ interface MovieSeatProps {
   isSelected: boolean;
   onSeatClick: (seatId: number) => void; 
   type: string;
+  //isBooked: boolean; // New prop to indicate whether the seat is booked
 }
 
 export const MovieSeat: React.FC<MovieSeatProps> = ({
@@ -23,6 +24,8 @@ export const MovieSeat: React.FC<MovieSeatProps> = ({
         return "../../../../purpleSeat.svg";
       case "Honeymoon":
         return "../../../../yellowSeat.svg";
+      case "Reserved":
+          return "../../../../reserveSeat.svg";
       default:
         return "../../../../chair.png";
     }
