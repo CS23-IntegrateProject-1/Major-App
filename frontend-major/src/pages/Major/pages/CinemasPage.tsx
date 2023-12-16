@@ -10,6 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { useNavigate } from "react-router-dom";
+import React from "react";
 interface theater {
 	theaterId: number;
 	name: string;
