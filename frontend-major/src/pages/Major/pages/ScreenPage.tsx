@@ -101,7 +101,7 @@ const ScreenPage: React.FC = () => {
 	const [allShowDetails, setAllShowDetails] = useState<ShowDetails>();
 	useEffect(() => {
 		if (showid) {
-			Axios.get(`http:///show/getShowByShowId/${showid}`)
+			Axios.get(`/show/getShowByShowId/${showid}`)
 				.then((response) => {
 					setAllShowDetails(response.data);
 				})
@@ -121,7 +121,7 @@ const ScreenPage: React.FC = () => {
 			const screenId = allShowDetails.show.Screens.screenId;
 			console.log("Screen ID:", screenId); // Log screenId
 			Axios.get(
-				`http:///seat/getUniqueSeatTypeByScreenId/${screenId}/${showid}`
+				`/seat/getUniqueSeatTypeByScreenId/${screenId}/${showid}`
 			)
 				.then((response) => {
 					setSeatType(response.data);
@@ -149,7 +149,7 @@ const ScreenPage: React.FC = () => {
 
 	useEffect(() => {
 		try {
-			Axios.get(`http:///film/getFilmById/${filmid}`).then((response) => {
+			Axios.get(`/film/getFilmById/${filmid}`).then((response) => {
 				setMovieInfo(response.data);
 			});
 		} catch (error) {
@@ -171,7 +171,7 @@ const ScreenPage: React.FC = () => {
 
 	useEffect(() => {
 		try {
-			Axios.get(`http:///theater/getTheaterById/${theaterid}`).then(
+			Axios.get(`/theater/getTheaterById/${theaterid}`).then(
 				(response) => {
 					setTheaterInfo(response.data);
 				}
@@ -200,7 +200,7 @@ const ScreenPage: React.FC = () => {
 			showId
 		) {
 			Axios.get(
-				`http:///seat/getSeatInfoByScreenId/${allShowDetails.show.screenId}/${showId}`
+				`/seat/getSeatInfoByScreenId/${allShowDetails.show.screenId}/${showId}`
 			)
 				.then((response) => {
 					setSeats(response.data);
@@ -218,7 +218,7 @@ const ScreenPage: React.FC = () => {
 			showId
 		) {
 			Axios.get(
-				`http:///seat/getAvailableSeatIdByShowIdAndScreenId/${showId}/${allShowDetails.show.screenId}`
+				`/seat/getAvailableSeatIdByShowIdAndScreenId/${showId}/${allShowDetails.show.screenId}`
 			)
 				.then((response) => {
 					setAvailableSeats(response.data);

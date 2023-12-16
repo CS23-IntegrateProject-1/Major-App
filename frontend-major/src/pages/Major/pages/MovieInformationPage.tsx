@@ -102,7 +102,7 @@ const MovieInformationPage = () => {
 
 	useEffect(() => {
 		try {
-			Axios.get(`http:///film/getFilmById/${id}`).then((response) => {
+			Axios.get(`/film/getFilmById/${id}`).then((response) => {
 				setMovieInfo(response.data);
 			});
 		} catch (error) {
@@ -126,7 +126,7 @@ const MovieInformationPage = () => {
 			}
 			console.log(dateToUse);
 			const response = await Axios.get(
-				`http:///show/getShowFromFilmIdAndDate/${id}/${dateToUse}`
+				`/show/getShowFromFilmIdAndDate/${id}/${dateToUse}`
 			);
 			console.log(response.data);
 			if (!response.data || response.data.length === 0) {
@@ -137,7 +137,7 @@ const MovieInformationPage = () => {
 			const theaterNamesResponses = await Promise.all(
 				response.data.map((screen: ScreenWithFilms) =>
 					Axios.get(
-						`http:///theater/getTheaterById/${screen.screen.theaterId}`
+						`/theater/getTheaterById/${screen.screen.theaterId}`
 					)
 				)
 			);

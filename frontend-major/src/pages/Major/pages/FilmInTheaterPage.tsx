@@ -113,7 +113,7 @@ const FilmInTheaterPage = () => {
 			}
 			console.log(dateToUse);
 			const response = await Axios.get(
-				`http:///show/getShowByTheaterIdAndDate/${id}/${dateToUse}`
+				`/show/getShowByTheaterIdAndDate/${id}/${dateToUse}`
 			);
 			console.log(id);
 			console.log(dateToUse);
@@ -149,7 +149,7 @@ const FilmInTheaterPage = () => {
 				response.data.map(
 					async (theaterScreening: TheaterScreening) => {
 						const theater = await Axios.get(
-							`http:///theater/getTheaterById/${theaterScreening.screen.theaterId}`
+							`/theater/getTheaterById/${theaterScreening.screen.theaterId}`
 						);
 						return theater.data;
 					}

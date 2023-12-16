@@ -25,7 +25,7 @@ const CinemasPage = () => {
 	const navigate = useNavigate();
 	useEffect(() => {
 		try {
-			Axios.get(`http:///theater/getTheaters`).then((response) => {
+			Axios.get(`/theater/getTheaters`).then((response) => {
 				setTheaterInfo(response.data);
 			});
 		} catch (error) {
