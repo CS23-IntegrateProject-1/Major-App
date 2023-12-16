@@ -401,7 +401,6 @@ const ScreenPage: React.FC = () => {
             return (
               <Flex key={row} align="center" mb={4}>
                 <Text
-                  minWidth="50px"
                   textAlign="right"
                   fontWeight="bold"
                   mr={4}
@@ -433,10 +432,7 @@ const ScreenPage: React.FC = () => {
       {/* TypeCard */}
       <Center>
         <Grid
-          templateColumns="repeat(auto-fill, minmax(200px, 1fr))"
-          gap={4}
-          maxWidth="800px" // Adjust the maximum width as needed
-          width="100%"
+          templateColumns="repeat(3, 1fr)" gap={20}
         >
           {seatType.map((type) => (
             <Box key={String(type)}>

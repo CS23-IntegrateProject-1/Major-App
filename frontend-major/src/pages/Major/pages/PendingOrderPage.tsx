@@ -77,23 +77,24 @@ function PendingOrderPage() {
 
   return (
     <Box>
-      <Text color="gold" {...TextStyle.h1} mb={4}>
+      <Text color="gold" {...TextStyle.h1}>
         Purchase Order
       </Text>
+      <Box>
+        <Flex flexWrap="wrap">
+          {uniqueSeatTypes.map((typeName, index) => (
+            <Box key={index} mr={4} mb={5}>
+              <TypeOfSeat2 type={{ typeName }} />
+            </Box>
+          ))}
+        </Flex>
+        <Box flexDir={"column"}>
+          <Text mb={1}>Selected Seat: {seatWithRow.join(", ")}</Text>
+          <Text>Total Price: {totalPrice.join(", ")} Baht</Text>
+        </Box>
+      </Box>
 
-      <Flex flexWrap="wrap">
-        {uniqueSeatTypes.map((typeName, index) => (
-          <Box key={index} mr={4} mb={4}>
-            <TypeOfSeat2 type={{ typeName }} />
-          </Box>
-        ))}
-      </Flex>
-
-      <Text>Selected Seat: {seatWithRow.join(", ")}</Text>
-
-      <Box>Total Price: {totalPrice.join(", ")} Baht</Box>
-
-      <Center {...TextStyle.h1} h={"20vh"}>
+      <Center {...TextStyle.h1} h={"10vh"}>
         Scan to pay
       </Center>
 
@@ -105,16 +106,16 @@ function PendingOrderPage() {
             w={"300px"}
             overflow={"hidden"}
             bgColor={"white"}
-            borderRadius={"12px"}
+            borderRadius={"5%"}
           >
-            <Center flexDir={"column"}>
+            <Center flexDir={"column"} >
               <Image src={logo} h={"50px"}></Image>
               <QRCode value={qrCode} />
               <Box p="20px">
-                <Text fontSize={"25px"} fontFamily={"inherit"} color={"black"}>
+                <Text fontSize={"24px"} fontFamily={"inherit"} color={"black"}>
                   {theaterInfo.name}
                 </Text>
-                <Text fontSize={"25px"} fontFamily={"inherit"} color={"black"} textAlign={'center'}>
+                <Text fontSize={"24px"} fontFamily={"inherit"} color={"black"} textAlign={'center'}>
                   {promptPayNum}
                 </Text>
               </Box>
@@ -123,7 +124,7 @@ function PendingOrderPage() {
         </Center>
       )}
 
-      <Center>
+      <Center mt={" 7vh"}>
         <Button
           bg="gold"
           _hover={{ bg: "gold" }}
