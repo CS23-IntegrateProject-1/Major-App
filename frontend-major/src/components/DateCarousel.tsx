@@ -12,41 +12,57 @@ import { useState } from "react";
 
 interface DateCarouselProps {
   onDateSelect: (date: string) => void;
-};
+}
 
 export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
+  
 
+  // Update handleDateClick to set the selected date
   const handleDateClick = (date?: string) => {
     const formattedDate = formatDate(date);
+    setSelectedDate(formattedDate); // Set the selected date
     onDateSelect(formattedDate);
-    console.log(formattedDate)
+    console.log(formattedDate);
   };
+
   
+
   const formatDate = (dateStr?: string): string => {
     if (!dateStr) {
-      const today = new Date(Date.UTC(
-        new Date().getUTCFullYear(),
-        new Date().getUTCMonth(),
-        new Date().getUTCDate()
-      ));
+      const today = new Date(
+        Date.UTC(
+          new Date().getUTCFullYear(),
+          new Date().getUTCMonth(),
+          new Date().getUTCDate()
+        )
+      );
       const year = today.getUTCFullYear();
-      const month = (today.getUTCMonth() + 1).toString().padStart(2, '0');
-      const day = today.getUTCDate().toString().padStart(2, '0');
-      console.log(day)
+      const month = (today.getUTCMonth() + 1).toString().padStart(2, "0");
+      const day = today.getUTCDate().toString().padStart(2, "0");
+      console.log(day);
       return `${year}-${month}-${day}`;
     }
     const months: { [key: string]: string } = {
-      Jan: '01', Feb: '02', Mar: '03', Apr: '04', May: '05', Jun: '06',
-      Jul: '07', Aug: '08', Sep: '09', Oct: '10', Nov: '11', Dec: '12'
+      Jan: "01",
+      Feb: "02",
+      Mar: "03",
+      Apr: "04",
+      May: "05",
+      Jun: "06",
+      Jul: "07",
+      Aug: "08",
+      Sep: "09",
+      Oct: "10",
+      Nov: "11",
+      Dec: "12",
     };
-    const parts = dateStr.split(' ');
-    const day = parts[2].padStart(2, '0'); 
+    const parts = dateStr.split(" ");
+    const day = parts[2].padStart(2, "0");
     const month = months[parts[3]];
     const year = new Date().getFullYear();
-  
+
     return `${year}-${month}-${day}`;
   };
-  
 
   const [tab, setTab] = useState<number>(0);
 
@@ -75,7 +91,7 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
       "Nov",
       "Dec",
     ];
-    let todayTime = new Date();
+    const todayTime = new Date();
     todayTime.setDate(todayTime.getDate()); // Set current date
 
     const endDate = new Date(
@@ -106,7 +122,7 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
   const dates: string[] = generateDay(numberOfDays);
 
   const handleLefttClick = () => {
-    let prev = tab;
+    const prev = tab;
     if (prev === 0) {
       return;
     } else {
@@ -115,13 +131,22 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
   };
 
   const handleRightClick = () => {
-    let prev = tab;
+    const prev = tab;
     if (prev === 3) {
       return;
     } else {
       setTab(prev + 1);
     }
   };
+
+  // const [selectedTab, setSelectedTab] = useState<number>(-1);
+
+  // const handleTabClick = (index: number) => {
+  //   setSelectedTab(index);
+  // };
+
+  // New state to keep track of the selected date
+  const [selectedDate, setSelectedDate] = useState(formatDate());
 
   return (
     <Box>
@@ -130,7 +155,7 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
           size="sm"
           colorScheme="white"
           variant="outline"
-          color="gold"
+          color={selectedDate === formatDate(dates[0]) ? "gold" : "white"} // Apply color conditionally
           _hover={{
             color: "white",
             bg: "gold",
@@ -160,8 +185,9 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
                 onClick={() => handleDateClick(date)}
               >
                 <Text
+                  color={selectedDate === formatDate(date) ? "gold" : "white"} // Apply color conditionally
                   _hover={{
-                    color: "gold", // Change text color on hover
+                    color: "gold",
                     transition: "color 0.3s ease-in-out",
                   }}
                 >
