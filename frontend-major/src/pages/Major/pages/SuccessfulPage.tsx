@@ -4,13 +4,16 @@ import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
 import QRCode from "qrcode.react";
 
-const reservationId = "YourReservationID";
+// const reservationId = "YourReservationID";
 
 const SuccessfulPage = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
   const totalPrice = queryParams.get("totalPrice")?.split(",") || [];
+  const reservationId = queryParams.get("reserve") || [];
+  const total = queryParams.get("total") || [];
+  const selectedSeat = queryParams.get("selectedSeats") || [];
 
   const uniqueSeatTypesMap = new Map<string, boolean>(); // Using Map to store unique seat types
 
@@ -26,7 +29,7 @@ const SuccessfulPage = () => {
 
   const uniqueSeatTypes = Array.from(uniqueSeatTypesMap.entries()); // Convert Map back to array of entries
 
-  const qrCodeValue = `Reservation ID: ${reservationId}`;
+  const qrCodeValue = `Reservation QR code ${reservationId}`;
 
   return (
     <Box>
@@ -37,10 +40,10 @@ const SuccessfulPage = () => {
       {uniqueSeatTypes.map(([typeName], index) => (
         <TypeOfSeat2 key={index} type={{ typeName }} />
       ))}
-      <Box>Total Price: {totalPrice.join(", ")}</Box>
-      <Text>Selected Seat No:</Text>
+      <Box>Total Price: {totalPrice.join(", ")} {total} Baht</Box>
+      <Text>Selected Seat No: {selectedSeat}</Text>
       <Center {...TextStyle.h1} h={"15vh"}>
-        Reservation ID:
+        Reservation QR code
       </Center>
       <Center>
         <Box p={"2%"} bgColor={"white"} borderRadius={"5%"} mb={"7vh"}>

@@ -83,7 +83,7 @@ function PendingOrderPage() {
       const reservationId = response.data[0].reservationId; // Declare reservationId using const
       console.log(response);
       await createPayment(reservationId); // Await the createPayment function with the correct reservationId
-      navigate(`/success?reserve=${reservationId}`);
+      navigate(`/success?reserve=${reservationId}&total=${totalPrice}&seatTypes=${seatTypes}&selectedSeats=${seatWithRow}&seatIds=${seatIds}&showid=${showId}`);
     } catch (error) {
       console.error("Error reserving seat:", error);
     }
