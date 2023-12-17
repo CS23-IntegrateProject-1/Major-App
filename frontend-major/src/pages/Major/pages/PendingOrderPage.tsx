@@ -24,7 +24,9 @@ function PendingOrderPage() {
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
   const totalPrice = queryParams.get("totalPrice")?.split(",") || [];
   const theaterId = queryParams.get("theaterId")?.split(",") || [];
+  const showId = queryParams.get("showid")?.split(",") || [];
   const [qrCode, setqrCode] = useState("sample");
+  const seatIds = queryParams.get("seatIds")|| []; 
   const navigate = useNavigate();
   const seatWithRow = queryParams.get("selectedSeats")?.split(",") || []; // Assuming seatIds are passed as a parameter
   //const seatIds = queryParams.get("seatIds")?.split(",") || []; // Assuming seatIds are passed as a parameter
@@ -71,8 +73,33 @@ function PendingOrderPage() {
     }
   }, [theaterInfo, totalPrice]);
 
-  const handleConfirm = () => {
-    navigate("/success");
+  const handleConfirm = async () => {
+    try {
+      console.log(seatIds);
+      console.log(showId);
+      const response = await Axios.post(`/seat/reserveSeatForShow/${showId}`, {
+        seatId: seatIds
+      });
+      const reservationId = response.data[0].reservationId; // Declare reservationId using const
+      console.log(response);
+      await createPayment(reservationId); // Await the createPayment function with the correct reservationId
+      navigate(`/success?reserve=${reservationId}`);
+    } catch (error) {
+      console.error("Error reserving seat:", error);
+    }
+  };
+  
+  const createPayment = async (reservationId: number) => { // Accept reservationId as an argument
+    try {
+      console.log(reservationId);
+      const payment = await Axios.post(`/payment/createPayment`, {
+        reservationId: reservationId,
+        paymentStatus: "success"
+      });
+      console.log(payment.data);
+    } catch (error) {
+      console.error("Error creating payment:", error);
+    }
   };
 
   return (
