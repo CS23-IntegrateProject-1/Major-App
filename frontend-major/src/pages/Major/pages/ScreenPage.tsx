@@ -15,7 +15,7 @@ import {
   ModalFooter,
 } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { MovieSeat } from "../../../components/MovieSeat/MovieSeat";
 import { TypeOfSeatCard } from "../../../components/MovieSeat/TypeOfSeatCard";
@@ -189,6 +189,23 @@ const ScreenPage: React.FC = () => {
   console.log(error);
 
   useEffect(() => {
+    const fetchAvailableSeats = () => {
+      if (
+        allShowDetails &&
+        allShowDetails.show &&
+        allShowDetails.show.screenId &&
+        showId
+      ) {
+        Axios.get(
+          `/seat/getAvailableSeatIdByShowIdAndScreenId/${showId}/${allShowDetails.show.screenId}`
+        )
+          .then((response) => {
+            setAvailableSeats(response.data);
+          })
+          .catch((error) => setError(error.message));
+      }
+    };
+
     if (
       allShowDetails &&
       allShowDetails.show &&
@@ -200,28 +217,11 @@ const ScreenPage: React.FC = () => {
       )
         .then((response) => {
           setSeats(response.data);
-          fetchAvailableSeats();
+          fetchAvailableSeats(); // Moved inside the useEffect
         })
         .catch((error) => setError(error.message));
     }
-  }, [allShowDetails, showId]);
-
-  const fetchAvailableSeats = () => {
-    if (
-      allShowDetails &&
-      allShowDetails.show &&
-      allShowDetails.show.screenId &&
-      showId
-    ) {
-      Axios.get(
-        `/seat/getAvailableSeatIdByShowIdAndScreenId/${showId}/${allShowDetails.show.screenId}`
-      )
-        .then((response) => {
-          setAvailableSeats(response.data);
-        })
-        .catch((error) => setError(error.message));
-    }
-  };
+  }, [allShowDetails, showId]); // Updated dependencies for the useEffectclude fetchAvailableSeats in the dependency array
 
   // const notAvailable = () =>{
   //   const notAvailableSeat = seats
@@ -259,13 +259,16 @@ const ScreenPage: React.FC = () => {
     }
   };
 
-  function getSeatIdFromIdentifier(seatIdentifier: string) {
-    return seats.find(
-      (s) =>
-        `${String.fromCharCode(64 + parseInt(s.seatRow, 10))}${s.seatNo}` ===
-        seatIdentifier
-    )?.seatId;
-  }
+  const getSeatIdFromIdentifier = useCallback(
+    (seatIdentifier: string) => {
+      return seats.find(
+        (s) =>
+          `${String.fromCharCode(64 + parseInt(s.seatRow, 10))}${s.seatNo}` ===
+          seatIdentifier
+      )?.seatId;
+    },
+    [seats]
+  );
   useEffect(() => {
     const calculateTotalPrice = () => {
       let total = 0;
@@ -281,7 +284,7 @@ const ScreenPage: React.FC = () => {
     };
 
     setTotalPrice(calculateTotalPrice());
-  }, [selectedSeats, seatType, seats]);
+  }, [selectedSeats, seatType, seats, getSeatIdFromIdentifier]); // Include getSeatIdFromIdentifier in the dependency array
 
   const seatsByRow: { [key: string]: Seat[] } = seats.reduce((acc, seat) => {
     acc[seat.seatRow] = acc[seat.seatRow] || [];
@@ -317,9 +320,9 @@ const ScreenPage: React.FC = () => {
         })
         .join(",");
 
-    //   const selectedSeatRows = selectedSeats
-    //     .map((seatIdentifier) => seatIdentifier.charAt(0)) // Extracting the row letter from seat identifier
-    //     .join(","); // Joining rows with a comma
+      //   const selectedSeatRows = selectedSeats
+      //     .map((seatIdentifier) => seatIdentifier.charAt(0)) // Extracting the row letter from seat identifier
+      //     .join(","); // Joining rows with a comma
 
       navigate(
         `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
@@ -400,11 +403,7 @@ const ScreenPage: React.FC = () => {
 
             return (
               <Flex key={row} align="center" mb={4}>
-                <Text
-                  textAlign="right"
-                  fontWeight="bold"
-                  mr={4}
-                >
+                <Text textAlign="right" fontWeight="bold" mr={4}>
                   {rowLetter}
                 </Text>
                 {seatsInRow.map((seat) => {
@@ -431,9 +430,7 @@ const ScreenPage: React.FC = () => {
       </Center>
       {/* TypeCard */}
       <Center>
-        <Grid
-          templateColumns="repeat(3, 1fr)" gap={20}
-        >
+        <Grid templateColumns="repeat(3, 1fr)" gap={20}>
           {seatType.map((type) => (
             <Box key={String(type)}>
               <TypeOfSeatCard type={type} key={String(type.seatTypeId)} />
