@@ -2,6 +2,9 @@ import { Box, Center, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
+import QRCode from "qrcode.react";
+
+const reservationId = "YourReservationID";
 
 const SuccessfulPage = () => {
   const location = useLocation();
@@ -22,6 +25,9 @@ const SuccessfulPage = () => {
   });
 
   const uniqueSeatTypes = Array.from(uniqueSeatTypesMap.entries()); // Convert Map back to array of entries
+
+  const qrCodeValue = `Reservation ID: ${reservationId}`;
+
   return (
     <Box>
       <Text color="gold" {...TextStyle.h1} mb={4}>
@@ -33,9 +39,15 @@ const SuccessfulPage = () => {
       ))}
       <Box>Total Price: {totalPrice.join(", ")}</Box>
       <Text>Selected Seat No:</Text>
-      <Center {...TextStyle.h1} h={"20vh"}>
+      <Center {...TextStyle.h1} h={"15vh"}>
         Reservation ID:
       </Center>
+      <Center>
+        <Box p={"2%"} bgColor={"white"} borderRadius={"5%"} mb={"7vh"}>
+          <QRCode value={qrCodeValue} />
+        </Box>
+      </Center>
+
       <Center>Scan this QR code to get a ticket</Center>
       <Center>(Please take this screenshot of this QR code)</Center>
     </Box>
