@@ -5,6 +5,7 @@ import theater from "./theatre";
 import show from "./show";
 import screen from "./screen";
 import seat from "./seat";
+import payment from "./payment";
 
 class Routes {
 	constructor(app: Application) {
@@ -19,6 +20,8 @@ class Routes {
 		app.use("/screen", screen);
 		app.use("/api/seat", seat);
 		app.use("/seat", seat);
+		app.use("/api/payment", payment);
+		app.use("/payment", payment);
 	}
 }
 export default Routes;

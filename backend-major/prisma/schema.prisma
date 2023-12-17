@@ -24,8 +24,6 @@ model Payments {
   paymentId        Int                    @id @default(autoincrement())
   reservationId    Int
   paymentDate      DateTime               @db.DateTime(0)
-  paymentAmount    Decimal                @db.Decimal(5, 2)
-  paymentMethod    Payments_paymentMethod
   paymentStatus    Payments_paymentStatus
   Reservation_Logs Reservation_Logs       @relation(fields: [reservationId], references: [reservationId], onUpdate: Restrict, map: "Payments_ibfk_1")
 
@@ -134,11 +132,6 @@ enum Screens_screenType {
   X4D
   Standard
   Kids
-}
-
-enum Payments_paymentMethod {
-  cash
-  promptPay
 }
 
 enum Payments_paymentStatus {
