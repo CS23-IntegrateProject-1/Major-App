@@ -141,14 +141,15 @@ function PendingOrderPage() {
       ) : (
         <Center m={"20px"}>
           <Box
-            w={"300px"}
+            w={"90vw"} /* Adjust the width of the box responsively */
+            maxW={"300px"} /* Set a maximum width for larger screens */
             overflow={"hidden"}
             bgColor={"white"}
             borderRadius={"5%"}
           >
             <Center flexDir={"column"}>
               <Image src={logo} h={"10vh"}></Image>
-              <QRCode value={qrCode} size={150} />
+              <QRCode value={qrCode} style={{ width: '17vw', height: '30vh' }} />
               <Box p="20px">
                 <Text fontSize={"24px"} fontFamily={"inherit"} color={"black"}>
                   {theaterInfo.name}
