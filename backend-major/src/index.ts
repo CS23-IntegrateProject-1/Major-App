@@ -18,7 +18,7 @@ app.use(cors(configureCors()));
 app.use(express.json());
 app.use(cookieParser());
 
-const routes = new Routes(app);
+new Routes(app);
 
 const port = process.env.PORT || 3000;
 

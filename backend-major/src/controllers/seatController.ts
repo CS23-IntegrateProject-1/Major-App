@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { isError } from "util";
 
 const prisma = new PrismaClient();
 
@@ -197,7 +196,7 @@ export const getTotalSeatsRowsColumns = async (req: Request, res: Response) => {
         }
 
         const totalSeats = seats.length;
-        let rowSeatCounts = {}; 
+        const rowSeatCounts = {}; 
         seats.forEach(seat => {
             rowSeatCounts[seat.seatRow] = (rowSeatCounts[seat.seatRow] || 0) + 1;
         });
