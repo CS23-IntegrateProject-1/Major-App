@@ -3,8 +3,8 @@ import {createPayment,
         updatePayment} from "../controllers/paymentController";
 import { Router } from "express";
 
-const router = Router();
-router.get("/getAllPayments", getAllPayments);
-router.post("/createPayment", createPayment);
-router.put("/updatePayment", updatePayment);
-export default router;
+const payment = Router();
+payment.get("/getAllPayments", getAllPayments);
+payment.post("/createPayment", createPayment);
+payment.put("/updatePayment", updatePayment);
+export default payment;

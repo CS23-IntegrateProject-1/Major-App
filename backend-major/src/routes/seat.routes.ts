@@ -7,15 +7,15 @@ import { getSeatByScreenIdAndShowId,
         getAllSeats} from "../controllers/seatController";
 import { Router } from "express";
 
-const router = Router();
+const seat = Router();
 
-router.get("/getAllSeats", getAllSeats);
-router.use("/getSeatInfoByScreenId/:id/:showid", getSeatByScreenIdAndShowId);
-router.post("/reserveSeatForShow/:showId", reserveSeatForShow);
-router.get("/getUniqueSeatTypeByScreenId/:id/:showid", getUniqueSeatTypeByScreenId);
-router.get("/getInfoBySeatId/:id", getInfoBySeatId);
-router.get("/getTotalSeatsRowsColumns/:screenId", getTotalSeatsRowsColumns);
-router.get("/getAvailableSeatIdByShowIdAndScreenId/:showId/:screenId", getAvailableSeatIdByShowIdAndScreenId);
+seat.get("/getAllSeats", getAllSeats);
+seat.use("/getSeatInfoByScreenId/:id/:showid", getSeatByScreenIdAndShowId);
+seat.post("/reserveSeatForShow/:showId", reserveSeatForShow);
+seat.get("/getUniqueSeatTypeByScreenId/:id/:showid", getUniqueSeatTypeByScreenId);
+seat.get("/getInfoBySeatId/:id", getInfoBySeatId);
+seat.get("/getTotalSeatsRowsColumns/:screenId", getTotalSeatsRowsColumns);
+seat.get("/getAvailableSeatIdByShowIdAndScreenId/:showId/:screenId", getAvailableSeatIdByShowIdAndScreenId);
 
 
-export default router;
+export default seat;
