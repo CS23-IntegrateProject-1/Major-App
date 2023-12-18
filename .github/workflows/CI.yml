@@ -6,11 +6,26 @@ on:
             - "*"
 
 jobs:
-    lint:
-        name: Check lint
+    frontend-lint:
+        name: Check lint FE
         runs-on: ubuntu-latest
         container: node:lts
         steps:
+            - name: Change Directiry
+              run:  cd frontend-major
+            - name: Checkout
+              uses: actions/checkout@v2
+            - name: install packages
+              run: npm i
+            - name: run lint
+              run: npm run lint
+    backend-lint:
+        name: Check lint BE
+        runs-on: ubuntu-latest
+        container: node:lts
+        steps:
+            - name: Change Directiry
+              run:  cd backend-major
             - name: Checkout
               uses: actions/checkout@v2
             - name: install packages
@@ -18,12 +33,31 @@ jobs:
             - name: run lint
               run: npm run lint
 
-    check-build:
-        name: Check Build
+    frontend-check-build:
+        name: Check Build FE
+        needs: frontend-lint
         runs-on: ubuntu-latest
         timeout-minutes: 5
         container: node:lts
         steps:
+            - name: Change Directory
+              run: cd frontend-major
+            - name: Checkout
+              uses: actions/checkout@v3
+            - name: install packages
+              run: npm ci
+            - name: run build
+              run: npm run build
+              
+    backend-check-build:
+        name: Check Build BE
+        needs: backend-lint
+        runs-on: ubuntu-latest
+        timeout-minutes: 5
+        container: node:lts
+        steps:
+            - name: Change Directory
+              run: cd backend-major
             - name: Checkout
               uses: actions/checkout@v3
             - name: install packages
