@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",
+    "start": "node src/index.js",
     "build": "tsc --project ."
   },
   "keywords": [],
