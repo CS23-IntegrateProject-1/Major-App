@@ -1,6 +1,6 @@
 import { Box, Text, Image, Button } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { Flex } from "@chakra-ui/react";
 import { Link } from "react-router-dom";
@@ -90,11 +90,6 @@ const MovieInformationPage = () => {
     setSelectedDate(date);
   };
   console.log(typeof selectedDate);
-  useEffect(() => {
-    if (selectedDate) {
-      fetchShowtimes();
-    }
-  }, [selectedDate]);
 
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const { filmId } = useParams<{ filmId?: string }>();
@@ -113,7 +108,7 @@ const MovieInformationPage = () => {
   const [showtimesByTheater, setShowtimesByTheater] =
     useState<TheaterScreenFilms>({});
 
-  const fetchShowtimes = async () => {
+  const fetchShowtimes = useCallback(async () => {
     try {
       let dateToUse = selectedDate;
       if (selectedDate === "") {
@@ -181,10 +176,17 @@ const MovieInformationPage = () => {
     } catch (error) {
       console.error("Error fetching showtimes:", error);
     }
-  };
+  }, [selectedDate, id]);
+
+  useEffect(() => {
+    if (selectedDate) {
+      fetchShowtimes();
+    }
+  }, [selectedDate, fetchShowtimes]);
+
   useEffect(() => {
     fetchShowtimes();
-  }, [id]);
+  }, [id, fetchShowtimes]);
 
   const isPastTime = (showDate: string, showTime: string): boolean => {
     console.log("Input Show Date:", showDate, "Input Show Time:", showTime);
