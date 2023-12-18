@@ -1,1 +1,19 @@
-FROM node:latest
+FROM node:latest as builder
+
+WORKDIR /mnt
+
+COPY . .
+
+RUN npm install
+
+RUN npm run build
+
+FROM thistine/simple-http-server as runner
+
+WORKDIR /mnt
+
+COPY --from=builder /mnt/dist ./static
+
+ENTRYPOINT [ "/app/serviceapifrontend" ]
+
+EXPOSE 4000
