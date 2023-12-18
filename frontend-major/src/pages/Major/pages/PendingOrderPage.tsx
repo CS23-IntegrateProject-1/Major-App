@@ -43,7 +43,9 @@ function PendingOrderPage() {
     const fetchTheaterInfo = async () => {
       try {
         const fetchedTheaterId = queryParams.get("theaterId")?.split(",") || [];
-        const response = await Axios.get(`/theater/getTheaterById/${fetchedTheaterId}`);
+        const response = await Axios.get(
+          `/theater/getTheaterById/${fetchedTheaterId}`
+        );
         setTheaterInfo(response.data);
         setPromptPayNum(response.data.promptPayNum);
         console.log(response.data);
@@ -53,10 +55,9 @@ function PendingOrderPage() {
         console.error("Error fetching theater information:", error);
       }
     };
-  
+
     fetchTheaterInfo();
   }, [queryParams, promptPayNum]); // Adjusted dependencies here
-  
 
   useEffect(() => {
     if (theaterInfo && totalPrice.length > 0) {
@@ -146,8 +147,8 @@ function PendingOrderPage() {
             borderRadius={"5%"}
           >
             <Center flexDir={"column"}>
-              <Image src={logo} h={"50px"}></Image>
-              <QRCode value={qrCode} />
+              <Image src={logo} h={"10vh"}></Image>
+              <QRCode value={qrCode} size={150} />
               <Box p="20px">
                 <Text fontSize={"24px"} fontFamily={"inherit"} color={"black"}>
                   {theaterInfo.name}

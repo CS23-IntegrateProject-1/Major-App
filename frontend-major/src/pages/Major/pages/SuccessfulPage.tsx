@@ -46,8 +46,8 @@ const SuccessfulPage = () => {
         Reservation QR code
       </Center>
       <Center>
-        <Box p={"2%"} bgColor={"white"} borderRadius={"5%"} mb={"7vh"}>
-          <QRCode value={qrCodeValue} />
+        <Box p={"2%"} bgColor={"white"} borderRadius={"5%"} mb={"7vh"} style={{ width: '23vw', height: '45vh' }}>
+          <QRCode value={qrCodeValue} style={{ width: '100%', height: '100%' }}/>
         </Box>
       </Center>
 
