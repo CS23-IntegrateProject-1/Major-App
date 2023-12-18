@@ -1,8 +1,17 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
-import { isError } from "util";
 
 const prisma = new PrismaClient();
+
+export const getAllSeats = async (req: Request, res: Response) => {
+    try {
+        const seats = await prisma.seats.findMany();
+        res.status(200).json(seats);
+    } catch (err) {
+        const error = err as Error;
+        res.status(500).json({ error: error.message });
+    }
+}
 
 export const getSeatByScreenIdAndShowId = async (req: Request, res: Response) => {
     try {
@@ -187,7 +196,7 @@ export const getTotalSeatsRowsColumns = async (req: Request, res: Response) => {
         }
 
         const totalSeats = seats.length;
-        let rowSeatCounts = {}; 
+        const rowSeatCounts = {}; 
         seats.forEach(seat => {
             rowSeatCounts[seat.seatRow] = (rowSeatCounts[seat.seatRow] || 0) + 1;
         });

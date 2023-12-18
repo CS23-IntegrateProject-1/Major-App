@@ -1,15 +1,13 @@
 import { Application } from "express";
-import MockRoutes from "./mock.routes";
-import router from "./film";
-import theater from "./theatre";
-import show from "./show";
-import screen from "./screen";
-import seat from "./seat";
-import payment from "./payment";
+import router from "./film.routes";
+import theater from "./theatre.routes";
+import show from "./show.routes";
+import screen from "./screen.routes";
+import seat from "./seat.routes";
+import payment from "./payment.routes";
 
 class Routes {
 	constructor(app: Application) {
-		app.use("/api/mock", MockRoutes);
 		app.use("/api/film", router);
 		app.use("/film", router);
 		app.use("/api/theater", theater);

@@ -24,3 +24,13 @@ export const getScreenInfoById = async (req: Request, res: Response) => {
         res.status(500).json({ error: error.message });
     }
 };
+
+export const getAllScreens = async (req: Request, res: Response) => {
+    try {
+        const screens = await prisma.screens.findMany();
+        res.status(200).json(screens);
+    } catch (err) {
+        const error = err as Error;
+        res.status(500).json({ error: error.message });
+    }
+}
