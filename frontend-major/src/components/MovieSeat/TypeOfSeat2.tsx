@@ -28,13 +28,13 @@ export const TypeOfSeat2: React.FC<{ type: Type }> = ({ type }) => {
       <Center
         style={TextStyle.body1}
         mt={10}
-        mb={10}
+        mb={8}
         borderWidth="0.2vw"
         borderColor="gold"
         display="flex"
         flexDirection="column"
         borderRadius="15"
-        p="4"
+        p="5"
         w="20vh"
         bg={"#2d2d2d"}
       >

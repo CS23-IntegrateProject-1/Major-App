@@ -16,7 +16,7 @@ const MoviePage = () => {
 	const [upcommingMovies, setUpcommingMovies] = useState([]);
 
 	useEffect(() => {
-		Axios.get("http:///film/getCurrentFilm")
+		Axios.get("/film/getCurrentFilm")
 			.then((response) => {
 				setNowShowingMovies(response.data);
 			})
@@ -25,7 +25,7 @@ const MoviePage = () => {
 			});
 	}, []);
 	useEffect(() => {
-		Axios.get("http:///film/getUpcomingFilm")
+		Axios.get("/film/getUpcomingFilm")
 			.then((response) => {
 				setUpcommingMovies(response.data);
 			})

@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { useState } from "react";
 import { DateCarousel } from "../../../components/DateCarousel";
 import { Axios } from "../../../AxiosInstance";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import {
 	Box,
 	Text,
@@ -81,7 +81,7 @@ const FilmInTheaterPage = () => {
 	};
 	const { theaterId } = useParams<{ theaterId: string }>();
 	const id = parseInt(theaterId || "0");
-	let theaterName = "";
+	// let theaterName = "";
 	console.log(id);
 	const [selectedDate, setSelectedDate] = useState<string>("");
 	const handleDateSelect = (date: string) => {
@@ -100,7 +100,7 @@ const FilmInTheaterPage = () => {
 		latitude: "",
 		longitude: "",
 	});
-	const fetchShowtimes = async () => {
+	const fetchShowtimes = useCallback(async () => {
 		try {
 			let dateToUse = selectedDate;
 			if (selectedDate === "") {
@@ -113,7 +113,7 @@ const FilmInTheaterPage = () => {
 			}
 			console.log(dateToUse);
 			const response = await Axios.get(
-				`http:///show/getShowByTheaterIdAndDate/${id}/${dateToUse}`
+				`/show/getShowByTheaterIdAndDate/${id}/${dateToUse}`
 			);
 			console.log(id);
 			console.log(dateToUse);
@@ -149,7 +149,7 @@ const FilmInTheaterPage = () => {
 				response.data.map(
 					async (theaterScreening: TheaterScreening) => {
 						const theater = await Axios.get(
-							`http:///theater/getTheaterById/${theaterScreening.screen.theaterId}`
+							`/theater/getTheaterById/${theaterScreening.screen.theaterId}`
 						);
 						return theater.data;
 					}
@@ -157,16 +157,16 @@ const FilmInTheaterPage = () => {
 			);
 
 			const theater = theaters[0];
-			theaterName = theater.name;
+			// theaterName = theater.name;
 			setTheaterInfo(theater);
-			console.log(theaterName);
+			// console.log(theaterName);
 		} catch (error) {
 			console.error("Error fetching showtimes:", error);
 		}
-	};
+	}, [selectedDate, id]);
 	useEffect(() => {
 		fetchShowtimes();
-	}, [selectedDate, theaterId]);
+	}, [fetchShowtimes]);
 
 	const isPastTime = (showDate: string, showTime: string): boolean => {
 		console.log("Input Show Date:", showDate, "Input Show Time:", showTime);
@@ -296,7 +296,7 @@ const FilmInTheaterPage = () => {
 																	film.date &&
 																nearestFutureTime.startTime ===
 																	film.startTime;
-															let buttonStyle =
+															const buttonStyle =
 																isPast
 																	? notAvailableStyle
 																	: isNearest

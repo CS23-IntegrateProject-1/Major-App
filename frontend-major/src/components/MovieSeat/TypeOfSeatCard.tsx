@@ -19,6 +19,10 @@ export const TypeOfSeatCard: React.FC<{ type: Type }> = ({ type }) => {
         return (
           <Image src="../../../../yellowSeat.svg" alt="purple chair" w="7vh" />
         );
+        case "Reserved":
+          return (
+            <Image src="../../../../reserveSeat.svg" alt="reserve chair" w="7vh" />
+          );
       default:
         return <Image src="../../../../chair.png" alt="chair" w="7vh" />;
     }
