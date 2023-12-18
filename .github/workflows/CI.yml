@@ -11,27 +11,27 @@ jobs:
         runs-on: ubuntu-latest
         container: node:lts
         steps:
-            - name: Change Directiry
-              run:  cd frontend-major
             - name: Checkout
               uses: actions/checkout@v2
             - name: install packages
               run: npm i
+              working-directory: ./frontend-major
             - name: run lint
               run: npm run lint
+              working-directory: ./frontend-major
     backend-lint:
         name: Check lint BE
         runs-on: ubuntu-latest
         container: node:lts
         steps:
-            - name: Change Directiry
-              run:  cd backend-major
             - name: Checkout
               uses: actions/checkout@v2
             - name: install packages
               run: npm i
+              working-directory: ./backend-major
             - name: run lint
               run: npm run lint
+              working-directory: ./backend-major
 
     frontend-check-build:
         name: Check Build FE
@@ -40,14 +40,14 @@ jobs:
         timeout-minutes: 5
         container: node:lts
         steps:
-            - name: Change Directory
-              run: cd frontend-major
             - name: Checkout
               uses: actions/checkout@v3
             - name: install packages
               run: npm ci
+              working-directory: ./frontend-major
             - name: run build
               run: npm run build
+              working-directory: ./frontend-major
               
     backend-check-build:
         name: Check Build BE
@@ -56,11 +56,11 @@ jobs:
         timeout-minutes: 5
         container: node:lts
         steps:
-            - name: Change Directory
-              run: cd backend-major
             - name: Checkout
               uses: actions/checkout@v3
             - name: install packages
               run: npm ci
+              working-directory: ./backend-major
             - name: run build
               run: npm run build
+              working-directory: ./backend-major
