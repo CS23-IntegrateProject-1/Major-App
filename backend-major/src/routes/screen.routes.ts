@@ -1,9 +1,9 @@
 import { getAllScreens, getScreenInfoById } from "../controllers/screenController";
 import { Router } from "express";
 
-const router = Router();
+const screen = Router();
 
-router.get("/getAllScreens", getAllScreens);
-router.use("/getScreenInfoById/:id", getScreenInfoById);
+screen.get("/getAllScreens", getAllScreens);
+screen.use("/getScreenInfoById/:id", getScreenInfoById);
 
-export default router;
+export default screen;
