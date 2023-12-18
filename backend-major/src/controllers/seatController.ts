@@ -4,6 +4,16 @@ import { isError } from "util";
 
 const prisma = new PrismaClient();
 
+export const getAllSeats = async (req: Request, res: Response) => {
+    try {
+        const seats = await prisma.seats.findMany();
+        res.status(200).json(seats);
+    } catch (err) {
+        const error = err as Error;
+        res.status(500).json({ error: error.message });
+    }
+}
+
 export const getSeatByScreenIdAndShowId = async (req: Request, res: Response) => {
     try {
         const { id, showid } = req.params;

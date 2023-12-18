@@ -3,10 +3,13 @@ import { getShowByTheaterId,
          getShowFromFilmId,
          getShowByTheaterIdAndDate,
          getShowFromFilmIdAndDate,
-         getShowByShowId} from "../controllers/showController";
+         getShowByShowId,
+         getAllShows} from "../controllers/showController";
 import { Router } from "express";
 
 const show = Router();
+
+show.get("/getAllShows", getAllShows);
 show.get("/getShowByTheaterId/:id", getShowByTheaterId);
 show.get("/getShowEveryTheater", getShowEveryTheater);
 show.get("/getShowFromFilmId/:id", getShowFromFilmId);

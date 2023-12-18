@@ -42,7 +42,17 @@ type FilmShowtimes = {
     screenType: string;
     posterImg: string;
     duration: number;
-  };
+};
+  
+export const getAllShows = async (req: Request, res: Response) => {
+    try {
+        const shows = await prisma.shows.findMany();
+        res.status(200).json(shows);
+    } catch (err) {
+        const error = err as Error;
+        res.status(500).json({error: error.message});
+    }
+};
 
 export const getShowFromFilmId = async (req: Request, res: Response) => {
     try {

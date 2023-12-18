@@ -3,11 +3,13 @@ import { getSeatByScreenIdAndShowId,
         getUniqueSeatTypeByScreenId,
         getInfoBySeatId,
         getTotalSeatsRowsColumns,
-        getAvailableSeatIdByShowIdAndScreenId} from "../controllers/seatController";
+        getAvailableSeatIdByShowIdAndScreenId,
+        getAllSeats} from "../controllers/seatController";
 import { Router } from "express";
 
 const router = Router();
 
+router.get("/getAllSeats", getAllSeats);
 router.use("/getSeatInfoByScreenId/:id/:showid", getSeatByScreenIdAndShowId);
 router.post("/reserveSeatForShow/:showId", reserveSeatForShow);
 router.get("/getUniqueSeatTypeByScreenId/:id/:showid", getUniqueSeatTypeByScreenId);
