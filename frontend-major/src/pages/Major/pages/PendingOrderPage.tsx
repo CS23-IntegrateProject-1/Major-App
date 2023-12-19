@@ -149,7 +149,7 @@ function PendingOrderPage() {
           >
             <Center flexDir={"column"}>
               <Image src={logo} h={"10vh"}></Image>
-              <QRCode value={qrCode} style={{ width: '17vw', height: '30vh' }} />
+              <QRCode value={qrCode} style={{ width: '100%', maxWidth: '20vh', height: 'auto' }} />
               <Box p="20px">
                 <Text fontSize={"24px"} fontFamily={"inherit"} color={"black"}>
                   {theaterInfo.name}
