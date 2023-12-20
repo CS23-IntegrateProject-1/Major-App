@@ -2,7 +2,7 @@ import { Box, Center, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
-import QRCode from "qrcode.react";
+// import QRCode from "qrcode.react";
 import { useBreakpointValue } from "@chakra-ui/react";
 
 // const reservationId = "YourReservationID";
@@ -12,7 +12,7 @@ const SuccessfulPage = () => {
   const queryParams = new URLSearchParams(location.search);
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
   const totalPrice = queryParams.get("totalPrice")?.split(",") || [];
-  const reservationId = queryParams.get("reserve") || [];
+  // const reservationId = queryParams.get("reserve") || [];
   const total = queryParams.get("total") || [];
   const selectedSeat = queryParams.get("selectedSeats") || [];
 
@@ -30,7 +30,7 @@ const SuccessfulPage = () => {
 
   const uniqueSeatTypes = Array.from(uniqueSeatTypesMap.entries()); // Convert Map back to array of entries
 
-  const qrCodeValue = `Reservation QR code ${reservationId}`;
+  // const qrCodeValue = `Reservation QR code ${reservationId}`;
 
   const boxWidth = useBreakpointValue({ base: "90%", md: "40%", lg: "30%" });
   const boxHeight = useBreakpointValue({
@@ -64,10 +64,10 @@ const SuccessfulPage = () => {
           width={boxWidth}
           height={boxHeight}
         >
-          <QRCode
+          {/* <QRCode
             value={qrCodeValue}
             style={{ width: "100%", height: "100%", objectFit: "contain" }}
-          />
+          /> */}
         </Box>
       </Center>
 
