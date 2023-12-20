@@ -53,7 +53,7 @@ export const createPaymentSession = async (req: Request, res: Response) => {
         },
       ],
       mode: "payment",
-      success_url: `${YOUR_DOMAIN}/success?total${totalPrice}&seat${selectSeat}&${seatId}`,
+      success_url: `${YOUR_DOMAIN}/success?total=${totalPrice}&seat=${selectSeat}&no=${seatId}`,
       cancel_url: `${YOUR_DOMAIN}`,
     });
     console.log(session.url)

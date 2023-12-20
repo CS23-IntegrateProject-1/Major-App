@@ -11,10 +11,11 @@ const SuccessfulPage = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
-  const totalPrice = queryParams.get("totalPrice")?.split(",") || [];
+  const totalPrice = queryParams.get("total")?.split(",") || [];
+  console.log(totalPrice)
   // const reservationId = queryParams.get("reserve") || [];
-  const total = queryParams.get("total") || [];
-  const selectedSeat = queryParams.get("selectedSeats") || [];
+  // const total = queryParams.get("total") || [];
+  const selectedSeat = queryParams.get("seat") || [];
 
   const uniqueSeatTypesMap = new Map<string, boolean>(); // Using Map to store unique seat types
 
@@ -49,7 +50,7 @@ const SuccessfulPage = () => {
         <TypeOfSeat2 key={index} type={{ typeName }} />
       ))}
       <Box>
-        Total Price: {totalPrice.join(", ")} {total} Baht
+        Total Price: {totalPrice.join(", ")} Baht
       </Box>
       <Text>Selected Seat No: {selectedSeat}</Text>
       <Center {...TextStyle.h1} h={"15vh"}>
