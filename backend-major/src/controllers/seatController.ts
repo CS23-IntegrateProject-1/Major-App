@@ -2,6 +2,7 @@ import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
+// const jwt = require("jsonwebtoken");
 
 export const getAllSeats = async (req: Request, res: Response) => {
     try {
@@ -18,9 +19,19 @@ export const getSeatByScreenIdAndShowId = async (req: Request, res: Response) =>
         const { id, showid } = req.params;
         const screenId = parseInt(id);
         const showId = parseInt(showid);
+
         if (isNaN(screenId) || isNaN(showId)) {
             return res.status(400).json({ error: "Invalid ID" });
         }
+        const screen = await prisma.screens.findUnique({
+            where: { 
+                screenId: screenId 
+            },
+            select: { 
+                price: true 
+            }
+        });
+
         const seats = await prisma.seats.findMany({
             where: { 
                 screenId: screenId 
@@ -29,25 +40,20 @@ export const getSeatByScreenIdAndShowId = async (req: Request, res: Response) =>
                 Seat_Types: true 
             }
         });
-        const show = await prisma.shows.findUnique({
-            where: { 
-                showId: showId 
-            },
-            select: {
-                price: true,
-            }
-        });
 
-        if (!seats.length || !show) {
+        if (!seats.length || !screen) {
             return res.status(404).json({ error: "Not found" });
         }
-        const seatsWithCalculatedPrices = seats.map(seat => ({
-            ...seat,
-            finalPrice: parseFloat(show.price.toString()) * parseFloat(seat.Seat_Types.price_modifier.toString()),
-        }));
-
+        const defaultPrice = 0; 
+        const seatsWithCalculatedPrices = seats.map(seat => {
+            const screenPrice = screen.price !== null ? parseFloat(screen.price.toString()) : defaultPrice;
+            const finalPrice = screenPrice * parseFloat(seat.Seat_Types.price_modifier.toString());
+            return {
+                ...seat,
+                finalPrice: finalPrice,
+            };
+        });
         res.status(200).json(seatsWithCalculatedPrices);
-
     } catch (err) {
         const error = err as Error;
         res.status(500).json({ error: error.message });
@@ -59,6 +65,18 @@ export const getUniqueSeatTypeByScreenId = async (req: Request, res: Response) =
         const { id, showid } = req.params;
         const screenId = parseInt(id);
         const showId = parseInt(showid);
+        console.log(showId)
+        const screen = await prisma.screens.findUnique({
+            where: {
+                screenId: screenId
+            },
+            select: {
+                price: true, 
+            }
+        });
+        if (!screen) {
+            return res.status(404).json({ error: "Screen not found" });
+        }
         const seats = await prisma.seats.findMany({
             where: {
                 screenId: screenId,
@@ -73,27 +91,17 @@ export const getUniqueSeatTypeByScreenId = async (req: Request, res: Response) =
                 },
             },
         });
-        const show = await prisma.shows.findUnique({
-            where: { 
-                showId: showId 
-            },
-            select: {
-                price: true,
-            }
-        });
         if (!seats) {
             return res.status(404).json({ error: "Seats not found" });
         }
         const seatTypeToPrice = new Map();
-
         for (const seat of seats) {
             const { seatTypeId, typeName, price_modifier } = seat.Seat_Types;
-            if (show) {
-                const finalPrice = parseFloat(show.price.toString()) * parseFloat(price_modifier.toString());
-                const key = `${seatTypeId}-${typeName}`; // Use a combined key
-                if (!seatTypeToPrice.has(key) || seatTypeToPrice.get(key).finalPrice !== finalPrice) {
-                    seatTypeToPrice.set(key, { seatTypeId, typeName, finalPrice });
-                }
+            const screenPrice = screen?.price ?? 0; 
+            const finalPrice = parseFloat(screenPrice.toString()) * parseFloat(price_modifier.toString());
+            const key = `${seatTypeId}-${typeName}`; 
+            if (!seatTypeToPrice.has(key) || seatTypeToPrice.get(key).finalPrice !== finalPrice) {
+                seatTypeToPrice.set(key, { seatTypeId, typeName, finalPrice });
             }
         }
         const seatTypesWithPrices = Array.from(seatTypeToPrice.values());
@@ -168,6 +176,15 @@ export const reserveSeatForShow = async (req: Request, res: Response) => {
         res.status(500).json({error: error.message});
     }
 };
+
+// export const getHashedReserveId = async (req: Request, res: Response) => {
+//     try{
+//         const {reserve} = req.params;
+//         const reserveId = parseInt(reserve);
+//         const hashedReserve = 
+
+//     }
+// }
 
 export const getTotalSeatsRowsColumns = async (req: Request, res: Response) => {
     try {
@@ -249,6 +266,16 @@ export const getAvailableSeatIdByShowIdAndScreenId = async (req: Request, res: R
         });
         const availableSeatsIds = seats.map(seat => seat.seatId);
         res.status(200).json(availableSeatsIds);
+    } catch (err) {
+        const error = err as Error;
+        res.status(500).json({ error: error.message });
+    }
+};
+
+export const getAllSeatType = async (req: Request, res: Response) => {
+    try {
+        const seatTypes = await prisma.seat_Types.findMany();
+        res.status(200).json(seatTypes);
     } catch (err) {
         const error = err as Error;
         res.status(500).json({ error: error.message });

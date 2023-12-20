@@ -48,6 +48,7 @@ model Screens {
   screen_number Int
   capacity      Int
   screenType    Screens_screenType
+  price         Int?
   Theaters      Theaters           @relation(fields: [theaterId], references: [theaterId], onUpdate: Restrict, map: "Screens_ibfk_1")
   Seats         Seats[]
   Shows         Shows[]
