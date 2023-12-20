@@ -33,6 +33,7 @@ export const createReservation = async (req: Request, res: Response) => {
 			});
 			return res.status(201).send(reservation);
 		}
+		throw new Error("Seat is already booked");
 	} catch (err) {
 		const error = err as Error;
 		res.status(500).json({ error: error.message });

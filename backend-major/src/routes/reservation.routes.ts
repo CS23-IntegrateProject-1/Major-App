@@ -3,6 +3,6 @@ import { createReservation } from "../controllers/reservationController";
 
 const reservation = Router();
 
-reservation.post("/reservation/crate", createReservation);
+reservation.post("/create", createReservation);
 
 export default reservation;
