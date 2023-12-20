@@ -1,7 +1,7 @@
 // import { Box, Button, Center, Text, Flex, Image } from "@chakra-ui/react";
 import { Box, Button, Center, Text, Flex } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
-import { useLocation} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
 import { useEffect, useState, useMemo } from "react";
 import { Axios } from "../../../AxiosInstance";
@@ -16,7 +16,9 @@ interface theater {
   latitude: string;
   longitude: string;
 }
-const stripePromise = loadStripe("pk_test_51OOyo2JnAxcvlB9ihjdMfNhFwNjRCmNlpFHo46RQeW7WZrx0EZ3nuLKvgBVziNiW6hkFAy6uVk1rwrMchN27p7CO00eV2YBL0b");
+const stripePromise = loadStripe(
+  "pk_test_51OOyo2JnAxcvlB9ihjdMfNhFwNjRCmNlpFHo46RQeW7WZrx0EZ3nuLKvgBVziNiW6hkFAy6uVk1rwrMchN27p7CO00eV2YBL0b"
+);
 
 function PendingOrderPage() {
   const location = useLocation();
@@ -34,11 +36,11 @@ function PendingOrderPage() {
   // const showId = queryParams.get("showid")?.split(",") || [];
   // // const [qrCode, setqrCode] = useState("sample");
   // const seatIds = queryParams.get("seatIds") || [];
-  
+
   const seatWithRow = queryParams.get("selectedSeats")?.split(",") || []; // Assuming seatIds are passed as a parameter
   //const seatIds = queryParams.get("seatIds")?.split(",") || []; // Assuming seatIds are passed as a parameter
   const [theaterInfo, setTheaterInfo] = useState<theater>({} as theater);
-  const [promptPayNum, setPromptPayNum] = useState<string>("");
+  //const [promptPayNum, setPromptPayNum] = useState<string>("");
 
   useEffect(() => {
     const fetchTheaterInfo = async () => {
@@ -48,22 +50,21 @@ function PendingOrderPage() {
           `/theater/getTheaterById/${fetchedTheaterId}`
         );
         setTheaterInfo(response.data);
-        setPromptPayNum(response.data.promptPayNum);
-        console.log(theaterInfo);
+        // setPromptPayNum(response.data.promptPayNum);
+        console.log(response.data);
       } catch (error) {
         console.error("Error fetching theater information:", error);
       }
     };
 
     fetchTheaterInfo();
-  }, [queryParams, promptPayNum]); // Adjusted dependencies here
+  }, [queryParams, theaterInfo]); // Include theaterInfo in the dependency array
 
-
-  const uniqueSeatTypesMap = new Map(); 
+  const uniqueSeatTypesMap = new Map();
   seatTypes.forEach((type) => {
     const [typeName] = type.split(":");
     if (!uniqueSeatTypesMap.has(typeName)) {
-      uniqueSeatTypesMap.set(typeName, true); 
+      uniqueSeatTypesMap.set(typeName, true);
     }
   });
 
@@ -73,12 +74,12 @@ function PendingOrderPage() {
     try {
       const response = await Axios.post(`/payment/createPaymentSession`, {
         totalPrice: parseFloat(totalPrice[0]) || 0,
-        selectSeat:seatWithRow.join(", "),
-        seatId: seatId
+        selectSeat: seatWithRow.join(", "),
+        seatId: seatId,
       });
 
       if (response.data.url) {
-        window.location.href = response.data.url; 
+        window.location.href = response.data.url;
       }
     } catch (error) {
       console.error("Error creating payment session:", error);
@@ -91,7 +92,6 @@ function PendingOrderPage() {
       createPaymentSession();
     }
   };
-
 
   return (
     <Box>
@@ -111,31 +111,25 @@ function PendingOrderPage() {
           <Text>Total Price: {totalPrice.join(", ")} Baht</Text>
         </Box>
       </Box>
-
       <Center {...TextStyle.h1} h={"10vh"}>
-        Scan to pay
-      </Center>
-
-      <Center {...TextStyle.h1} h={"10vh"}>
-        Payment Information
+        Payment
       </Center>
 
       <Box>
-      {/* Your previous JSX code here */}
+        {/* Your previous JSX code here */}
 
-      <Center m={"20px"}>
-        <Button
-          onClick={handlePayment}
-          bg="gold"
-          _hover={{ bg: "gold" }}
-          size="md"
-          width="15rem"
-        >
-          PAY NOW
-        </Button>
-      </Center>
-    </Box>
-
+        <Center m={"20px"}>
+          <Button
+            onClick={handlePayment}
+            bg="gold"
+            _hover={{ bg: "gold" }}
+            size="md"
+            width="15rem"
+          >
+            PAY NOW
+          </Button>
+        </Center>
+      </Box>
     </Box>
   );
 }
