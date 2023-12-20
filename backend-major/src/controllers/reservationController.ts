@@ -25,12 +25,17 @@ export const createReservation = async (req: Request, res: Response) => {
 		const { showId, seatId } = req.body;
 
 		if (await checkAvailability(showId, seatId)) {
-			const reservation = await prisma.reservation_Logs.create({
-				data: {
-					showId: showId,
-					seatId: seatId,
-				},
-			});
+			let reservation;
+			try {
+				reservation = await prisma.reservation_Logs.create({
+					data: {
+						showId: showId,
+						seatId: seatId,
+					},
+				});
+			} catch (e) {
+				console.log(e);
+			}
 			return res.status(201).send(reservation);
 		}
 		throw new Error("Seat is already booked");
