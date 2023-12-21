@@ -138,44 +138,51 @@ export const getUniqueSeatTypeByScreenId = async (req: Request, res: Response) =
     }
  };
 
-export const reserveSeatForShow = async (req: Request, res: Response) => {
+ export const reserveSeatForShow = async (req: Request, res: Response) => {
     try {
         const { showId } = req.params; 
         const { seatId } = req.body;
         const showIdNum = parseInt(showId);
-        const seatIdArray =seatId.split(",");
-        let isError = false;
-        const reservations = await Promise.all(seatIdArray.map(async (seatId) => {
-            const seatIdNum = parseInt(seatId);
-            console.log(seatIdNum)
-            const existingReservation = await prisma.reservation_Logs.findFirst({
-                where: {
-                    showId: showIdNum,
-                    seatId: seatIdNum
-                }
-            });
-            if (existingReservation) {
-                isError = true
-                return res.status(400).json({error: "Seat is already reserved for this show"});
+        const seatIdArray = seatId.map(id => parseInt(id));
+        console.log("Show ID:", showIdNum);
+        console.log("Seat IDs:", seatIdArray);
+
+
+        const existingReservations = await prisma.reservation_Logs.findFirst({
+            where: {
+                showId: showIdNum,
+                seatId: { in: seatIdArray },
+            },
+            select: {
+                reservationId: true,
+                seatId: true,
+                showId: true,
             }
-            const newReservation = await prisma.reservation_Logs.create({
+        });
+
+        console.log("Existing reservation:", existingReservations);
+
+        if (existingReservations != undefined) {
+            console.log('Exist')
+            return res.status(200).json([existingReservations]);
+        }
+        const reservations = await Promise.all(seatIdArray.map(seatIdNum => {
+            return prisma.reservation_Logs.create({
                 data: {
                     showId: showIdNum,
                     seatId: seatIdNum
                 }
             });
-            return newReservation;
-        }
-        ));
-        if (isError){
-            return;
-        }
+        }));
+        console.log(reservations)
+
         res.status(200).json(reservations);
     } catch (err) {
         const error = err as Error;
-        res.status(500).json({error: error.message});
+        res.status(500).json({ error: error.message });
     }
 };
+
 
 // export const getHashedReserveId = async (req: Request, res: Response) => {
 //     try{

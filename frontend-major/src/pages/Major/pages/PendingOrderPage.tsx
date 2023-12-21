@@ -28,19 +28,16 @@ function PendingOrderPage() {
   );
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
   const seatId = queryParams.get("seatIds")?.split(",") || [];
+  const showId = queryParams.get("showid")?.split(",") || [];
   const totalPrice = useMemo(
     () => queryParams.get("totalPrice")?.split(",") || [],
     [queryParams]
   );
-  //const theaterId = queryParams.get("theaterId")?.split(",") || [];
-  // const showId = queryParams.get("showid")?.split(",") || [];
-  // // const [qrCode, setqrCode] = useState("sample");
-  // const seatIds = queryParams.get("seatIds") || [];
 
   const seatWithRow = queryParams.get("selectedSeats")?.split(",") || []; // Assuming seatIds are passed as a parameter
-  //const seatIds = queryParams.get("seatIds")?.split(",") || []; // Assuming seatIds are passed as a parameter
+
   const [theaterInfo, setTheaterInfo] = useState<theater>({} as theater);
-  //const [promptPayNum, setPromptPayNum] = useState<string>("");
+
 
   useEffect(() => {
     const fetchTheaterInfo = async () => {
@@ -76,6 +73,7 @@ function PendingOrderPage() {
         totalPrice: parseFloat(totalPrice[0]) || 0,
         selectSeat: seatWithRow.join(", "),
         seatId: seatId,
+        showId: showId,
       });
 
       if (response.data.url) {
