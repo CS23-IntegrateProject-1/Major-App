@@ -3,7 +3,25 @@ import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
-const checkAvailability = async (showId: number, seatId: number) => {
+export const checkAvailability = async (req: Request, res: Response) => {
+	const { showId, seatId } = req.body;
+	const reservation = await prisma.reservation_Logs.findMany({
+		where: {
+			showId: showId,
+			seatId: seatId,
+		},
+		select: {
+			showId: true,
+			seatId: true,
+		},
+	});
+	if (reservation.length > 0) {
+		return res.status(200).send(false);
+	}
+	return res.status(200).send(true);
+};
+
+const localCheckAvailability = async (showId: number, seatId: number) => {
 	const reservation = await prisma.reservation_Logs.findMany({
 		where: {
 			showId: showId,
@@ -24,7 +42,7 @@ export const createReservation = async (req: Request, res: Response) => {
 	try {
 		const { showId, seatId } = req.body;
 
-		if (await checkAvailability(showId, seatId)) {
+		if (await localCheckAvailability(showId, seatId)) {
 			let reservation;
 			try {
 				reservation = await prisma.reservation_Logs.create({
