@@ -27,6 +27,7 @@ export const TypeOfSeatCard: React.FC<{ type: Type }> = ({ type }) => {
         return <Image src="../../../../chair.png" alt="chair" w="7vh" />;
     }
   };
+  
 
   return (
     <Box>

@@ -1,5 +1,5 @@
 // import { Box, Button, Center, Text, Flex, Image } from "@chakra-ui/react";
-import { Box, Button, Center, Text, Flex } from "@chakra-ui/react";
+import { Box, Button, Center, Text, Flex, Image } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
@@ -16,9 +16,7 @@ interface theater {
   latitude: string;
   longitude: string;
 }
-const stripePromise = loadStripe(
-  "pk_test_51OOyo2JnAxcvlB9ihjdMfNhFwNjRCmNlpFHo46RQeW7WZrx0EZ3nuLKvgBVziNiW6hkFAy6uVk1rwrMchN27p7CO00eV2YBL0b"
-);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY ?? "");
 
 function PendingOrderPage() {
   const location = useLocation();
@@ -28,19 +26,15 @@ function PendingOrderPage() {
   );
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
   const seatId = queryParams.get("seatIds")?.split(",") || [];
+  const showId = queryParams.get("showid")?.split(",") || [];
   const totalPrice = useMemo(
     () => queryParams.get("totalPrice")?.split(",") || [],
     [queryParams]
   );
-  //const theaterId = queryParams.get("theaterId")?.split(",") || [];
-  // const showId = queryParams.get("showid")?.split(",") || [];
-  // // const [qrCode, setqrCode] = useState("sample");
-  // const seatIds = queryParams.get("seatIds") || [];
 
   const seatWithRow = queryParams.get("selectedSeats")?.split(",") || []; // Assuming seatIds are passed as a parameter
-  //const seatIds = queryParams.get("seatIds")?.split(",") || []; // Assuming seatIds are passed as a parameter
+
   const [theaterInfo, setTheaterInfo] = useState<theater>({} as theater);
-  //const [promptPayNum, setPromptPayNum] = useState<string>("");
 
   useEffect(() => {
     const fetchTheaterInfo = async () => {
@@ -58,7 +52,7 @@ function PendingOrderPage() {
     };
 
     fetchTheaterInfo();
-  }, [queryParams, theaterInfo]); // Include theaterInfo in the dependency array
+  }, [queryParams]); // Include theaterInfo in the dependency array
 
   const uniqueSeatTypesMap = new Map();
   seatTypes.forEach((type) => {
@@ -76,6 +70,7 @@ function PendingOrderPage() {
         totalPrice: parseFloat(totalPrice[0]) || 0,
         selectSeat: seatWithRow.join(", "),
         seatId: seatId,
+        showId: showId,
       });
 
       if (response.data.url) {
@@ -93,6 +88,16 @@ function PendingOrderPage() {
     }
   };
 
+  const [isHovered, setIsHovered] = useState(false);
+
+  const handleHover = () => {
+    setIsHovered(true);
+  };
+
+  const handleMouseOut = () => {
+    setIsHovered(false);
+  };
+
   return (
     <Box>
       <Text color="gold" {...TextStyle.h1}>
@@ -101,12 +106,13 @@ function PendingOrderPage() {
       <Box>
         <Flex flexWrap="wrap">
           {uniqueSeatTypes.map((typeName, index) => (
-            <Box key={index} mr={4} mb={5}>
+            <Box key={index} mr={4}>
               <TypeOfSeat2 type={{ typeName }} />
             </Box>
           ))}
         </Flex>
         <Box flexDir={"column"}>
+          <Text>{theaterInfo.name}</Text>
           <Text mb={1}>Selected Seat: {seatWithRow.join(", ")}</Text>
           <Text>Total Price: {totalPrice.join(", ")} Baht</Text>
         </Box>
@@ -121,12 +127,43 @@ function PendingOrderPage() {
         <Center m={"20px"}>
           <Button
             onClick={handlePayment}
-            bg="gold"
-            _hover={{ bg: "gold" }}
-            size="md"
-            width="15rem"
+            h={{ base: "18vh", sm: "18vh", md: "18vh", lg: "30vh" }}
+            w={{ base: "20vh", sm: "20vh", md: "20vh", lg: "30vh" }}
+            mb={10}
+            borderWidth="0.2vw"
+            borderColor="white"
+            display="flex"
+            flexDirection="column"
+            borderRadius="15"
+            p="4"
+            bg={"#2d2d2d"}
+            _hover={{
+              boxShadow: "0 0 15px gold",
+              transition: "box-shadow 0.3s ease-in-out, color 0.3s ease-in-out", // Adding transitions for both text and box-shadow
+            }}
+            transition="box-shadow 0.2s ease-in-out" // Adding transition for smooth effect
+            onMouseOver={handleHover}
+            onMouseOut={handleMouseOut}
           >
-            PAY NOW
+            <Image
+              src={
+                isHovered
+                  ? "../../../../creditcardG.png"
+                  : "../../../../creditcardW.png"
+              }
+              alt="creditcard"
+              w="11vh"
+              transition="0.3s ease-in-out" // Adding transition for the image
+            />
+            <Text
+              mt="2"
+              mb="1"
+              fontSize={"xl"}
+              color={isHovered ? "gold" : "white"}
+              transition="color 0.05s ease-in-out" // Adding transition for the text color
+            >
+              Credit/Debit
+            </Text>
           </Button>
         </Center>
       </Box>

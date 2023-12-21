@@ -2,36 +2,78 @@ import { Box, Center, Text } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
-// import QRCode from "qrcode.react";
+import QRCode from "qrcode.react";
 import { useBreakpointValue } from "@chakra-ui/react";
-
-// const reservationId = "YourReservationID";
+import { Axios } from "../../../AxiosInstance";
+import { useEffect, useRef, useMemo, useState } from "react";
+ 
 
 const SuccessfulPage = () => {
   const location = useLocation();
-  const queryParams = new URLSearchParams(location.search);
-  const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
-  const totalPrice = queryParams.get("total")?.split(",") || [];
-  console.log(totalPrice)
-  // const reservationId = queryParams.get("reserve") || [];
-  // const total = queryParams.get("total") || [];
+  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
+  const seatTypes = useMemo(() => queryParams.get("seatTypes")?.split(",") || [], [queryParams]);
+  const totalPrice = useMemo(() => queryParams.get("total")?.split(",") || [], [queryParams]);
+  console.log(totalPrice);
+
   const selectedSeat = queryParams.get("seat") || [];
-
+  const seatId = useMemo(() => queryParams.get("no")?.split(",") || [], [queryParams]);
+  const showId = useMemo(() => queryParams.get("show")?.split(",") || [], [queryParams]);
+  const reservationIdRef = useRef<number | null>(null);
+  const [reservationCreated, setReservationCreated] = useState(false);
+  const [paymentCreated, setPaymentCreated] = useState(false);
   const uniqueSeatTypesMap = new Map<string, boolean>(); // Using Map to store unique seat types
+  const hasRun = useRef(false);
 
-  // Loop through seatTypes to extract unique seat types
+  useEffect(() => {
+    if (hasRun.current) return;
+    const createReservation = async () => {
+      if(reservationIdRef.current !== null) return; 
+    try {
+      const response = await Axios.post(`/seat/reserveSeatForShow/${showId}`, {
+        seatId: seatId,
+      });
+      console.log(seatId)
+      console.log(response.data);
+      const createdReservationId = response.data[0].reservationId;
+      reservationIdRef.current = createdReservationId; // Store the value in the useRef
+      setReservationCreated(true); // Mark reservation as created
+      } catch (error) {
+        console.error("Error fetching now showing theatre:", error);
+      }
+    };
+    createReservation();    
+  }, [seatId, showId]);
+
+  useEffect(() => {
+    if (!paymentCreated && reservationCreated) {
+      const createPayment = async (reservationId: number) => {
+        try {
+          console.log(reservationId);
+          const payment = await Axios.post(`/payment/createPayment`, {
+            reservationId: reservationId,
+            paymentStatus: "success",
+          });
+          console.log(payment.data);
+          setPaymentCreated(true); // Mark payment as created
+        } catch (error) {
+          console.error("Error creating payment:", error);
+        }
+      };
+      createPayment(reservationIdRef.current || 0);
+    }
+  }, [reservationCreated, paymentCreated]);
+
   seatTypes.forEach((type) => {
     const [typeName] = type.split(":");
-
-    // Check if the seat type name already exists in the Map
     if (!uniqueSeatTypesMap.has(typeName)) {
       uniqueSeatTypesMap.set(typeName, true); // Store the unique seat type with its price
     }
   });
 
+
   const uniqueSeatTypes = Array.from(uniqueSeatTypesMap.entries()); // Convert Map back to array of entries
 
-  // const qrCodeValue = `Reservation QR code ${reservationId}`;
+  const qrCodeValue = `Reservation QR code ${reservationIdRef.current}`;
 
   const boxWidth = useBreakpointValue({ base: "90%", md: "40%", lg: "30%" });
   const boxHeight = useBreakpointValue({
@@ -65,10 +107,10 @@ const SuccessfulPage = () => {
           width={boxWidth}
           height={boxHeight}
         >
-          {/* <QRCode
+          <QRCode
             value={qrCodeValue}
             style={{ width: "100%", height: "100%", objectFit: "contain" }}
-          /> */}
+          />
         </Box>
       </Center>
 
