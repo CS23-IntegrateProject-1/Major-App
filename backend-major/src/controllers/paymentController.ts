@@ -36,7 +36,7 @@ const YOUR_DOMAIN = "http://localhost:4000";
 
 export const createPaymentSession = async (req: Request, res: Response) => {
   try {
-    const { totalPrice,selectSeat, seatId, showId } = req.body; // Assuming the frontend sends the totalPrice
+    const { totalPrice, selectSeat, seatId, showId } = req.body; // Assuming the frontend sends the totalPrice
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -57,15 +57,13 @@ export const createPaymentSession = async (req: Request, res: Response) => {
       cancel_url: `${YOUR_DOMAIN}`,
     });
 
-    console.log(session.url)
-    res.status(201).json({url:session.url})
+    console.log(session.url);
+    res.status(201).json({ url: session.url });
   } catch (err) {
     const error = err as Error;
     res.status(500).json({ error: error.message });
   }
 };
-
-
 
 // export const getPaymentById = async (req: Request, res: Response) => {
 
