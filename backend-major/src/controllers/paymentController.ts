@@ -32,7 +32,7 @@ export const createPayment = async (req: Request, res: Response) => {
 };
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? "");
-const YOUR_DOMAIN = "http://localhost:4000";
+const YOUR_DOMAIN = process.env.FRONTEND_URL ?? "";
 
 export const createPaymentSession = async (req: Request, res: Response) => {
   try {
@@ -47,7 +47,7 @@ export const createPaymentSession = async (req: Request, res: Response) => {
             product_data: {
               name: "Movie Ticket",
             },
-            unit_amount: totalPrice * 100, // Convert to cents
+            unit_amount: totalPrice * 100, 
           },
           quantity: 1,
         },
