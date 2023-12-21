@@ -44,3 +44,19 @@ export const createReservation = async (req: Request, res: Response) => {
 		res.status(500).json({ error: error.message });
 	}
 };
+
+export const getReserveSeatByShowId = async (req: Request, res: Response) => {
+	try {
+		const showId = Number(req.body.showId);
+		const data = await prisma.reservation_Logs.findMany({
+			where: {
+				showId: showId
+			}
+		})
+		res.json(data);
+	} catch (err) {
+		const error = err as Error;
+		res.status(500).json({ error: error.message });
+		console.log(err)
+	}
+}
