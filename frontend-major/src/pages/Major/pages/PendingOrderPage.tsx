@@ -127,8 +127,8 @@ function PendingOrderPage() {
         <Center m={"20px"}>
           <Button
             onClick={handlePayment}
-            h={{ base: "18vh", sm: "18vh", md: "18vh", lg: "18vh" }}
-            w={{ base: "20vh", sm: "20vh", md: "20vh", lg: "20vh" }}
+            h={{ base: "18vh", sm: "18vh", md: "18vh", lg: "30vh" }}
+            w={{ base: "20vh", sm: "20vh", md: "20vh", lg: "30vh" }}
             mb={10}
             borderWidth="0.2vw"
             borderColor="white"
@@ -152,12 +152,13 @@ function PendingOrderPage() {
                   : "../../../../creditcardW.png"
               }
               alt="creditcard"
-              w="7vh"
+              w="11vh"
               transition="0.3s ease-in-out" // Adding transition for the image
             />
             <Text
               mt="2"
               mb="1"
+              fontSize={"xl"}
               color={isHovered ? "gold" : "white"}
               transition="color 0.05s ease-in-out" // Adding transition for the text color
             >
