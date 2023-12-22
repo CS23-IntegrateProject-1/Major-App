@@ -320,15 +320,30 @@ const ScreenPage: React.FC = () => {
         })
         .join(",");
 
+        const reserveSeat = async () => {
+          try {
+            const response = await Axios.post(`/seat/reserveSeatForShow/${showid}`, {
+              seatId: seatIds,
+            });
+            console.log(response.data);
+            navigate(
+              `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
+                ","
+              )}&theaterId=${theaterId}` // Include selectedSeats in the URL
+            );
+          } catch (error) {
+            console.error("Error reserving seat:", error);
+          }
+        }
+        reserveSeat();
+
       //   const selectedSeatRows = selectedSeats
       //     .map((seatIdentifier) => seatIdentifier.charAt(0)) // Extracting the row letter from seat identifier
       //     .join(","); // Joining rows with a comma
 
-      navigate(
-        `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
-          ","
-        )}&theaterId=${theaterId}` // Include selectedSeats in the URL
-      );
+
+
+      
     }
   };
 

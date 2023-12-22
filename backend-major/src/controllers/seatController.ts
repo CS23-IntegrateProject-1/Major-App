@@ -157,7 +157,8 @@ export const reserveSeatForShow = async (req: Request, res: Response) => {
     const { showId } = req.params;
     const { seatId } = req.body;
     const showIdNum = parseInt(showId);
-    const seatIdArray = seatId.map((id) => parseInt(id));
+    const seatIdArray = seatId.split(",").map((id) => parseInt(id));
+    // const seatIdArray = seatId.map((id) => parseInt(id));
     console.log("Show ID:", showIdNum);
     console.log("Seat IDs:", seatIdArray);
 

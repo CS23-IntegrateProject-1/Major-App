@@ -87,3 +87,17 @@ export const updatePayment = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+
+export const deleteReservation = async (reservationId: string) => {
+  try {
+    await prisma.reservation_Logs.delete({
+      where: {
+        reservationId: parseInt(reservationId),
+      },
+    });
+  } catch (error) {
+    console.error('Error deleting reservation:', error);
+    throw error;
+  }
+}
