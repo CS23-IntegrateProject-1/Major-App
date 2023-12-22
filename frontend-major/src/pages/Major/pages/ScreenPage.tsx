@@ -301,7 +301,7 @@ const ScreenPage: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
 
-  const handleSelect = () => {
+  const handleSelect = async () => {
     if (selectedSeats.length === 0) {
       onOpen(); // Open modal if no seat is selected
     } else {
@@ -319,33 +319,30 @@ const ScreenPage: React.FC = () => {
           return seat ? `${seat.Seat_Types.typeName}` : "";
         })
         .join(",");
-
-        const reserveSeat = async () => {
-          try {
-            const response = await Axios.post(`/seat/reserveSeatForShow/${showid}`, {
-              seatId: seatIds,
-            });
-            console.log(response.data);
-            navigate(
-              `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
-                ","
-              )}&theaterId=${theaterId}` // Include selectedSeats in the URL
-            );
-          } catch (error) {
-            console.error("Error reserving seat:", error);
-          }
+      try{
+        const response = await Axios.post(`/seat/addWaitLog`,{
+          seatId: seatIds,
+          showId: showid,
+        })
+        if (response.data) {
+          console.log(response.data);
+          navigate(
+            `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
+              ","
+            )}&theaterId=${theaterId}` // Include selectedSeats in the URL
+          );
+        } else {
+          alert("Someone is buying this seat. Please try again.")
         }
-        reserveSeat();
-
+      } catch (error) {
+        console.error("Error fetching show details:", error);
+      }
       //   const selectedSeatRows = selectedSeats
       //     .map((seatIdentifier) => seatIdentifier.charAt(0)) // Extracting the row letter from seat identifier
       //     .join(","); // Joining rows with a comma
-
-
-
-      
     }
   };
+
 
   return (
     <>

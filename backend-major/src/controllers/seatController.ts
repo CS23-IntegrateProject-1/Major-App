@@ -152,53 +152,6 @@ export const getInfoBySeatId = async (req: Request, res: Response) => {
   }
 };
 
-export const reserveSeatForShow = async (req: Request, res: Response) => {
-  try {
-    const { showId } = req.params;
-    const { seatId } = req.body;
-    const showIdNum = parseInt(showId);
-    const seatIdArray = seatId.split(",").map((id) => parseInt(id));
-    // const seatIdArray = seatId.map((id) => parseInt(id));
-    console.log("Show ID:", showIdNum);
-    console.log("Seat IDs:", seatIdArray);
-
-    const existingReservations = await prisma.reservation_Logs.findFirst({
-      where: {
-        showId: showIdNum,
-        seatId: { in: seatIdArray },
-      },
-      select: {
-        reservationId: true,
-        seatId: true,
-        showId: true,
-      },
-    });
-
-    console.log("Existing reservation:", existingReservations);
-
-    if (existingReservations != undefined) {
-      console.log("Exist");
-      return res.status(200).json([existingReservations]);
-    }
-    const reservations = await Promise.all(
-      seatIdArray.map((seatIdNum) => {
-        return prisma.reservation_Logs.create({
-          data: {
-            showId: showIdNum,
-            seatId: seatIdNum,
-          },
-        });
-      })
-    );
-    console.log(reservations);
-
-    res.status(200).json(reservations);
-  } catch (err) {
-    const error = err as Error;
-    res.status(500).json({ error: error.message });
-  }
-};
-
 export const getHashedReserveId = async (req: Request, res: Response) => {
     try{
         const {reserve} = req.params;
@@ -310,3 +263,91 @@ export const getAllSeatType = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+export const addWaitingLog = async (req: Request, res: Response) => {
+  try {
+    const { showId, seatId } = req.body;
+    console.log(showId)
+    console.log(seatId)
+      const now = new Date();
+      const seatIdArray = seatId.split(",").map((id) => parseInt(id));
+      const findWaitingLog = await prisma.waiting_Logs.findMany({
+      where: {
+          showId: parseInt(showId),
+          seatId: { in: seatIdArray },
+          startTime: {
+            gt: new Date(new Date().getTime() - 30 * 60000), 
+          }
+      },
+      select: {
+          showId: true,
+          seatId: true,
+      },
+      });
+      if (findWaitingLog.length > 0) {
+        return res.status(200).send(false);
+      }
+      const waitingLog = await Promise.all(
+      seatIdArray.map((seatIdNum) => {
+          return prisma.waiting_Logs.create({
+          data: {
+              showId: parseInt(showId),
+              seatId: seatIdNum,
+              startTime: now,
+          },
+          });
+      })
+      );
+      res.status(200).json(waitingLog);
+  } catch (err) {
+      const error = err as Error;
+      res.status(500).json({ error: error.message });
+  }
+}
+
+
+export const reserveSeatForShow = async (req: Request, res: Response) => {
+try {
+  const { showId } = req.params;
+  const { seatId } = req.body;
+  const showIdNum = parseInt(showId);
+  const seatIdArray = seatId.map((id) => parseInt(id));
+  console.log("Show ID:", showIdNum);
+  console.log("Seat IDs:", seatIdArray);
+
+  const existingReservations = await prisma.reservation_Logs.findFirst({
+    where: {
+      showId: showIdNum,
+      seatId: { in: seatIdArray },
+    },
+    select: {
+      reservationId: true,
+      seatId: true,
+      showId: true,
+    },
+  });
+
+  console.log("Existing reservation:", existingReservations);
+
+  if (existingReservations != undefined) {
+    console.log("Exist");
+    return res.status(200).json([existingReservations]);
+  }
+  const reservations = await Promise.all(
+    seatIdArray.map((seatIdNum) => {
+      return prisma.reservation_Logs.create({
+        data: {
+          showId: showIdNum,
+          seatId: seatIdNum,
+        },
+      });
+    })
+  );
+  console.log(reservations);
+
+  res.status(200).json(reservations);
+} catch (err) {
+  const error = err as Error;
+  res.status(500).json({ error: error.message });
+}
+}

@@ -58,6 +58,7 @@ export const createPaymentSession = async (req: Request, res: Response) => {
     });
 
     console.log(session.url);
+
     res.status(201).json({ url: session.url });
   } catch (err) {
     const error = err as Error;
@@ -89,13 +90,15 @@ export const updatePayment = async (req: Request, res: Response) => {
 };
 
 
-export const deleteReservation = async (reservationId: string) => {
+export const deleteReservation = async (reservationId: string[]) => {
   try {
-    await prisma.reservation_Logs.delete({
+    const reservation = reservationId.map((id) => parseInt(id));
+    const reservationLogs = await prisma.reservation_Logs.deleteMany({
       where: {
-        reservationId: parseInt(reservationId),
+        reservationId: { in: reservation },
       },
     });
+    return reservationLogs;
   } catch (error) {
     console.error('Error deleting reservation:', error);
     throw error;
