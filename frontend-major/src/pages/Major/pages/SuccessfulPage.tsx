@@ -23,6 +23,7 @@ const SuccessfulPage = () => {
   const [paymentCreated, setPaymentCreated] = useState(false);
   const uniqueSeatTypesMap = new Map<string, boolean>(); // Using Map to store unique seat types
   const hasRun = useRef(false);
+  const [hashedReserve, setHashedReserve] = useState<string>("");
 
   useEffect(() => {
     if (hasRun.current) return;
@@ -43,6 +44,7 @@ const SuccessfulPage = () => {
     };
     createReservation();    
   }, [seatId, showId]);
+  console.log(reservationIdRef.current);
 
   useEffect(() => {
     if (!paymentCreated && reservationCreated) {
@@ -63,6 +65,21 @@ const SuccessfulPage = () => {
     }
   }, [reservationCreated, paymentCreated]);
 
+  useEffect(() => {
+    if (!reservationCreated){
+      return;
+    }
+    const getHashedReserve = async () => {
+      try{
+        const response = await Axios.get(`/seat/getHashedReserve/${reservationIdRef.current}`);
+        setHashedReserve(response.data.hashedReserveId);
+      } catch (error) {
+        console.error("Error fetching hashed reserve:", error);
+      }
+    }
+    getHashedReserve();
+  })
+
   seatTypes.forEach((type) => {
     const [typeName] = type.split(":");
     if (!uniqueSeatTypesMap.has(typeName)) {
@@ -73,7 +90,7 @@ const SuccessfulPage = () => {
 
   const uniqueSeatTypes = Array.from(uniqueSeatTypesMap.entries()); // Convert Map back to array of entries
 
-  const qrCodeValue = `Reservation QR code ${reservationIdRef.current}`;
+  const qrCodeValue = `Reservation QR code ${hashedReserve}`;
 
   const boxWidth = useBreakpointValue({ base: "90%", md: "40%", lg: "30%" });
   const boxHeight = useBreakpointValue({

@@ -5,7 +5,8 @@ import { getSeatByScreenIdAndShowId,
         getTotalSeatsRowsColumns,
         getAvailableSeatIdByShowIdAndScreenId,
         getAllSeats,
-        getAllSeatType} from "../controllers/seatController";
+        getAllSeatType,
+        getHashedReserveId} from "../controllers/seatController";
 import { Router } from "express";
 
 const seat = Router();
@@ -18,6 +19,7 @@ seat.get("/getInfoBySeatId/:id", getInfoBySeatId);
 seat.get("/getTotalSeatsRowsColumns/:screenId", getTotalSeatsRowsColumns);
 seat.get("/getAvailableSeatIdByShowIdAndScreenId/:showId/:screenId", getAvailableSeatIdByShowIdAndScreenId);
 seat.get("/getAllSeatType", getAllSeatType);
+seat.get("/getHashedReserve/:reserve", getHashedReserveId);
 
 
 export default seat;

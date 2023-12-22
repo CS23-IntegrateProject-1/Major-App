@@ -1,8 +1,8 @@
 import { PrismaClient } from "@prisma/client";
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
-// const jwt = require("jsonwebtoken");
 
 export const getAllSeats = async (req: Request, res: Response) => {
   try {
@@ -198,14 +198,18 @@ export const reserveSeatForShow = async (req: Request, res: Response) => {
   }
 };
 
-// export const getHashedReserveId = async (req: Request, res: Response) => {
-//     try{
-//         const {reserve} = req.params;
-//         const reserveId = parseInt(reserve);
-//         const hashedReserve =
-
-//     }
-// }
+export const getHashedReserveId = async (req: Request, res: Response) => {
+    try{
+        const {reserve} = req.params;
+        console.log(reserve)
+        const reserveId = parseInt(reserve);
+        const hashedReserveId = jwt.sign({reserveId}, process.env.JWT_SECRET_KEY ?? "");
+        res.status(200).json({hashedReserveId});
+    } catch (err) {
+        const error = err as Error;
+        res.status(500).json({ error: error.message });
+    }
+}
 
 export const getTotalSeatsRowsColumns = async (req: Request, res: Response) => {
   try {
