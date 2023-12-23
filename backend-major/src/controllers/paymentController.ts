@@ -16,15 +16,24 @@ export const getAllPayments = async (req: Request, res: Response) => {
 export const createPayment = async (req: Request, res: Response) => {
   try {
     const { reservationId, paymentStatus } = req.body;
+    const reserveArray = reservationId.split(",");
     const now = new Date();
-    const payment = await prisma.payments.create({
-      data: {
-        reservationId: reservationId,
-        paymentDate: now,
-        paymentStatus: paymentStatus,
-      },
-    });
-    res.status(201).json({ data: payment });
+
+    const payments = await Promise.all(
+      reserveArray.map((reservationIdNum) => {
+        return prisma.payments.create({
+          data: {
+            reservationId: parseInt(reservationIdNum),
+            paymentDate: now,
+            paymentStatus: paymentStatus,
+          },
+        });
+      })
+    );
+
+    const paymentIds = payments.map((payment) => payment.paymentId); // Extracting paymentIds
+
+    res.status(201).json(paymentIds); // Returning only paymentIds in an array
   } catch (err) {
     const error = err as Error;
     res.status(500).json({ error: error.message });
@@ -36,7 +45,11 @@ const YOUR_DOMAIN = process.env.FRONTEND_URL ?? "";
 
 export const createPaymentSession = async (req: Request, res: Response) => {
   try {
-    const { totalPrice, selectSeat, seatId, showId } = req.body; // Assuming the frontend sends the totalPrice
+    const { totalPrice, selectSeat, seatId, showId, reservationId, paymentId } =
+      req.body;
+    //console.log(reservationId);
+    console.log(paymentId);
+    const sessionTimeout = Math.floor(Date.now() / 1000) + 60;
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
@@ -47,17 +60,20 @@ export const createPaymentSession = async (req: Request, res: Response) => {
             product_data: {
               name: "Movie Ticket",
             },
-            unit_amount: totalPrice * 100, 
+            unit_amount: totalPrice * 100,
           },
           quantity: 1,
         },
       ],
       mode: "payment",
-      success_url: `${YOUR_DOMAIN}/success?total=${totalPrice}&seat=${selectSeat}&no=${seatId}&show=${showId}`,
-      cancel_url: `${YOUR_DOMAIN}`,
+      success_url: `${YOUR_DOMAIN}/success?total=${totalPrice}&seat=${selectSeat}&no=${seatId}&show=${showId}&r=${reservationId}`,
+      cancel_url: `${YOUR_DOMAIN}/fallback?r=${reservationId}`,
+      metadata: {
+        sessionTimeout: sessionTimeout,
+      },
     });
 
-    console.log(session.url);
+    //console.log(session.url);
     res.status(201).json({ url: session.url });
   } catch (err) {
     const error = err as Error;
@@ -65,22 +81,41 @@ export const createPaymentSession = async (req: Request, res: Response) => {
   }
 };
 
-// export const getPaymentById = async (req: Request, res: Response) => {
-
-// }
-
 export const updatePayment = async (req: Request, res: Response) => {
   try {
-    const { reservationId, paymentId } = req.body;
-    const payment = await prisma.payments.update({
+    const { reservationId, paymentStatus } = req.body;
+    //console.log(reservationId);
+    const reserveArray = reservationId.map((id) => parseInt(id));
+    const payments = await prisma.payments.updateMany({
       where: {
-        paymentId: parseInt(paymentId),
-        reservationId: parseInt(reservationId),
+        reservationId: {
+          in: reserveArray,
+        },
       },
       data: {
-        paymentStatus: "success",
+        paymentStatus: paymentStatus,
       },
     });
+
+    res.status(200).json({ data: payments });
+  } catch (err) {
+    const error = err as Error;
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const deletePayment = async (req: Request, res: Response) => {
+  try {
+    const { reservationId } = req.params;
+
+    const payment = await prisma.payments.deleteMany({
+      where: {
+        reservationId: {
+          in: reservationId.split(",").map((id) => parseInt(id)),
+        },
+      },
+    });
+
     res.status(200).json({ data: payment });
   } catch (err) {
     const error = err as Error;

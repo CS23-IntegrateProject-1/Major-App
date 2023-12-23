@@ -68,13 +68,30 @@ export const getReserveSeatByShowId = async (req: Request, res: Response) => {
 		const showId = Number(req.body.showId);
 		const data = await prisma.reservation_Logs.findMany({
 			where: {
-				showId: showId
-			}
-		})
+				showId: showId,
+			},
+		});
 		res.json(data);
 	} catch (err) {
 		const error = err as Error;
 		res.status(500).json({ error: error.message });
-		console.log(err)
+		console.log(err);
 	}
-}
+};
+
+export const deleteReservation = async (req: Request, res: Response) => {
+	try {
+		const showId = Number(req.body.showId);
+		const seatId = Number(req.body.seatId);
+		const data = await prisma.reservation_Logs.deleteMany({
+			where: {
+				showId: showId,
+				seatId: seatId,
+			},
+		});
+		res.status(200).json(data);
+	} catch (e: Error | any) {
+		console.log(e);
+		res.status(500).json({ error: e.message });
+	}
+};

@@ -62,7 +62,7 @@ export const getShowFromFilmId = async (req: Request, res: Response) => {
         filmId: parseInt(id),
       },
     });
-    console.log(shows);
+    //console.log(shows);
     const results: ScreenWithFilms[] = [];
     for (const show of shows) {
       const screen = await prisma.screens.findUnique({
@@ -121,7 +121,7 @@ export const getShowFromFilmIdAndDate = async (req: Request, res: Response) => {
         startTime: "asc",
       },
     });
-    console.log(shows);
+    //console.log(shows);
     const results: ScreenWithFilms[] = [];
     for (const show of shows) {
       const screen = await prisma.screens.findUnique({
@@ -227,7 +227,7 @@ export const getShowByTheaterIdAndDate = async (
         theaterId: parseInt(id),
       },
     });
-    console.log(screens);
+    //console.log(screens);
     if (!screens) {
       res.status(404).json({ error: "Screen not found" });
     }
@@ -239,8 +239,6 @@ export const getShowByTheaterIdAndDate = async (
           date: new Date(date),
         },
       });
-      // Collect showIds for this screen
-      // const showIds = showtimes.map(showtime => showtime.showId);
 
       const filmsWithShowtimes: FilmShowtimes[] = [];
       for (const showtime of showtimes) {
@@ -353,42 +351,3 @@ export const getShowByShowId = async (req: Request, res: Response) => {
     res.status(500).json({ error: error.message });
   }
 };
-
-// export const getShowOfEveryTheaterByDate = async (req: Request, res: Response) => {
-//     try {
-//         const { date } = req.params;
-//         const screens = await prisma.screens.findMany();
-//         let results: ScreenWithFilms[] = [];
-//         for (let screen of screens) {
-//             const showtimes = await prisma.shows.findMany({
-//                 where: {
-//                     screenId: screen.screenId,
-//                     date: new Date(date)
-//                 }
-//             });
-//             let filmsWithShowtimes: FilmShowtime[] = [];
-//             for (let showtime of showtimes) {
-//                 const film = await prisma.films.findUnique({
-//                     where: {
-//                         filmId: showtime.filmId
-//                     }
-//                 });
-//                 if (film) {
-//                     filmsWithShowtimes.push({
-//                         name: film.name,
-//                         date: showtime.date,
-//                         startTime: showtime.startTime
-//                     });
-//                 }
-//             }
-//             results.push({
-//                 screen,
-//                 films: filmsWithShowtimes
-//             });
-//         }
-//         res.status(200).json(results);
-//     } catch (err) {
-//         const error = err as Error;
-//         res.status(500).json({error: error.message});
-//     }
-// }

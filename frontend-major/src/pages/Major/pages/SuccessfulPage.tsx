@@ -5,63 +5,63 @@ import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
 import QRCode from "qrcode.react";
 import { useBreakpointValue } from "@chakra-ui/react";
 import { Axios } from "../../../AxiosInstance";
-import { useEffect, useRef, useMemo, useState } from "react";
- 
+import { useEffect, useMemo, useState } from "react";
 
 const SuccessfulPage = () => {
   const location = useLocation();
-  const queryParams = useMemo(() => new URLSearchParams(location.search), [location.search]);
-  const seatTypes = useMemo(() => queryParams.get("seatTypes")?.split(",") || [], [queryParams]);
-  const totalPrice = useMemo(() => queryParams.get("total")?.split(",") || [], [queryParams]);
-  console.log(totalPrice);
+  const queryParams = useMemo(
+    () => new URLSearchParams(location.search),
+    [location.search]
+  );
+  const seatTypes = useMemo(
+    () => queryParams.get("seatTypes")?.split(",") || [],
+    [queryParams]
+  );
+  const totalPrice = useMemo(
+    () => queryParams.get("total")?.split(",") || [],
+    [queryParams]
+  );
+
+  const reservationIdParam = queryParams.get("r");
+  const reservationId = useMemo(
+    () => (reservationIdParam ? reservationIdParam.split(",") : []),
+    [reservationIdParam]
+  );
 
   const selectedSeat = queryParams.get("seat") || [];
-  const seatId = useMemo(() => queryParams.get("no")?.split(",") || [], [queryParams]);
-  const showId = useMemo(() => queryParams.get("show")?.split(",") || [], [queryParams]);
-  const reservationIdRef = useRef<number | null>(null);
-  const [reservationCreated, setReservationCreated] = useState(false);
-  const [paymentCreated, setPaymentCreated] = useState(false);
   const uniqueSeatTypesMap = new Map<string, boolean>(); // Using Map to store unique seat types
-  const hasRun = useRef(false);
+  const [hashedReserve, setHashedReserve] = useState<string>("");
 
   useEffect(() => {
-    if (hasRun.current) return;
-    const createReservation = async () => {
-      if(reservationIdRef.current !== null) return; 
-    try {
-      const response = await Axios.post(`/seat/reserveSeatForShow/${showId}`, {
-        seatId: seatId,
-      });
-      console.log(seatId)
-      console.log(response.data);
-      const createdReservationId = response.data[0].reservationId;
-      reservationIdRef.current = createdReservationId; // Store the value in the useRef
-      setReservationCreated(true); // Mark reservation as created
+    const updatePayment = async () => {
+      try {
+        await Axios.put(`/payment/updatePayment/`, {
+          reservationId: reservationId,
+          paymentStatus: "success",
+        });
       } catch (error) {
-        console.error("Error fetching now showing theatre:", error);
+        console.error("Error updating payment:", error);
       }
     };
-    createReservation();    
-  }, [seatId, showId]);
+    updatePayment();
+  }, [reservationId]);
 
   useEffect(() => {
-    if (!paymentCreated && reservationCreated) {
-      const createPayment = async (reservationId: number) => {
-        try {
-          console.log(reservationId);
-          const payment = await Axios.post(`/payment/createPayment`, {
-            reservationId: reservationId,
-            paymentStatus: "success",
-          });
-          console.log(payment.data);
-          setPaymentCreated(true); // Mark payment as created
-        } catch (error) {
-          console.error("Error creating payment:", error);
-        }
-      };
-      createPayment(reservationIdRef.current || 0);
+    if (reservationId.length === 0) {
+      return;
     }
-  }, [reservationCreated, paymentCreated]);
+    const getHashedReserve = async () => {
+      try {
+        const response = await Axios.get(
+          `/seat/getHashedReserve/${reservationId[0]}`
+        );
+        setHashedReserve(response.data.hashedReserveId);
+      } catch (error) {
+        console.error("Error fetching hashed reserve:", error);
+      }
+    };
+    getHashedReserve();
+  });
 
   seatTypes.forEach((type) => {
     const [typeName] = type.split(":");
@@ -70,10 +70,9 @@ const SuccessfulPage = () => {
     }
   });
 
-
   const uniqueSeatTypes = Array.from(uniqueSeatTypesMap.entries()); // Convert Map back to array of entries
 
-  const qrCodeValue = `Reservation QR code ${reservationIdRef.current}`;
+  const qrCodeValue = `Reservation QR code ${hashedReserve}`;
 
   const boxWidth = useBreakpointValue({ base: "90%", md: "40%", lg: "30%" });
   const boxHeight = useBreakpointValue({
@@ -91,9 +90,7 @@ const SuccessfulPage = () => {
       {uniqueSeatTypes.map(([typeName], index) => (
         <TypeOfSeat2 key={index} type={{ typeName }} />
       ))}
-      <Box>
-        Total Price: {totalPrice.join(", ")} Baht
-      </Box>
+      <Box>Total Price: {totalPrice.join(", ")} Baht</Box>
       <Text>Selected Seat No: {selectedSeat}</Text>
       <Center {...TextStyle.h1} h={"15vh"}>
         Reservation QR code
