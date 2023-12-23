@@ -282,7 +282,7 @@ const ScreenPage: React.FC = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
 
-  const handleSelect = () => {
+  const handleSelect = async () => {
     if (selectedSeats.length === 0) {
       onOpen(); // Open modal if no seat is selected
     } else {
@@ -322,6 +322,7 @@ const ScreenPage: React.FC = () => {
       reserveSeat();
     }
   };
+
 
   return (
     <>

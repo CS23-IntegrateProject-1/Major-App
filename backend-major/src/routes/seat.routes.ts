@@ -7,7 +7,8 @@ import { getSeatByScreenIdAndShowId,
         getAllSeats,
         getAllSeatType,
         getHashedReserveId,
-        deleteReservation} from "../controllers/seatController";
+        deleteReservation,
+        addWaitingLog} from "../controllers/seatController";
 import { Router } from "express";
 
 const seat = Router();
@@ -22,6 +23,6 @@ seat.get("/getAvailableSeatIdByShowIdAndScreenId/:showId/:screenId", getAvailabl
 seat.get("/getAllSeatType", getAllSeatType);
 seat.get("/getHashedReserve/:reserve", getHashedReserveId);
 seat.delete("/delete/:reservationId", deleteReservation);
-
+seat.post("/addWaitLog", addWaitingLog);
 
 export default seat;
