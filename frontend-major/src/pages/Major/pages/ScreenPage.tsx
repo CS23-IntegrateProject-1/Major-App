@@ -86,8 +86,6 @@ const ScreenPage: React.FC = () => {
   const showid = parseInt(showId || "0");
   const [selectedSeatId, setSelectedSeatId] = useState<number | null>(null);
 
-  console.log(showid);
-
   interface film {
     filmId: number;
     name: string;
@@ -119,7 +117,6 @@ const ScreenPage: React.FC = () => {
       showid
     ) {
       const screenId = allShowDetails.show.Screens.screenId;
-      console.log("Screen ID:", screenId); // Log screenId
       Axios.get(`/seat/getUniqueSeatTypeByScreenId/${screenId}/${showid}`)
         .then((response) => {
           setSeatType(response.data);
@@ -143,7 +140,6 @@ const ScreenPage: React.FC = () => {
     );
     return formattedDate.replace(/,/, "");
   };
-  // console.log(formatDate(date));
 
   useEffect(() => {
     try {
@@ -223,15 +219,6 @@ const ScreenPage: React.FC = () => {
     }
   }, [allShowDetails, showId]); // Updated dependencies for the useEffectclude fetchAvailableSeats in the dependency array
 
-  // const notAvailable = () =>{
-  //   const notAvailableSeat = seats
-  //   .filter((seat) => !availableSeats.includes(seat.seatId))
-  //   .map((seat) => seat.seatId);
-  //   setNotAvailableSeat(notAvailableSeat);
-  //   console.log(notAvailableSeat);
-  //   return notAvailableSeat;
-  // }
-
   const isNotAvailable = (seatId: number) => {
     const notAvailableSeat = seats
       .filter((seat) => !availableSeats.includes(seat.seatId))
@@ -291,12 +278,6 @@ const ScreenPage: React.FC = () => {
     acc[seat.seatRow].push(seat);
     return acc;
   }, {} as { [key: string]: Seat[] });
-  console.log(seats);
-  console.log(seatsByRow);
-
-  console.log("Selected Seats:", selectedSeats);
-  console.log("Seat Types:", seatType);
-  console.log("Seats:", seats);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const navigate = useNavigate();
@@ -320,30 +301,25 @@ const ScreenPage: React.FC = () => {
         })
         .join(",");
 
-        const reserveSeat = async () => {
-          try {
-            const response = await Axios.post(`/seat/reserveSeatForShow/${showid}`, {
+      const reserveSeat = async () => {
+        try {
+          const response = await Axios.post(
+            `/seat/reserveSeatForShow/${showid}`,
+            {
               seatId: seatIds,
-            });
-            console.log(response.data);
-            navigate(
-              `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
-                ","
-              )}&theaterId=${theaterId}` // Include selectedSeats in the URL
-            );
-          } catch (error) {
-            console.error("Error reserving seat:", error);
-          }
+            }
+          );
+
+          navigate(
+            `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
+              ","
+            )}&theaterId=${theaterId}&reserve=${response.data}` // Include selectedSeats in the URL
+          );
+        } catch (error) {
+          console.error("Error reserving seat:", error);
         }
-        reserveSeat();
-
-      //   const selectedSeatRows = selectedSeats
-      //     .map((seatIdentifier) => seatIdentifier.charAt(0)) // Extracting the row letter from seat identifier
-      //     .join(","); // Joining rows with a comma
-
-
-
-      
+      };
+      reserveSeat();
     }
   };
 

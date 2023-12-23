@@ -158,9 +158,9 @@ export const reserveSeatForShow = async (req: Request, res: Response) => {
     const { seatId } = req.body;
     const showIdNum = parseInt(showId);
     const seatIdArray = seatId.split(",").map((id) => parseInt(id));
-    // const seatIdArray = seatId.map((id) => parseInt(id));
-    console.log("Show ID:", showIdNum);
-    console.log("Seat IDs:", seatIdArray);
+
+    //console.log("Show ID:", showIdNum);
+    //console.log("Seat IDs:", seatIdArray);
 
     const existingReservations = await prisma.reservation_Logs.findFirst({
       where: {
@@ -174,12 +174,14 @@ export const reserveSeatForShow = async (req: Request, res: Response) => {
       },
     });
 
-    console.log("Existing reservation:", existingReservations);
+    //console.log("Existing reservation:", existingReservations);
 
     if (existingReservations != undefined) {
-      console.log("Exist");
-      return res.status(200).json([existingReservations]);
+      //console.log("Exist");
+      const reservationId = existingReservations.reservationId; // Extracting reservationId
+      return res.status(200).json([reservationId]); // Returning only reservationId
     }
+
     const reservations = await Promise.all(
       seatIdArray.map((seatIdNum) => {
         return prisma.reservation_Logs.create({
@@ -190,19 +192,47 @@ export const reserveSeatForShow = async (req: Request, res: Response) => {
         });
       })
     );
-    console.log(reservations);
 
-    res.status(200).json(reservations);
+    const reservationIds = reservations.map((reservation) => reservation.reservationId); // Extracting reservationIds
+
+    //console.log("New reservations:", reservations);
+    //console.log("New reservation IDs:", reservationIds);
+
+    res.status(200).json(reservationIds); // Returning only reservationIds
   } catch (err) {
     const error = err as Error;
     res.status(500).json({ error: error.message });
   }
 };
 
+
+
+export const deleteReservation = async (req: Request, res: Response) => {
+  try {
+     const { reservationId } = req.params;
+     const reserationArr = reservationId.split(",");
+      //(reserationArr);
+      const reservation = await Promise.all(
+        reserationArr.map((reservationIdNum) => {
+          return prisma.reservation_Logs.delete({
+            where: {
+              reservationId: parseInt(reservationIdNum),
+            },
+          });
+        })
+      );
+
+      res.status(200).json({ data: reservation });
+  } catch (err) {
+    const error = err as Error;
+    res.status(500).json({ error: error.message });
+  }
+}
+
 export const getHashedReserveId = async (req: Request, res: Response) => {
     try{
         const {reserve} = req.params;
-        console.log(reserve)
+        //console.log(reserve)
         const reserveId = parseInt(reserve);
         const hashedReserveId = jwt.sign({reserveId}, process.env.JWT_SECRET_KEY ?? "");
         res.status(200).json({hashedReserveId});

@@ -6,7 +6,7 @@ import ScreenPage from "./pages/ScreenPage";
 import PendingOrderPage from "./pages/PendingOrderPage";
 import FilmInTheaterPage from "./pages/FilmInTheaterPage";
 import SuccessfulPage from "./pages/SuccessfulPage";
-// import UpcomingMovie from "./pages/UpcomingMovie";
+import FallBackPage from "./pages/FallBackPage";
 
 const ExampleRoutes = () => {
   return [
@@ -18,10 +18,6 @@ const ExampleRoutes = () => {
       path: "/",
       element: <MoviePage />,
     },
-    // {
-    // 	path: "/upComing",
-    // 	element: <UpcomingMovie/>
-    // },
     {
       path: "/Movie",
       element: <MoviePage />,
@@ -49,6 +45,10 @@ const ExampleRoutes = () => {
     {
       path: "/success",
       element: <SuccessfulPage />,
+    },
+    {
+      path: "/fallback",
+      element: <FallBackPage />,
     },
   ];
 };

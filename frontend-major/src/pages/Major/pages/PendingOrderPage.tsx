@@ -1,4 +1,3 @@
-// import { Box, Button, Center, Text, Flex, Image } from "@chakra-ui/react";
 import { Box, Button, Center, Text, Flex, Image } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
@@ -27,6 +26,7 @@ function PendingOrderPage() {
   const seatTypes = queryParams.get("seatTypes")?.split(",") || [];
   const seatId = queryParams.get("seatIds")?.split(",") || [];
   const showId = queryParams.get("showid")?.split(",") || [];
+  const reservationId = queryParams.get("reserve");
   const totalPrice = useMemo(
     () => queryParams.get("totalPrice")?.split(",") || [],
     [queryParams]
@@ -44,15 +44,14 @@ function PendingOrderPage() {
           `/theater/getTheaterById/${fetchedTheaterId}`
         );
         setTheaterInfo(response.data);
-        // setPromptPayNum(response.data.promptPayNum);
-        console.log(response.data);
+
       } catch (error) {
         console.error("Error fetching theater information:", error);
       }
     };
 
     fetchTheaterInfo();
-  }, [queryParams]); // Include theaterInfo in the dependency array
+  }, [queryParams]);
 
   const uniqueSeatTypesMap = new Map();
   seatTypes.forEach((type) => {
@@ -71,6 +70,8 @@ function PendingOrderPage() {
         selectSeat: seatWithRow.join(", "),
         seatId: seatId,
         showId: showId,
+        reservationId: reservationId,
+        paymentId: paymentId,
       });
 
       if (response.data.url) {
@@ -80,11 +81,23 @@ function PendingOrderPage() {
       console.error("Error creating payment session:", error);
     }
   };
+  const [paymentId, setPaymentId] = useState("");
 
   const handlePayment = async () => {
-    const stripe = await stripePromise;
-    if (stripe) {
-      createPaymentSession();
+    try {
+      const response = await Axios.post(`payment/createPayment`, {
+        reservationId: reservationId,
+        paymentStatus: "pending",
+      });
+      setPaymentId(response.data);
+      if (response.data) {
+        const stripe = await stripePromise;
+        if (stripe) {
+          createPaymentSession();
+        }
+      }
+    } catch (error) {
+      console.error("Error occurred during payment creation:", error);
     }
   };
 
@@ -122,8 +135,6 @@ function PendingOrderPage() {
       </Center>
 
       <Box>
-        {/* Your previous JSX code here */}
-
         <Center m={"20px"}>
           <Button
             onClick={handlePayment}

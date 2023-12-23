@@ -85,11 +85,9 @@ const MovieInformationPage = () => {
   };
 
   const [selectedDate, setSelectedDate] = useState<string>("");
-  console.log(selectedDate);
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
   };
-  console.log(typeof selectedDate);
 
   const [movieInfo, setMovieInfo] = useState<film>({} as film);
   const { filmId } = useParams<{ filmId?: string }>();
@@ -119,11 +117,9 @@ const MovieInformationPage = () => {
           .split("T")[0];
         dateToUse = localISODate;
       }
-      console.log(dateToUse);
       const response = await Axios.get(
         `/show/getShowFromFilmIdAndDate/${id}/${dateToUse}`
       );
-      console.log(response.data);
       if (!response.data || response.data.length === 0) {
         setShowtimesByTheater({});
         throw new Error("No data received from API");
@@ -134,7 +130,6 @@ const MovieInformationPage = () => {
           Axios.get(`/theater/getTheaterById/${screen.screen.theaterId}`)
         )
       );
-      console.log(response.data);
       interface ScreenWithFilms {
         screen: {
           showId: number;
@@ -144,7 +139,6 @@ const MovieInformationPage = () => {
         };
         films: Film[];
       }
-      console.log(response.data);
       const groupedData: TheaterScreenFilms = {};
       response.data.forEach((screen: ScreenWithFilms, index: number) => {
         const theaterName = theaterNamesResponses[index].data.name;
@@ -172,7 +166,6 @@ const MovieInformationPage = () => {
         groupedData[theaterName][screenNo].films.push(...filmsWithShowId);
       });
       setShowtimesByTheater(groupedData);
-      console.log(groupedData);
     } catch (error) {
       console.error("Error fetching showtimes:", error);
     }
@@ -189,7 +182,6 @@ const MovieInformationPage = () => {
   }, [id, fetchShowtimes]);
 
   const isPastTime = (showDate: string, showTime: string): boolean => {
-    console.log("Input Show Date:", showDate, "Input Show Time:", showTime);
     const timeParts = showTime.split(":");
     if (timeParts.length === 2) {
       showTime += ":00";
@@ -198,12 +190,7 @@ const MovieInformationPage = () => {
       return false;
     }
     const showDateTimeStr = `${showDate.slice(0, 10)}T${showTime}+07:00`;
-    console.log(showDateTimeStr);
     const showDateTime = new Date(showDateTimeStr);
-    console.log(showDateTime);
-
-    // Log the constructed date for debugging
-    console.log("Constructed Show DateTime:", showDateTime);
 
     // Validate the constructed Date object
     if (isNaN(showDateTime.getTime())) {
@@ -213,11 +200,9 @@ const MovieInformationPage = () => {
 
     // Get the current date and time
     const now = new Date();
-    console.log("Current DateTime:", now); // Log the ISO string for clarity
 
     // Compare the current date and time to the show date and time
     const result = now > showDateTime;
-    console.log("Comparison result:", result);
 
     // Return the result of the comparison
     return result;
@@ -234,7 +219,6 @@ const MovieInformationPage = () => {
       const datePart = film.date.split("T")[0];
       const showDateTimeStr = `${datePart}T${film.startTime}`;
       const showDateTime = new Date(showDateTimeStr);
-      console.log(showDateTime);
       const diff = showDateTime.getTime() - now.getTime();
       if (!isNaN(diff) && diff > 0 && diff < minDiff) {
         nearestTime = { date: film.date, startTime: film.startTime };
@@ -327,7 +311,6 @@ const MovieInformationPage = () => {
                     <AccordionPanel pb={4}>
                       {Object.entries(screens).map(
                         ([screenNo, screenDetails], screenIdx) => {
-                          console.log(screenNo, screenDetails);
                           const nearestFutureTime =
                             findNearestFutureTimeForScreen(screenDetails);
                           return (

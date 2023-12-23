@@ -19,6 +19,7 @@
     "@stripe/stripe-js": "^2.2.2",
     "@tanstack/react-query": "^4.35.3",
     "axios": "^1.5.1",
+    "js-cookie": "^3.0.5",
     "promptpay-qr": "^0.5.0",
     "qrcode.react": "^3.1.0",
     "react": "^18.2.0",
@@ -27,6 +28,7 @@
     "react-router-dom": "^6.16.0"
   },
   "devDependencies": {
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20.10.5",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",

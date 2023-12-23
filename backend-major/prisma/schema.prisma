@@ -73,6 +73,7 @@ model Seats {
   Reservation_Logs Reservation_Logs[]
   Screens          Screens            @relation(fields: [screenId], references: [screenId], onUpdate: Restrict, map: "Seats_Screens_screenId_fk")
   Seat_Types       Seat_Types         @relation(fields: [seatTypeId], references: [seatTypeId], onUpdate: Restrict, map: "Seats_Seat_Types_seatTypeId_fk")
+  Waiting_Logs     Waiting_Logs[]
 
   @@index([screenId], map: "Seats_Screens_screenId_fk")
   @@index([seatTypeId], map: "Seats_Seat_Types_seatTypeId_fk")
@@ -89,6 +90,7 @@ model Shows {
   Reservation_Logs Reservation_Logs[]
   Films            Films              @relation(fields: [filmId], references: [filmId], onUpdate: Restrict, map: "Shows_Films_filmId_fk")
   Screens          Screens            @relation(fields: [screenId], references: [screenId], onUpdate: Restrict, map: "Shows_Screens_screenId_fk")
+  Waiting_Logs     Waiting_Logs[]
 
   @@index([filmId], map: "Shows_Films_filmId_fk")
   @@index([screenId], map: "Shows_Screens_screenId_fk")
@@ -103,6 +105,18 @@ model Theaters {
   latitude     Decimal   @db.Decimal(20, 15)
   longitude    Decimal   @db.Decimal(20, 15)
   Screens      Screens[]
+}
+
+model Waiting_Logs {
+  waiting_id Int      @id @unique(map: "Waiting_Logs_pk") @default(autoincrement())
+  seatId     Int
+  showId     Int
+  startTime  DateTime @db.DateTime(0)
+  Seats      Seats    @relation(fields: [seatId], references: [seatId], onUpdate: Restrict, map: "Waiting_Logs_Seats_seatId_fk")
+  Shows      Shows    @relation(fields: [showId], references: [showId], onUpdate: Restrict, map: "Waiting_Logs_Shows_showId_fk")
+
+  @@index([seatId], map: "Waiting_Logs_Seats_seatId_fk")
+  @@index([showId], map: "Waiting_Logs_Shows_showId_fk")
 }
 
 enum Films_genre {

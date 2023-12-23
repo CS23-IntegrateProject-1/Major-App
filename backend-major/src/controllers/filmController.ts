@@ -48,7 +48,7 @@ export const getUpcomingFilm = async (req: Request, res: Response) => {
 export const getFilmById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    console.log(id);
+    // console.log(id);
     const filmId = parseInt(id);
     if (isNaN(filmId)) {
       return res.status(400).json({ error: "Invalid film ID" });
