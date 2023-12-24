@@ -2,9 +2,10 @@ import { Box, Button, Center, Text, Flex, Image } from "@chakra-ui/react";
 import { TextStyle } from "../../../theme/TextStyle";
 import { useLocation } from "react-router-dom";
 import { TypeOfSeat2 } from "../../../components/MovieSeat/TypeOfSeat2";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Axios } from "../../../AxiosInstance";
 import { loadStripe } from "@stripe/stripe-js";
+import Cookies from "js-cookie";
 
 interface theater {
   theaterId: number;
@@ -35,6 +36,54 @@ function PendingOrderPage() {
   const seatWithRow = queryParams.get("selectedSeats")?.split(",") || []; // Assuming seatIds are passed as a parameter
 
   const [theaterInfo, setTheaterInfo] = useState<theater>({} as theater);
+
+  const [timerExpired, setTimerExpired] = useState(false);
+
+  useEffect(() => {
+    const stayDuration = Cookies.get('stayDuration');
+    const currentTime = new Date().getTime();
+
+    if (!stayDuration) {
+      Cookies.set('stayDuration', currentTime.toString());
+    } else {
+      const startTime = parseInt(stayDuration);
+      const elapsedTime = currentTime - startTime;
+
+      if (elapsedTime > 1 * 60 * 1000) {
+        setTimerExpired(true);
+      }
+    }
+  }, []);
+
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimerExpired(true);
+    }, 1 * 60 * 1000); 
+    
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+  
+  const deleteReservation = useCallback(async () => {
+    try {
+      await Axios.delete(`/seat/delete/${reservationId}`);
+    } catch (error) {
+      console.error("Error deleting reservation:", error);
+    }
+  }, [reservationId]);
+  
+  const redirectToOtherPage = () => {
+    Cookies.remove('stayDuration');
+    window.history.back();
+  };
+  useEffect(() => {
+    if (timerExpired) {
+      deleteReservation();
+      redirectToOtherPage();
+    }
+  }, [timerExpired, deleteReservation]);
 
   useEffect(() => {
     const fetchTheaterInfo = async () => {
