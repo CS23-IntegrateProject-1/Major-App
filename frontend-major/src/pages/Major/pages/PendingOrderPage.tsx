@@ -71,7 +71,6 @@ function PendingOrderPage() {
         seatId: seatId,
         showId: showId,
         reservationId: reservationId,
-        paymentId: paymentId,
       });
 
       if (response.data.url) {
@@ -81,7 +80,7 @@ function PendingOrderPage() {
       console.error("Error creating payment session:", error);
     }
   };
-  const [paymentId, setPaymentId] = useState("");
+ 
 
   const handlePayment = async () => {
     try {
@@ -89,7 +88,6 @@ function PendingOrderPage() {
         reservationId: reservationId,
         paymentStatus: "pending",
       });
-      setPaymentId(response.data);
       if (response.data) {
         const stripe = await stripePromise;
         if (stripe) {

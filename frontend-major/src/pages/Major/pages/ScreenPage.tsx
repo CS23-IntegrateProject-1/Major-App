@@ -117,7 +117,7 @@ const ScreenPage: React.FC = () => {
       showid
     ) {
       const screenId = allShowDetails.show.Screens.screenId;
-      Axios.get(`/seat/getUniqueSeatTypeByScreenId/${screenId}/${showid}`)
+      Axios.get(`/seat/getUniqueSeatTypeByScreenId/${screenId}`)
         .then((response) => {
           setSeatType(response.data);
         })
@@ -303,6 +303,7 @@ const ScreenPage: React.FC = () => {
 
       const reserveSeat = async () => {
         try {
+          //console.log(seatIds);
           const response = await Axios.post(
             `/seat/reserveSeatForShow/${showid}`,
             {

@@ -45,10 +45,10 @@ const YOUR_DOMAIN = process.env.FRONTEND_URL ?? "";
 
 export const createPaymentSession = async (req: Request, res: Response) => {
   try {
-    const { totalPrice, selectSeat, seatId, showId, reservationId, paymentId } =
+    const { totalPrice, selectSeat, seatId, showId, reservationId } =
       req.body;
     //console.log(reservationId);
-    console.log(paymentId);
+    //console.log(paymentId);
     const sessionTimeout = Math.floor(Date.now() / 1000) + 60;
 
     const session = await stripe.checkout.sessions.create({
