@@ -20,18 +20,18 @@ export const createPayment = async (req: Request, res: Response) => {
     // console.log(reserveArray)
     // console.log(reservationId)
     const now = new Date();
-    const findPayment = await prisma.payments.findMany({
-      where: {
-        reservationId: {
-          in: reserveArray.map((id) => parseInt(id)),
-        },
-      },
-    });
-   //console.log(findPayment)
-    if (findPayment.length > 0) {
-      //return res.status(200).json(false)
-      return res.status(200).json(false)
-    }
+  //   const findPayment = await prisma.payments.findMany({
+  //     where: {
+  //       reservationId: {
+  //         in: reserveArray.map((id) => parseInt(id)),
+  //       },
+  //     },
+  //   });
+  //  //console.log(findPayment)
+  //   if (findPayment.length > 0) {
+  //     //return res.status(200).json(false)
+  //     return res.status(200).json(false)
+  //   }
     const payments = await Promise.all(
       reserveArray.map((reservationIdNum) => {
         return prisma.payments.create({

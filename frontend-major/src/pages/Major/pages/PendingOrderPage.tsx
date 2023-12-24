@@ -88,11 +88,11 @@ function PendingOrderPage() {
         reservationId: reservationId,
         paymentStatus: "pending",
       });
-      console.log(response.data)
-      if (response.data === false) {
-        alert("Someone is buying")
-        // return;
-      }
+      // console.log(response.data)
+      // if (response.data === false) {
+      //   alert("Someone is buying")
+      //   // return;
+      // }
       if (response.data.success === true) {
         const stripe = await stripePromise;
         if (stripe) {

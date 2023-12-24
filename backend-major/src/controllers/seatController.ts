@@ -354,10 +354,10 @@ try {
     },
   });
 
-  console.log("Existing reservation:", existingReservations);
+  //console.log("Existing reservation:", existingReservations);
 
   if (existingReservations != undefined) {
-    console.log("Exist");
+    //console.log("Exist");
     return res.status(200).json(false);
   }
   const reservations = await Promise.all(
