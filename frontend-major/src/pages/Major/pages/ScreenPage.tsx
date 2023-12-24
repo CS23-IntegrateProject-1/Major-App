@@ -310,7 +310,10 @@ const ScreenPage: React.FC = () => {
               seatId: seatIds,
             }
           );
-
+          if (response.data === false){
+            alert("Someone is buying")
+            return;
+          }
           navigate(
             `/PendingOrder?seatIds=${seatIds}&seatTypes=${selectedSeatTypes}&totalPrice=${totalPrice}&showid=${showid}&selectedSeats=${selectedSeats.join(
               ","

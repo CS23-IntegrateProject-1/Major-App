@@ -88,12 +88,21 @@ function PendingOrderPage() {
         reservationId: reservationId,
         paymentStatus: "pending",
       });
-      if (response.data) {
+      console.log(response.data)
+      if (response.data === false) {
+        alert("Someone is buying")
+        // return;
+      }
+      if (response.data.success === true) {
         const stripe = await stripePromise;
         if (stripe) {
           createPaymentSession();
         }
       }
+      //else{
+        // alert("Someone is buying")
+      //}
+
     } catch (error) {
       console.error("Error occurred during payment creation:", error);
     }
