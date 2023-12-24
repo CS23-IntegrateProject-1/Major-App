@@ -72,10 +72,10 @@ export const getUniqueSeatTypeByScreenId = async (
   res: Response
 ) => {
   try {
-    const { id, showid } = req.params;
+    const { id } = req.params;
     const screenId = parseInt(id);
-    const showId = parseInt(showid);
-    console.log(showId);
+    // const showId = parseInt(showid);
+    //console.log(showId);
     const screen = await prisma.screens.findUnique({
       where: {
         screenId: screenId,
@@ -292,8 +292,8 @@ export const getAllSeatType = async (req: Request, res: Response) => {
 export const addWaitingLog = async (req: Request, res: Response) => {
   try {
     const { showId, seatId } = req.body;
-    console.log(showId)
-    console.log(seatId)
+    // console.log(showId)
+    // console.log(seatId)
       const now = new Date();
       const seatIdArray = seatId.split(",").map((id) => parseInt(id));
       const findWaitingLog = await prisma.waiting_Logs.findMany({
@@ -335,10 +335,12 @@ export const reserveSeatForShow = async (req: Request, res: Response) => {
 try {
   const { showId } = req.params;
   const { seatId } = req.body;
+  // console.log(seatId);
   const showIdNum = parseInt(showId);
-  const seatIdArray = seatId.map((id) => parseInt(id));
-  console.log("Show ID:", showIdNum);
-  console.log("Seat IDs:", seatIdArray);
+ //const seatIdArray = seatId.map((id) => parseInt(id));
+ const seatIdArray = seatId.split(",").map((id) => parseInt(id))
+  // console.log("Show ID:", showIdNum);
+  // console.log("Seat IDs:", seatIdArray);
 
   const existingReservations = await prisma.reservation_Logs.findFirst({
     where: {
@@ -352,11 +354,11 @@ try {
     },
   });
 
-  console.log("Existing reservation:", existingReservations);
+  //console.log("Existing reservation:", existingReservations);
 
   if (existingReservations != undefined) {
-    console.log("Exist");
-    return res.status(200).json([existingReservations]);
+    //console.log("Exist");
+    return res.status(200).json(false);
   }
   const reservations = await Promise.all(
     seatIdArray.map((seatIdNum) => {
@@ -368,9 +370,9 @@ try {
       });
     })
   );
-  console.log(reservations);
-
-  res.status(200).json(reservations);
+  //console.log(reservations);
+  const reservationIds = reservations.map((reservation) => reservation.reservationId);
+  res.status(200).json(reservationIds);
 } catch (err) {
   const error = err as Error;
   res.status(500).json({ error: error.message });

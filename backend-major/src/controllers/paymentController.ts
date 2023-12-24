@@ -17,8 +17,21 @@ export const createPayment = async (req: Request, res: Response) => {
   try {
     const { reservationId, paymentStatus } = req.body;
     const reserveArray = reservationId.split(",");
+    // console.log(reserveArray)
+    // console.log(reservationId)
     const now = new Date();
-
+  //   const findPayment = await prisma.payments.findMany({
+  //     where: {
+  //       reservationId: {
+  //         in: reserveArray.map((id) => parseInt(id)),
+  //       },
+  //     },
+  //   });
+  //  //console.log(findPayment)
+  //   if (findPayment.length > 0) {
+  //     //return res.status(200).json(false)
+  //     return res.status(200).json(false)
+  //   }
     const payments = await Promise.all(
       reserveArray.map((reservationIdNum) => {
         return prisma.payments.create({
@@ -33,7 +46,7 @@ export const createPayment = async (req: Request, res: Response) => {
 
     const paymentIds = payments.map((payment) => payment.paymentId); // Extracting paymentIds
 
-    res.status(201).json(paymentIds); // Returning only paymentIds in an array
+    res.status(201).json({paymentIds, success: true}); // Returning only paymentIds in an array
   } catch (err) {
     const error = err as Error;
     res.status(500).json({ error: error.message });
@@ -45,10 +58,10 @@ const YOUR_DOMAIN = process.env.FRONTEND_URL ?? "";
 
 export const createPaymentSession = async (req: Request, res: Response) => {
   try {
-    const { totalPrice, selectSeat, seatId, showId, reservationId, paymentId } =
+    const { totalPrice, selectSeat, seatId, showId, reservationId } =
       req.body;
     //console.log(reservationId);
-    console.log(paymentId);
+    //console.log(paymentId);
     const sessionTimeout = Math.floor(Date.now() / 1000) + 60;
 
     const session = await stripe.checkout.sessions.create({

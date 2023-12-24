@@ -22,7 +22,7 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
     const formattedDate = formatDate(date);
     setSelectedDate(formattedDate); // Set the selected date
     onDateSelect(formattedDate);
-    console.log(formattedDate);
+    //console.log(formattedDate);
   };
 
   
@@ -39,7 +39,7 @@ export const DateCarousel: React.FC<DateCarouselProps> = ({ onDateSelect }) => {
       const year = today.getUTCFullYear();
       const month = (today.getUTCMonth() + 1).toString().padStart(2, "0");
       const day = today.getUTCDate().toString().padStart(2, "0");
-      console.log(day);
+      //console.log(day);
       return `${year}-${month}-${day}`;
     }
     const months: { [key: string]: string } = {
